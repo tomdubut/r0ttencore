@@ -100,6 +100,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - videos (array of media/YouTube: main aftermovie + clips, title each, reorderable)
 - line-up (array of **references to artist documents**, reorderable)
 - short text, credits = list of { role (dropdown: Photos / Video / Location), name, optional Instagram handle }, several people per role, reorderable. Location falls back to the venue if empty.
+- **Per-item credit**: each gallery photo, video and media slot (events and artists) has "Photo by" / "Video by": a dropdown of the document's Credits (stores the credit `_key`). Empty = automatic: the only person credited for that role, if there is exactly one. Shown as a `PHOTO — NAME ↗` caption under each slide / video and over the hero; one videographer for all videos → shown once under the main video. Decision (option A): names live in each event's Credits, no shared People list.
 - SEO: optional title, description, share image (fallbacks: title / short text / cover)
 
 **artist**

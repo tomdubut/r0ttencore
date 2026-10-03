@@ -8,7 +8,8 @@ import { defineQuery } from 'groq';
 const IMAGE = `{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }`;
 
 // One "media" object (Image | YouTube video).
-const MEDIA = `{ kind, image ${IMAGE}, youtubeUrl, title, poster ${IMAGE} }`;
+// `by` = _key of the credited person in the document's Credits list ("Photo by" in the Studio).
+const MEDIA = `{ kind, image ${IMAGE}, youtubeUrl, title, poster ${IMAGE}, by }`;
 
 const CREDITS = `credits[]{ _key, role, name, instagram }`;
 
@@ -19,8 +20,8 @@ export const EVENTS_QUERY = defineQuery(`
     "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,
     cover ${IMAGE},
     heroMedia ${MEDIA},
-    gallery[] ${IMAGE},
-    videos[]{ _key, title, url },
+    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },
+    videos[]{ _key, title, url, by },
     "lineup": lineup[]-> ${ARTIST_SUMMARY},
     ${CREDITS}
   }

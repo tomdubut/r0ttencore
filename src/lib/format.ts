@@ -35,10 +35,3 @@ export function alternate(first: 'dark' | 'light', count: number): ('dark' | 'li
 export function creditsFor(event: EventDoc, role: CreditRole): Credit[] {
   return event.credits.filter((c) => c.role === role);
 }
-
-/** "NAME A · NAME B" for a role, or "" if nobody is credited. */
-export function creditLine(event: EventDoc, role: CreditRole): string {
-  return creditsFor(event, role)
-    .map((c) => c.name)
-    .join(' · ');
-}
