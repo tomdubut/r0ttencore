@@ -13,7 +13,7 @@ Decisions and design rules live in `/CLAUDE.md`.
 - Self-hosted fonts via Fontsource (Anton, Archivo Black, Archivo, JetBrains Mono), with preload for the display fonts.
 - Design system: tokens, type scale (`clamp()` from 390 → 1440), grid, pills, buttons, grain overlay, arrows, play button, section dark/light variants.
 - Shared components: `Logo` (single swap point for the future SVG), `Header` (desktop and mobile with menu overlay, NEXT pill shown only if an upcoming event exists), `Footer` (from homepage-D-hybrid + mobile version), `GenreTicker`, `VideoFacade`, `ResponsiveImage`.
-- 4 page templates with `[PLACEHOLDER]` content from a local mock data file shaped like the future Sanity data: `/`, `/events`, `/events/[slug]`, `/about`. Also a 404 page.
+- 4 page templates (every photo/video section built with placeholder media, ready for Sanity) with `[PLACEHOLDER]` content from a local mock data file shaped like the future Sanity data: `/`, `/events`, `/events/[slug]`, `/about`. Also a 404 page.
 - Events listing city filter: progressive enhancement (all events visible without JS).
 - `prefers-reduced-motion` handling from the start.
 - Cloudflare: Worker with static assets connected to the GitHub repo (Workers Builds), production = `main`, preview URLs for branches. First deploy on the `*.workers.dev` URL.
@@ -31,7 +31,8 @@ Decisions and design rules live in `/CLAUDE.md`.
 - Media library plugin (search, tags, usage). Check compatibility with the current Studio version first.
 - Deploy schema; GROQ queries; typed data layer; build-time fetch (published content only, CDN API).
 - Replace mock data on all pages; image pipeline via `@sanity/image-url` (format auto, srcset, hotspot/crop respected).
-- Hero loop: stored in Sanity, copied into the build output at build time so it is served from Cloudflare (to be confirmed, see Open questions).
+- Reusable `media` field (Image | YouTube video) used by every photo/video slot.
+- Studio interface in English.
 
 **Done when**: changing a field in Studio and rebuilding updates the preview site.
 
@@ -44,7 +45,7 @@ Decisions and design rules live in `/CLAUDE.md`.
 - Aftermovies and clips on YouTube/Vimeo, linked in Sanity.
 - Tokyo event (03) as `upcoming`, with ticket link when available.
 - About page content from the deck; Formats photos; Network photo (final resolution).
-- Final logo (SVG) and hero loop (desktop + vertical + poster, < 3 MB each).
+- Final logo (SVG or high-res) and homepage hero media.
 
 **Done when**: no `[PLACEHOLDER]` text remains on any public page (or every remaining one is approved).
 
@@ -69,20 +70,32 @@ Decisions and design rules live in `/CLAUDE.md`.
 
 ---
 
+## Decisions taken (session 1 answers)
+
+- **Homepage**: mockup A, but the hero is a media slot (image first, video later) and sections alternate dark/light like the other pages.
+- **Mobile**: `homepage-D-mobile.html` is not used. Mobile = same content as desktop, stacked.
+- **Logo**: ASCII cup (`design-reference/assets/logo-ascii-cup_v2.png` for now, better file coming) **plus** the "r0t" text wordmark.
+- **Dark/light alternation on every page.**
+- **Mockup copy not in the deck is sample text, not approved** → `[PLACEHOLDER]` or editable in Sanity.
+- **Videos: all on YouTube**, linked from Sanity. Every media slot lets the editor choose Image or YouTube video.
+- **Sanity Studio in English.**
+
+## Recommendation: upcoming event page (Q5, awaiting OK)
+
+Same E2 template, switched by the event's status:
+- **Hero**: left panel identical (number, name, city · date · venue, line-up). Right panel shows `heroMedia`: the flyer, or a YouTube teaser. A big **TICKETS ↗** pill under the meta row; if no ticket link yet, a non-clickable "TICKETS SOON" pill (wording to approve).
+- **Shown**: "the night" text (if filled), line-up, MORE EVENTS.
+- **Hidden** while upcoming: PHOTOS, VIDEOS, CREDITS (each section is hidden whenever it is empty, on any event).
+- **After the night**: the editor sets status to *past* and adds photos/videos; no code change.
+- **Safety net**: a free daily scheduled rebuild (GitHub Actions cron → Cloudflare deploy hook) plus a build rule: an "upcoming" event whose date has passed no longer appears in the NEXT pill. Prevents "NEXT: TOKYO" staying online after the event.
+- Optional later: "Add to calendar" (.ics file generated at build).
+
 ## Open questions
 
-To answer before or during the phase that needs them.
-
-1. **Homepage hero video and ticker** (phase 1): the chosen homepage A has no video hero and no genre ticker; both exist only in homepage D. Where should they appear on A? (Options: video loop in place of the ASCII cup or as the hero background; ticker between the hero and the NEXT EVENT strip.)
-2. **Homepage mobile** (phase 1): the only mobile mockup is the dark homepage D. Should mobile A stay light (adapting A's sections), or use D's dark video hero on mobile?
-3. **Homepage A header** (phase 1): A's header is the text wordmark + nav + "2026", with no logo image and no NEXT pill, unlike the other pages. Use A's header as drawn, or the shared header (logo + nav + NEXT pill)?
-4. **Dark/light alternation on homepage A** (phase 1): A's "ARCHIVE" and "WHAT IS r0t?" sections are both light, which breaks the alternation rule. Keep A as drawn, or make one of them dark?
-5. **Upcoming event page** (phase 1): E2 is designed for a past event (photos, videos, credits). What does `/events/<tokyo>` show before the event? Proposal: same hero with line-up + TICKETS button instead of the vertical aftermovie, and photo/video sections hidden.
-6. **Aftermovie formats** (phase 2): E2 shows a vertical 9:16 aftermovie in the hero and a 16:9 aftermovie in VIDEOS. Do we need two aftermovie fields (vertical + horizontal)? If there is only one, what goes in the hero?
-7. **Clip durations** (phase 2): E2 shows durations next to clips. A static site can't read them from YouTube/Vimeo without an API key, so either an optional manual field or drop them.
-8. **NEXT pill target** (phase 1): link to the upcoming event page, or straight to the ticket link? (Mobile footer says "NEXT: TOKYO — TICKETS ↗".)
-9. **Hero loop storage** (phase 2): the brief stores it in `siteSettings` (Sanity file) but also says videos are never uploaded to Sanity. Proposal: allow this one exception in Sanity (editable), copied into the static build at build time so visitors download it from Cloudflare, not Sanity's bandwidth quota.
-10. **Mockup UI copy not in the deck** (phase 1): "NEVER MISS THE NEXT ONE.", "THE NIGHT", "SCROLL — ARCHIVE", "PLAYING — REEL 2026", the empty-state lines ("Beijing is next on the map…"). Are these approved? Proposal: short UI labels approved as drawn; sentences become editable in Sanity.
-11. **About copy vs deck** (phase 2): the deck's NETWORK slide has a 4th paragraph and the Formats card is "CREATIVE COLLABORATIONS"; the mockup has 3 paragraphs and "COLLABORATIONS". Which is right? ("Launching in 2026." from the deck is outdated and is left out.)
-12. **Body font** (phase 1): the deck's body text is Public Sans Bold; the mockups use Archivo. Brief says Archivo: confirm.
-13. **Studio location** (phase 2): standalone Studio on `r0t.sanity.studio` (simplest, keeps site static) vs embedded at `/studio` (needs client-side app in the site). Recommendation: standalone.
+- **H1. Homepage hero video on YouTube**: fine for click-to-play videos, but a poor fit for an autoplaying background loop. The YouTube player adds ~0.5–1 MB of scripts (puts Lighthouse 90+ at risk), shows YouTube branding/controls on load, and often won't autoplay on phones in low-power mode. Recommendation: hero = image now; when you want a video, either (a) a click-to-play YouTube reel, or (b) the single exception of a small muted MP4 (< 3 MB) uploaded in the hero media field. Decide when the video exists.
+- **H2. NEXT pill target** (Q8, unanswered): the upcoming event page (recommended: line-up + tickets in one place) or the ticket link directly?
+- **H3. Mobile header**: logo + r0t + 3 nav items + NEXT pill don't fit in 390px. Recommendation: logo + NEXT pill + menu button opening a full-screen menu (dark, Anton nav items).
+- **H4. Header logo**: cup image + "r0t" wordmark side by side on every page (recommended), or cup in the header and "r0t" only as the big hero text?
+- **H5. About copy vs deck**: the deck's NETWORK slide has a 4th paragraph and says "CREATIVE COLLABORATIONS"; the mockup has 3 paragraphs and "COLLABORATIONS". Recommendation: follow the deck (it is the approved copy). "Launching in 2026." is left out as outdated.
+- **H6. Body font**: deck body text is Public Sans Bold, mockups use Archivo. Recommendation: Archivo, as briefed.
+- **H7. Studio location**: recommendation: standalone Studio hosted by Sanity (`<name>.sanity.studio`), keeps the site 100% static.

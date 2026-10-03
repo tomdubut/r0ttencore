@@ -20,22 +20,24 @@ Phase plan: `docs/build-plan.md`. Design source: `design-reference/` (start with
 | Content | **Sanity**. Project `r0ttencore`, ID `suitidnh`, dataset `production` (exists, ACL **public** → never store private data in it). |
 | Hosting | **Cloudflare free plan, Workers with static assets** (Cloudflare's current recommendation for new projects; Pages still works). Git-connected Workers Builds → preview URL per branch. Only a minimal `wrangler.jsonc` pointing at `./dist`; the build output stays plain static files, portable to any host. |
 | Rebuild | Sanity webhook (on publish) → Workers Builds **Deploy Hook** URL (production branch). |
-| Videos | YouTube or Vimeo embeds only, loaded on click (facade). **Never** upload event videos to Sanity or the repo. Only exception: homepage hero loop (see §5). |
+| Videos | **All videos on YouTube**, linked from Sanity (URL field). Click-to-play embeds use a facade (poster + button; iframe only on click, `youtube-nocookie.com`). **Never** upload videos to the repo. Hero background video: see open question H1 in `docs/build-plan.md`. |
+| Media slots | Every place that shows a photo or a video uses one **"media" field in Sanity: the editor picks Image or YouTube video**, and the site renders whichever was chosen. Changing a photo to a video (or back) never needs code. |
+| Sanity Studio | Interface in **English**. |
 | Backend | None. No database, no Supabase, no accounts, no forms. Contact = `mailto:` link. |
 | DNS | Email is hosted on **Hostinger**. When connecting the domain, **never touch MX, SPF/DKIM/DMARC TXT, or any mail-related record**. |
 | Fonts | Self-hosted via Fontsource: Anton, Archivo Black, Archivo (400/600/700/800), JetBrains Mono (400/600). No Google Fonts CDN. |
-| Logo | Low-res PNG placeholder now. Rendered through **one component** (`Logo`) so it can be swapped for an SVG in one place. |
+| Logo | ASCII cup. Placeholder now: `design-reference/assets/logo-ascii-cup_v2.png` (better one coming from Tom). Rendered through **one component** (`Logo`) so it can be swapped in one place. The **"r0t" text wordmark (Archivo Black) stays** alongside the cup. |
 
 ## 3. Page → mockup mapping
 
 | Page | URL | Mockup (`design-reference/pages/`) |
 |---|---|---|
-| Homepage | `/` | `homepage-A-archive.html` (light, closest to the deck) |
+| Homepage | `/` | `homepage-A-archive.html`, **modified**: hero = media slot (image now, video later); sections alternate dark/light like the other pages |
 | Events listing | `/events` | `events-listing-L1.html` |
 | Event page | `/events/<slug>` | `event-page-E2.html` |
 | About | `/about` | `about-AB1.html` |
 | Footer (all pages) | — | footer of `homepage-D-hybrid.html` **only** |
-| Mobile (all pages) | — | `homepage-D-mobile.html`: header = logo + NEXT pill + menu button; stacked sections; mobile footer. Adapt to each page's own design. |
+| Mobile (all pages) | — | **No mobile mockup is used** (`homepage-D-mobile.html` is ignored). Mobile shows **the same content as desktop**, stacked in a single column, with the same dark/light sections. |
 | Contact | — | No page: `CONTACT` nav item → footer contact block (`#contact`) / `mailto:`. |
 
 Mockups are fixed-width (1440 desktop / 390 mobile) with absolute positioning: **rebuild as responsive flex/grid**, never copy pixel positions. Ignore canvas tags (`<x-dc>`, `<helmet>`, `<sc-for>`, `<sc-if>`, `text/x-dc` scripts).
@@ -72,24 +74,33 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 **Texture**: inline SVG `feTurbulence` grain overlay (`mix-blend-mode: overlay`, opacity 0.25–0.55) on media/heroes, plus `texture-grain-swoosh.webp` / `texture-grain-splash.webp` (inverted on dark, low opacity). Decorative only (`aria-hidden`, empty `alt`).
 
-**Recurring elements**: ↘ / ↗ arrows on links, the diagonal arrow SVG (`M5 5l14 14M19 8v11H8`), round outlined play buttons, big title + mono counter on a bottom-ruled row, dark/light section alternation.
+**Recurring elements**: ↘ / ↗ arrows on links, the diagonal arrow SVG (`M5 5l14 14M19 8v11H8`), round outlined play buttons, big title + mono counter on a bottom-ruled row.
 
-**Header**: logo + EVENTS / ABOUT / CONTACT + `NEXT: <CITY> ↗` pill (**only when an upcoming event exists**). Transparent over dark heroes. Active nav item underlined. Mobile: logo + NEXT pill + menu button (the menu overlay has no mockup: design it in the same language).
+**Dark/light alternation (all pages, including the homepage)**: consecutive sections always alternate dark (`#101010`/`#141414`) and light (`#EFEFEB`). The footer is black (`#000`) with its top rule.
+
+**Header**: logo + EVENTS / ABOUT / CONTACT + `NEXT: <CITY> ↗` pill (**only when an upcoming event exists**). Transparent over dark heroes. Active nav item underlined. Mobile layout: to be confirmed (see open question H3 in `docs/build-plan.md`).
 
 **Motion**: subtle only (genre ticker scrolling, hover states, fade-ins). Everything respects `prefers-reduced-motion` (ticker static, no fades).
 
 ## 5. Content model (Sanity) — draft, to refine in phase 2
 
+**media** (reusable object, used for every photo/video slot): `type` radio = **Image** | **YouTube video**. Image → image (hotspot/crop) + alt text (required). YouTube → URL (validated as YouTube) + optional poster image + alt/label. Only the fields of the chosen type are shown. The site renders an image, or a click-to-play YouTube facade.
+
 **event**
 - title, slug (from title), number (string, e.g. `02`), city (dropdown: Paris / Tokyo / Beijing), date, venue, status (dropdown: upcoming / past), ticket link (URL)
-- coverImage (required, with alt text), gallery (array of images with alt, drag to reorder)
-- aftermovie link (YouTube/Vimeo), extra clip links (title + URL), line-up (array: artist name + Instagram handle, reorderable)
+- coverImage (required image + alt: used for cards, lists and share cards)
+- heroMedia (media: right-hand poster panel of E2; flyer/teaser before the event, aftermovie after)
+- gallery (array of images with alt, drag to reorder)
+- videos (array of media/YouTube: main aftermovie + clips, title each, reorderable)
+- line-up (array: artist name + Instagram handle, reorderable)
 - short text, credits (photographer, videographer)
 - SEO: optional title, description, share image (fallbacks: title / short text / cover)
 
-**siteSettings** (singleton): contact email, Instagram handle, genre list (ticker), homepage hero video loop (desktop + vertical mobile + poster), default share image.
+**homePage** (singleton): heroMedia (media), the homepage texts (not in the deck → editable).
 
-**aboutPage** (singleton): the About sections (hero texts, The Sounds text + genre cloud, Formats ×4 = photo + label + text, Network text + photo).
+**siteSettings** (singleton): contact email, Instagram handle, genre list (ticker / The Sounds), default share image, short UI sentences that are not in the deck (e.g. listing CTA, empty states).
+
+**aboutPage** (singleton): the About sections (hero texts, The Sounds text + genre cloud, Formats ×4 = media + label + text, Network text + media).
 
 **Studio rules**: clear labels, help text on every field, required fields validated, dropdowns for city/status, singletons cannot be duplicated/deleted, media library plugin (search, tags, see where an image is used). The editor must be simple for a non-technical person.
 
@@ -97,6 +108,8 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 - All copy comes **from the deck (`design-reference/brand/r0t-deck.pdf`) or from Sanity**. Never invent text, artist names, dates, venues, numbers or durations.
 - Missing content → visible `[PLACEHOLDER]` text in brackets, never plausible fake content.
+- Copy that appears in the mockups but not in the deck ("NEVER MISS THE NEXT ONE.", "THE NIGHT", "SCROLL — ARCHIVE", "PLAYING — REEL 2026", the empty-state lines…) is **sample text, not approved**: render it as `[PLACEHOLDER]` or make it an editable Sanity field.
+- Phase 1 builds every photo/video section empty-ready (placeholder media); real photos and videos are added by Tom via Sanity later.
 - Anything the team might want to change must be editable in Sanity without code.
 - Counts, "NEXT: <CITY>", years and "LATEST — 02" are computed from Sanity data, never hard-coded.
 
@@ -117,4 +130,4 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 ## 9. Open questions (remove when answered)
 
-See the "Open questions" section of `docs/build-plan.md`.
+See "Open questions" in `docs/build-plan.md` (H1–H7) and the upcoming-event-page recommendation.
