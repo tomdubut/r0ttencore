@@ -1,0 +1,333 @@
+---
+/* About — mockup about-AB1.html, copy from the deck (deck wins over the mockup). */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Media from '../components/Media.astro';
+import Grain from '../components/Grain.astro';
+import Arrow from '../components/icons/Arrow.astro';
+import { getAboutPage } from '../lib/content';
+
+const about = await getAboutPage();
+---
+
+<BaseLayout title="About" description="[PLACEHOLDER — about page description]">
+  <Header slot="header" active="about" />
+
+  <!-- 1. What is r0t? (dark) -->
+  <section class="intro theme-dark" aria-labelledby="about-title">
+    <img class="intro-texture" src="/textures/texture-grain-swoosh.webp" alt="" decoding="async" />
+    <div class="wrap intro-inner">
+      <h1 id="about-title" class="display intro-title">WHAT IS<br />r0t?</h1>
+      <div class="intro-text">
+        <Arrow size={52} stroke={1.4} />
+        <div class="lead">
+          {about.intro.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+      <p class="display intro-cities">{about.cities}</p>
+    </div>
+  </section>
+
+  <!-- 2. The sounds (light) -->
+  <section class="section sounds theme-light" aria-labelledby="sounds-title">
+    <img class="sounds-texture" src="/textures/texture-grain-splash.webp" alt="" loading="lazy" decoding="async" />
+    <div class="wrap sounds-inner">
+      <h2 id="sounds-title" class="display sounds-title">THE SOUNDS</h2>
+      <ul class="cloud" aria-label="Genres" data-reveal>
+        {about.genreCloud.map((g) => <li class={`g-${g.size}`}>{g.name}</li>)}
+      </ul>
+      <div class="lead sounds-text" data-reveal>
+        {about.soundsText.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Formats (dark) -->
+  <section class="section formats theme-dark" aria-labelledby="formats-title">
+    <Grain opacity={0.25} />
+    <div class="wrap formats-inner">
+      <h2 id="formats-title" class="display formats-title">FORMATS</h2>
+      <ul class="format-grid">
+        {
+          about.formats.map((f, i) => (
+            <li class="format" data-reveal>
+              <Media
+                media={f.media}
+                label="[PHOTO]"
+                labelPosition="bottom"
+                seed={i + 3}
+                class="format-media"
+                sizes="(min-width: 1100px) 25vw, (min-width: 600px) 50vw, 100vw"
+              />
+              <h3 class="format-label">{f.label}</h3>
+              {f.text.length > 1 ? (
+                <ul class="format-text format-list">
+                  {f.text.map((t) => (
+                    <li>{t}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="format-text">{f.text[0]}</p>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. Network (light) -->
+  <section class="section network theme-light" aria-labelledby="network-title">
+    <div class="wrap network-inner">
+      <h2 id="network-title" class="display network-title">NETWORK</h2>
+      <Media media={about.networkMedia} label="[NETWORK PHOTO]" class="network-media" sizes="(min-width: 900px) 40vw, 100vw" />
+      <div class="network-text" data-reveal>
+        {about.networkText.map((p) => <p>{p}</p>)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ---------- Intro ---------- */
+  .intro {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro-texture {
+    position: absolute;
+    right: -200px;
+    top: 60px;
+    width: min(1100px, 160vw);
+    max-width: none;
+    filter: invert(1);
+    opacity: 0.2;
+    pointer-events: none;
+  }
+
+  .intro-inner {
+    position: relative;
+    display: grid;
+    gap: 36px;
+    padding-top: clamp(48px, 5.5vw, 78px);
+    padding-bottom: clamp(40px, 4vw, 56px);
+  }
+
+  .intro-title {
+    font-size: clamp(96px, calc(96px + 154 * (100vw - 390px) / 1050), 250px);
+    line-height: 0.84;
+  }
+
+  .intro-text {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .intro-cities {
+    font-size: clamp(30px, calc(30px + 26 * (100vw - 390px) / 1050), 56px);
+    line-height: 1;
+    margin-top: clamp(16px, 4vw, 56px);
+  }
+
+  @media (min-width: 900px) {
+    .intro-inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+    }
+
+    .intro-title {
+      grid-column: 1 / span 7;
+      font-size: min(250px, 15.5vw);
+      white-space: nowrap;
+    }
+
+    .intro-text {
+      grid-column: 8 / span 5;
+      padding-top: 80px;
+      gap: 28px;
+    }
+
+    .intro-cities {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ---------- The sounds ---------- */
+  .sounds-texture {
+    position: absolute;
+    left: -80px;
+    top: -40px;
+    width: min(760px, 160vw);
+    max-width: none;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .sounds-inner {
+    position: relative;
+    display: grid;
+    gap: 36px;
+  }
+
+  .sounds-title {
+    font-size: var(--fs-title);
+    line-height: 0.85;
+  }
+
+  .cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 16px;
+    padding: clamp(20px, 2.2vw, 30px) clamp(20px, 2.2vw, 32px);
+    border-radius: var(--radius-box);
+    background: var(--black);
+    color: var(--bg-light);
+    font-family: var(--font-heavy);
+    line-height: 1.15;
+  }
+
+  .g-s {
+    font-size: clamp(13px, 1.25vw, 18px);
+  }
+  .g-m {
+    font-size: clamp(19px, 2vw, 29px);
+  }
+  .g-l {
+    font-size: clamp(26px, 3vw, 44px);
+  }
+  .g-xl {
+    font-size: clamp(30px, 3.6vw, 53px);
+  }
+
+  @media (min-width: 900px) {
+    .sounds-inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      row-gap: 80px;
+    }
+
+    .sounds-title {
+      grid-column: 1 / -1;
+      justify-self: end;
+    }
+
+    .cloud {
+      grid-column: 1 / span 6;
+      align-self: start;
+    }
+
+    .sounds-text {
+      grid-column: 8 / span 5;
+    }
+  }
+
+  /* ---------- Formats ---------- */
+  .formats-inner {
+    position: relative;
+  }
+
+  .formats-title {
+    font-size: var(--fs-title);
+    line-height: 0.85;
+  }
+
+  .format-grid {
+    display: grid;
+    gap: 40px 24px;
+    margin-top: clamp(32px, 3.9vw, 56px);
+  }
+
+  @media (min-width: 600px) {
+    .format-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .format-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .format {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .format :global(.format-media) {
+    height: 240px;
+  }
+
+  .format-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+    padding: 8px 20px;
+    border-radius: var(--radius-pill);
+    background: var(--black);
+    font-family: var(--font-heavy);
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .format-text {
+    padding: 0 8px;
+    font-family: var(--font-heavy);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted-on-dark-2);
+  }
+
+  /* ---------- Network ---------- */
+  .network-inner {
+    display: grid;
+    gap: 32px;
+  }
+
+  .network-title {
+    font-size: var(--fs-title);
+    line-height: 0.85;
+  }
+
+  .network :global(.network-media img) {
+    filter: grayscale(1);
+  }
+
+  .network-text {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    font-weight: 800;
+    font-size: clamp(19px, calc(19px + 5 * (100vw - 390px) / 1050), 24px);
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+  }
+
+  @media (min-width: 900px) {
+    .network-inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      row-gap: 48px;
+    }
+
+    .network-title {
+      grid-column: span 7;
+      align-self: end;
+    }
+
+    .network-inner :global(.network-media) {
+      grid-column: span 5;
+    }
+
+    .network-text {
+      grid-column: 3 / span 8;
+    }
+  }
+</style>

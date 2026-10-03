@@ -1,0 +1,191 @@
+---
+/*
+ * One event in a list.
+ * variant "archive" (homepage A): NO · NAME · CITY · DATE · 3 thumbnails · ↘
+ * variant "index"   (events L1):  NO · CITY · NAME · DATE · media info · ↘
+ * Mobile: thumbnail + "02 · PARIS · DATE" + name + arrow (stacked).
+ */
+import Arrow from './icons/Arrow.astro';
+import Media from './Media.astro';
+import type { EventDoc } from '../lib/types';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  event: EventDoc;
+  variant?: 'archive' | 'index';
+}
+
+const { event, variant = 'archive' } = Astro.props;
+const seed = Number(event.number) || 0;
+const thumbs = event.gallery.slice(0, 3);
+const mediaInfo = [event.videos.length > 0 && '▶ AFTERMOVIE', event.gallery.length > 0 && 'PHOTOS']
+  .filter(Boolean)
+  .join(' · ');
+---
+
+<a
+  class:list={['event-row', `event-row--${variant}`]}
+  href={`/events/${event.slug}`}
+  data-city={event.city}
+>
+  <Media media={event.cover} seed={seed} class="row-thumb-m" sizes="84px" />
+  <span class="mono row-no">{event.number}</span>
+  <span class="row-city">{event.city.toUpperCase()}</span>
+  <span class="display row-name">{event.title}</span>
+  <span class="mono row-date">{formatDate(event.date)}</span>
+  <span class="mono row-meta-m muted">{event.number} · {event.city.toUpperCase()} · {formatDate(event.date)}</span>
+  {
+    variant === 'archive' ? (
+      <span class="row-thumbs" aria-hidden="true">
+        {thumbs.map((g, i) => (
+          <Media
+            media={g.image ? { kind: 'image', image: g.image, alt: '' } : null}
+            seed={seed + i * 3}
+            class="row-thumb"
+            sizes="68px"
+          />
+        ))}
+      </span>
+    ) : (
+      <span class="mono row-media muted">{mediaInfo}</span>
+    )
+  }
+  <Arrow class="row-arrow" />
+</a>
+
+<style>
+  .event-row {
+    display: grid;
+    grid-template-columns: 84px 1fr auto;
+    grid-template-areas:
+      'thumb meta arrow'
+      'thumb name arrow';
+    align-items: center;
+    column-gap: 14px;
+    row-gap: 6px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    transition: opacity 0.2s var(--ease);
+  }
+
+  .event-row:hover {
+    opacity: 0.7;
+  }
+
+  .event-row :global(.row-thumb-m) {
+    grid-area: thumb;
+    width: 84px;
+    height: 104px;
+  }
+
+  .row-meta-m {
+    grid-area: meta;
+    align-self: end;
+    letter-spacing: 0;
+  }
+
+  .row-name {
+    grid-area: name;
+    align-self: start;
+    font-size: var(--fs-display-s);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .event-row :global(.row-arrow) {
+    grid-area: arrow;
+    width: 22px;
+    height: 22px;
+  }
+
+  .row-no,
+  .row-city,
+  .row-date,
+  .row-thumbs,
+  .row-media {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .event-row {
+      column-gap: var(--col-gap);
+      padding: 0;
+      row-gap: 0;
+    }
+
+    .event-row--archive {
+      grid-template-columns: 80px minmax(0, 1fr) 140px 160px 216px 40px;
+      grid-template-areas: 'no name city date thumbs arrow';
+      height: 120px;
+    }
+
+    .event-row--index {
+      grid-template-columns: 80px 120px minmax(0, 1fr) 160px 200px 40px;
+      grid-template-areas: 'no city name date media arrow';
+      height: 168px;
+    }
+
+    .event-row :global(.row-thumb-m),
+    .row-meta-m {
+      display: none;
+    }
+
+    .row-no,
+    .row-city,
+    .row-date,
+    .row-thumbs,
+    .row-media {
+      display: block;
+    }
+
+    .row-no {
+      grid-area: no;
+      font-size: 14px;
+    }
+
+    .row-city {
+      grid-area: city;
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+
+    .row-name {
+      align-self: center;
+    }
+
+    .event-row--archive .row-name {
+      font-size: var(--fs-display-m);
+    }
+
+    .event-row--index .row-name {
+      font-size: clamp(56px, 5.6vw, 80px);
+    }
+
+    .row-date {
+      grid-area: date;
+      font-size: 14px;
+    }
+
+    .row-thumbs {
+      grid-area: thumbs;
+      display: flex;
+      gap: 6px;
+    }
+
+    .row-thumbs :global(.row-thumb) {
+      width: 68px;
+      height: 84px;
+    }
+
+    .row-media {
+      grid-area: media;
+      letter-spacing: 0;
+    }
+
+    .event-row :global(.row-arrow) {
+      width: 28px;
+      height: 28px;
+    }
+  }
+</style>

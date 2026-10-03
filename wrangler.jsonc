@@ -1,0 +1,11 @@
+// Cloudflare Workers with static assets.
+// This is the only host-specific file: it just tells Cloudflare to serve ./dist as static files.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "r0ttencore",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

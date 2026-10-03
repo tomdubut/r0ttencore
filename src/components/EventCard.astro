@@ -1,0 +1,98 @@
+---
+/*
+ * "MORE EVENTS" card on the event page (E2).
+ * Past event: cover media + "01 · PARIS · DATE" + name ↘.
+ * Upcoming event: black card with the logo + "03 · COMING" / "TOKYO · DATE" / "NEXT UP ↗".
+ */
+import Logo from './Logo.astro';
+import Media from './Media.astro';
+import Grain from './Grain.astro';
+import type { EventDoc } from '../lib/types';
+import { formatDate } from '../lib/format';
+import { isEventUpcoming } from '../lib/content';
+
+interface Props {
+  event: EventDoc;
+}
+
+const { event } = Astro.props;
+const upcoming = isEventUpcoming(event);
+---
+
+<a class:list={['event-card', upcoming && 'event-card--next theme-ink']} href={`/events/${event.slug}`}>
+  {
+    upcoming ? (
+      <>
+        <span class="card-logo" aria-hidden="true">
+          <Logo height={400} heightMobile={260} />
+        </span>
+        <span class="mono card-top">{event.number} · COMING</span>
+        <span class="card-bottom">
+          <span class="mono">
+            {event.city.toUpperCase()} · {formatDate(event.date)}
+          </span>
+          <span class="display card-name">NEXT UP ↗</span>
+        </span>
+      </>
+    ) : (
+      <>
+        <Media media={event.cover} seed={Number(event.number)} class="card-media" sizes="(min-width: 900px) 50vw, 100vw" />
+        <Grain opacity={0.3} />
+        <span class="card-bottom">
+          <span class="mono">
+            {event.number} · {event.city.toUpperCase()} · {formatDate(event.date)}
+          </span>
+          <span class="display card-name">{event.title} ↘</span>
+        </span>
+      </>
+    )
+  }
+</a>
+
+<style>
+  .event-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: clamp(320px, calc(320px + 140 * (100vw - 390px) / 1050), 460px);
+    padding: clamp(16px, 1.7vw, 24px);
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--bg-light);
+  }
+
+  .event-card :global(.card-media) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .card-logo {
+    position: absolute;
+    right: clamp(16px, 3vw, 40px);
+    top: clamp(16px, 2vw, 30px);
+    opacity: 0.9;
+    --logo-filter: invert(1);
+  }
+
+  .card-top,
+  .card-bottom {
+    position: relative;
+  }
+
+  .card-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .card-name {
+    font-size: clamp(40px, calc(40px + 24 * (100vw - 390px) / 1050), 64px);
+    line-height: 1;
+  }
+
+  .event-card:hover .card-name {
+    opacity: 0.75;
+  }
+</style>

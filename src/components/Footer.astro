@@ -1,0 +1,187 @@
+---
+/*
+ * Footer on every page — from homepage-D-hybrid.html (desktop), stacked on mobile.
+ * Holds the contact block (#contact), target of the CONTACT nav link.
+ */
+import Logo from './Logo.astro';
+import Pill from './Pill.astro';
+import { getSettings, getUpcomingEvent } from '../lib/content';
+import { instagramUrl } from '../lib/format';
+
+const settings = await getSettings();
+const next = await getUpcomingEvent();
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer theme-black" id="contact">
+  <div class="wrap">
+    <div class="footer-grid">
+      <a href="/" class="footer-logo" aria-label="r0t — home">
+        <Logo height={220} heightMobile={150} />
+      </a>
+
+      <div class="footer-contact">
+        <h2 class="mono muted">CONTACT / BOOKINGS</h2>
+        <a class="footer-email display" href={`mailto:${settings.email}`}>{settings.email}</a>
+        <a class="footer-insta display" href={instagramUrl(settings.instagram)} target="_blank" rel="noopener">
+          @{settings.instagram}<span class="sr-only"> on Instagram (opens in a new tab)</span>
+        </a>
+      </div>
+
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="/events">EVENTS</a>
+        <a href="/about">ABOUT</a>
+        <a href={`mailto:${settings.email}`}>CONTACT</a>
+        {
+          next && (
+            <Pill href={`/events/${next.slug}`} class="footer-next" size="m">
+              NEXT: {next.city.toUpperCase()} ↗
+            </Pill>
+          )
+        }
+      </nav>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© {year} r0ttencore</span>
+      <span>PARIS — TOKYO — BEIJING</span>
+      <span class="presented">presented by r0ttencore</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-top: clamp(48px, calc(48px + 24 * (100vw - 390px) / 1050), 72px);
+    border-top: 1px solid var(--line-on-dark-soft);
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: 40px;
+  }
+
+  .footer-logo {
+    justify-self: start;
+  }
+
+  .footer-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .footer-contact h2 {
+    font-weight: 400;
+  }
+
+  .footer-email {
+    font-size: clamp(30px, calc(30px + 34 * (100vw - 390px) / 1050), 64px);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .footer-insta {
+    font-size: clamp(24px, calc(24px + 8 * (100vw - 390px) / 1050), 32px);
+    line-height: 1;
+    color: var(--muted-on-dark-2);
+  }
+
+  .footer-email,
+  .footer-insta,
+  .footer-nav a:not(.footer-next) {
+    transition: color 0.2s var(--ease);
+  }
+
+  .footer-email:hover,
+  .footer-insta:hover,
+  .footer-nav a:not(.footer-next):hover {
+    color: var(--muted-on-dark);
+  }
+
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 24px;
+    font-weight: 800;
+    font-size: var(--fs-nav);
+    letter-spacing: 1px;
+  }
+
+  .footer-nav a:not(.footer-next) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .footer-next {
+    flex-basis: 100%;
+    margin-top: 8px;
+    letter-spacing: 0;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 40px;
+    padding: 16px 0 24px;
+    border-top: 1px solid var(--rule-footer);
+    font-size: 12px;
+    color: var(--muted-on-dark);
+  }
+
+  .presented {
+    order: -1;
+    font-size: 18px;
+    letter-spacing: -0.4px;
+    color: var(--bg-light);
+  }
+
+  @media (min-width: 900px) {
+    .footer-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      align-items: end;
+    }
+
+    .footer-logo {
+      grid-column: span 3;
+    }
+
+    .footer-contact {
+      grid-column: span 6;
+      gap: 14px;
+    }
+
+    .footer-nav {
+      grid-column: span 3;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0;
+    }
+
+    .footer-next {
+      flex-basis: auto;
+      margin-top: 10px;
+    }
+
+    .footer-bottom {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+      margin-top: 64px;
+      padding: 0;
+      font-size: 14px;
+    }
+
+    .presented {
+      order: 0;
+      font-size: 22px;
+      letter-spacing: -0.6px;
+    }
+  }
+</style>

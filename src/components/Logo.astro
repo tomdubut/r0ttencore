@@ -1,0 +1,64 @@
+---
+/*
+ * THE one place the logo lives. To swap in the final logo (SVG or high-res),
+ * replace LOGO_SRC / LOGO_RATIO below (or the file in public/brand/) — nothing else.
+ *
+ * The cup image is black on transparent; on dark sections it is inverted via --logo-filter.
+ */
+interface Props {
+  /** Height of the cup in px (desktop). */
+  height?: number;
+  /** Optional mobile height in px. */
+  heightMobile?: number;
+  /** Show the "r0t" text wordmark next to the cup. */
+  wordmark?: boolean;
+  class?: string;
+}
+
+const LOGO_SRC = '/brand/logo-cup.png';
+const LOGO_RATIO = 226 / 480; // width / height of the image file
+
+const { height = 48, heightMobile = height, wordmark = false, class: className } = Astro.props;
+---
+
+<span
+  class:list={['logo', className]}
+  style={`--logo-h: ${height}px; --logo-h-m: ${heightMobile}px;`}
+>
+  <img
+    class="logo-cup"
+    src={LOGO_SRC}
+    width={Math.round(height * LOGO_RATIO)}
+    height={height}
+    alt=""
+    decoding="async"
+  />
+  {wordmark && <span class="logo-word" aria-hidden="true">r0t</span>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-cup {
+    height: var(--logo-h-m);
+    width: auto;
+    filter: var(--logo-filter, none);
+  }
+
+  .logo-word {
+    font-family: var(--font-heavy);
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  @media (min-width: 768px) {
+    .logo-cup {
+      height: var(--logo-h);
+    }
+  }
+</style>

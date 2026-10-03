@@ -1,0 +1,41 @@
+---
+/*
+ * Round outlined play button, centred in its (position: relative) parent.
+ * `decorative` = just the visual (placeholders); the real button is the YouTube facade.
+ */
+interface Props {
+  decorative?: boolean;
+}
+const { decorative = false } = Astro.props;
+---
+
+<span class="play" aria-hidden={decorative ? 'true' : undefined}>
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+    <path d="M8 5v14l11-7z"></path>
+  </svg>
+</span>
+
+<style>
+  .play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(72px, calc(72px + 24 * (100vw - 390px) / 1050), 96px);
+    height: clamp(72px, calc(72px + 24 * (100vw - 390px) / 1050), 96px);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg-light);
+    color: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+
+  .play svg {
+    width: 30%;
+    height: 30%;
+  }
+</style>
