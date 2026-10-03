@@ -1,0 +1,316 @@
+---
+/* Events listing — mockup events-listing-L1.html. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Pill from '../../components/Pill.astro';
+import EventRow from '../../components/EventRow.astro';
+import { getPastEvents, getSettings, getUpcomingEvent } from '../../lib/content';
+import { alternate, formatDate, instagramUrl, pad2 } from '../../lib/format';
+import { CITIES } from '../../lib/types';
+
+const next = await getUpcomingEvent();
+const past = await getPastEvents();
+const settings = await getSettings();
+
+// Hero is dark; following sections alternate, whichever ones are present.
+const present = [next && 'next', 'list', 'cta'].filter(Boolean) as string[];
+const themes = alternate('light', present.length);
+const themeOf = (key: string) => themes[present.indexOf(key)];
+
+const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
+---
+
+<BaseLayout title="Events" description="[PLACEHOLDER — events page description]">
+  <Header slot="header" active="events" />
+
+  <section class="hero theme-dark" aria-labelledby="events-title">
+    <img class="hero-texture" src="/textures/texture-grain-swoosh.webp" alt="" decoding="async" />
+    <div class="wrap hero-inner">
+      <div class="title-row">
+        <h1 id="events-title" class="display title">EVENTS</h1>
+        <span class="mono count" aria-live="polite" data-count>({pad2(past.length)})</span>
+      </div>
+
+      <!-- City filter: shown only when JS runs (without JS every event stays visible). -->
+      <div class="filters-row" data-filters>
+        <div class="filters" role="group" aria-label="Filter events by city">
+          {
+            filters.map((f, i) => (
+              <button type="button" class="filter" data-filter={f} aria-pressed={i === 0 ? 'true' : 'false'}>
+                {f}
+              </button>
+            ))
+          }
+        </div>
+        <span class="mono muted">sorted by date ↓</span>
+      </div>
+    </div>
+  </section>
+
+  {
+    next && (
+      <section class:list={['upcoming', `theme-${themeOf('next')}`]} aria-labelledby="upcoming-city">
+        <div class="wrap upcoming-inner">
+          <span class="mono upcoming-label">UPCOMING</span>
+          <div class="upcoming-city">
+            <a id="upcoming-city" class="display" href={`/events/${next.slug}`}>
+              {next.city.toUpperCase()}
+            </a>
+            <span class="mono">{next.number}</span>
+          </div>
+          <div class="upcoming-meta">
+            <span>{formatDate(next.date)}</span>
+            <span>{next.venue}</span>
+          </div>
+          {next.ticketUrl ? (
+            <Pill href={next.ticketUrl} variant="filled" size="l" external class="upcoming-cta">
+              TICKETS ↗
+            </Pill>
+          ) : (
+            <Pill variant="filled" size="l" class="upcoming-cta">
+              [TICKETS SOON]
+            </Pill>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <section class:list={['section list', `theme-${themeOf('list')}`]} aria-label="Past events">
+    <div class="wrap">
+      <div class="list-head mono muted" aria-hidden="true">
+        <span>NO.</span><span>CITY</span><span>EVENT</span><span>DATE</span><span>MEDIA</span><span></span>
+      </div>
+      <div class="rows" data-rows>
+        {past.map((e) => <EventRow event={e} variant="index" />)}
+      </div>
+      <div class="empty" data-empty hidden={past.length > 0}>
+        <p class="display empty-title">[NOTHING HERE YET.]</p>
+        <p class="mono muted">[EMPTY-STATE TEXT]</p>
+      </div>
+    </div>
+  </section>
+
+  <section class:list={['cta', `theme-${themeOf('cta')}`]} aria-label="Follow r0t">
+    <div class="wrap cta-inner">
+      <p class="display cta-title">[NEVER MISS THE NEXT ONE.]</p>
+      <Pill href={instagramUrl(settings.instagram)} variant="filled" size="l" external>
+        FOLLOW @{settings.instagram} ↗
+      </Pill>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../../scripts/event-filter';
+</script>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: clamp(40px, 4vw, 56px);
+  }
+
+  .hero-texture {
+    position: absolute;
+    right: -120px;
+    top: -40px;
+    width: min(900px, 140vw);
+    max-width: none;
+    filter: invert(1);
+    opacity: 0.14;
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: clamp(40px, 4.4vw, 64px);
+  }
+
+  .title {
+    font-size: var(--fs-mega);
+    line-height: 0.82;
+  }
+
+  .count {
+    padding-bottom: 0.8em;
+    font-size: clamp(12px, calc(12px + 6 * (100vw - 390px) / 1050), 18px);
+    letter-spacing: 0;
+  }
+
+  .filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: clamp(24px, 2.5vw, 36px);
+  }
+
+  /* The filter needs JS: only shown when JS runs (html.js is set before first paint, so no layout shift). */
+  :global(html:not(.js)) .filters-row {
+    display: none;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter {
+    min-height: 44px;
+    padding: 0 clamp(14px, 1.5vw, 22px);
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--bg-light);
+    background: transparent;
+    color: var(--bg-light);
+    font-family: var(--font-heavy);
+    font-size: clamp(12px, 1vw, 13px);
+    cursor: pointer;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+
+  .filter[aria-pressed='true'],
+  .filter:hover {
+    background: var(--bg-light);
+    color: var(--ink);
+  }
+
+  /* ---------- Upcoming ---------- */
+  .upcoming {
+    padding-block: clamp(40px, 4vw, 56px);
+  }
+
+  .upcoming-inner {
+    display: grid;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .upcoming-label {
+    letter-spacing: 1px;
+  }
+
+  .upcoming-city {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+
+  .upcoming-city a {
+    font-size: clamp(72px, calc(72px + 48 * (100vw - 390px) / 1050), 120px);
+    line-height: 0.9;
+  }
+
+  .upcoming-city a:hover {
+    opacity: 0.7;
+  }
+
+  .upcoming-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-family: var(--font-heavy);
+    font-size: 17px;
+  }
+
+  .upcoming :global(.upcoming-cta) {
+    margin-top: 8px;
+  }
+
+  @media (min-width: 900px) {
+    .upcoming-inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+    }
+
+    .upcoming-label {
+      grid-column: span 2;
+    }
+
+    .upcoming-city {
+      grid-column: span 6;
+      gap: 28px;
+    }
+
+    .upcoming-meta {
+      grid-column: span 2;
+    }
+
+    .upcoming :global(.upcoming-cta) {
+      grid-column: span 2;
+      justify-self: end;
+      margin-top: 0;
+    }
+  }
+
+  /* ---------- List ---------- */
+  .list-head {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .list-head {
+      display: grid;
+      grid-template-columns: 80px 120px minmax(0, 1fr) 160px 200px 40px;
+      gap: var(--col-gap);
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--fg);
+      font-size: 12px;
+    }
+  }
+
+  .empty {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: clamp(48px, 5vw, 72px) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .empty[hidden] {
+    display: none;
+  }
+
+  .empty-title {
+    font-size: clamp(40px, calc(40px + 24 * (100vw - 390px) / 1050), 64px);
+    line-height: 1;
+  }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    padding-block: clamp(48px, 5vw, 72px);
+  }
+
+  .cta-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+
+  .cta-title {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+  }
+
+  @media (min-width: 900px) {
+    .cta-inner {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+</style>

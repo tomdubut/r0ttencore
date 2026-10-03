@@ -60,6 +60,11 @@ button {
   color: inherit;
 }
 
+/* `hidden` always wins over component display rules. */
+[hidden] {
+  display: none !important;
+}
+
 /* Visible focus on every interactive element (keyboard only). */
 :focus-visible {
   outline: 2px solid currentColor;

@@ -13,7 +13,7 @@ const { title, meta, as: Tag = 'h2', size = 'title', rule = 'thin', id } = Astro
 
 <div class:list={['section-title', `rule-${rule}`]}>
   <Tag class:list={['display', `size-${size}`]} id={id}>{title}</Tag>
-  {meta && <span class="mono meta" data-counter>{meta}</span>}
+  {meta && <span class="mono meta" data-meta>{meta}</span>}
   <slot />
 </div>
 
