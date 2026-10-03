@@ -1,0 +1,56 @@
+/*
+ * Design tokens, taken from the mockups in design-reference/pages/.
+ * Fluid sizes interpolate between the 390px (mobile) and 1440px (desktop) widths:
+ *   calc(MIN + (MAX - MIN) * (100vw - 390px) / 1050)
+ */
+:root {
+  /* Colors */
+  --bg-dark: #101010;
+  --ink: #141414;
+  --black: #000000;
+  --bg-light: #efefeb;
+  --muted-on-dark: #a8a8a2;
+  --muted-on-dark-2: #cfcfca;
+  --muted-on-light: #55554f;
+  --muted-on-light-2: #6b6b66;
+  --divider: #8a8a85;
+  --rule-footer: #3a3a38;
+  --line-on-dark: rgba(239, 239, 235, 0.35);
+  --line-on-dark-soft: rgba(239, 239, 235, 0.25);
+
+  /* Fonts */
+  --font-display: 'Anton', 'Impact', sans-serif;
+  --font-heavy: 'Archivo Black', 'Arial Black', sans-serif;
+  --font-body: 'Archivo', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Layout */
+  --gutter: clamp(16px, calc(16px + 24 * (100vw - 390px) / 1050), 40px);
+  --col-gap: clamp(16px, calc(16px + 8 * (100vw - 390px) / 1050), 24px);
+  --max-width: 1600px;
+  --header-h: 72px;
+
+  /* Section spacing */
+  --space-section: clamp(56px, calc(56px + 56 * (100vw - 390px) / 1050), 112px);
+
+  /* Type scale (mobile → desktop) */
+  --fs-mega: clamp(96px, calc(96px + 204 * (100vw - 390px) / 1050), 300px);  /* EVENTS listing h1, event number */
+  --fs-title: clamp(88px, calc(88px + 132 * (100vw - 390px) / 1050), 220px); /* section titles: ARCHIVE, FORMATS… */
+  --fs-title-s: clamp(64px, calc(64px + 116 * (100vw - 390px) / 1050), 180px); /* PHOTOS, VIDEOS */
+  --fs-display-l: clamp(48px, calc(48px + 40 * (100vw - 390px) / 1050), 88px);
+  --fs-display: clamp(40px, calc(40px + 32 * (100vw - 390px) / 1050), 72px);
+  --fs-display-m: clamp(30px, calc(30px + 26 * (100vw - 390px) / 1050), 56px);
+  --fs-display-s: clamp(26px, calc(26px + 10 * (100vw - 390px) / 1050), 36px);
+  --fs-lead: clamp(20px, calc(20px + 6 * (100vw - 390px) / 1050), 26px);
+  --fs-body: clamp(16px, calc(16px + 1 * (100vw - 390px) / 1050), 17px);
+  --fs-meta: clamp(11px, calc(11px + 2 * (100vw - 390px) / 1050), 13px);
+  --fs-nav: clamp(13px, calc(13px + 1 * (100vw - 390px) / 1050), 14px);
+
+  /* Shapes */
+  --radius-pill: 999px;
+  --radius-box: 32px;
+  --tap: 44px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
