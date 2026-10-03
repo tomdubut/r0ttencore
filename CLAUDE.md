@@ -88,7 +88,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 **Motion**: subtle only (genre ticker scrolling, hover states, fade-ins). Everything respects `prefers-reduced-motion` (ticker static, no fades).
 
-## 5. Content model (Sanity) — draft, to refine in phase 2
+## 5. Content model (Sanity) — built in phase 2 (`studio/schemaTypes/`)
 
 **media** (reusable object, used for every photo/video slot): `type` radio = **Image** | **YouTube video**. Image → image (hotspot/crop) + alt text (required). YouTube → URL (validated as YouTube) + optional poster image + alt/label. Only the fields of the chosen type are shown. The site renders an image, or a click-to-play YouTube facade.
 
@@ -103,18 +103,18 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - SEO: optional title, description, share image (fallbacks: title / short text / cover)
 
 **artist**
-- name, slug, based in (city), genres (picked from the siteSettings genre list), short description
+- name, slug, based in (free text city), genres (free tags; same spelling as Settings → Genres is asked in the help text), short description
 - portrait (media), work (array of media: images and/or YouTube, reorderable)
 - links: Instagram (+ SoundCloud / Spotify / Bandcamp later, platforms not decided)
 - **showPage** switch (default off): off → the artist appears in line-ups with an Instagram link only, no page; on → page published at `/artists/<slug>/` and line-up names link to it
 - "events with r0t" is **computed** (events whose line-up references the artist), never entered by hand
 - Rights: only material the artist has provided or approved; credit photographers (same credits list as events)
 
-**homePage** (singleton): heroMedia (media), the homepage texts (not in the deck → editable).
+**homePage** (singleton, `_id: homePage`): heroMedia (media), tagline lines, cities line, "What is r0t?" paragraphs, SEO description.
 
-**siteSettings** (singleton): contact email, Instagram handle, genre list (ticker / The Sounds), default share image, short UI sentences that are not in the deck (e.g. listing CTA, empty states).
+**siteSettings** (singleton, `_id: siteSettings`): contact email, Instagram handle, genre list, default share image, **Short texts** (not in the deck, start as `[PLACEHOLDER]`): tickets-soon button, follow CTA, empty-state title/text, night label, 404 text, events/artists page descriptions.
 
-**aboutPage** (singleton): the About sections (hero texts, The Sounds text + genre cloud, Formats ×4 = media + label + text, Network text + media).
+**aboutPage** (singleton, `_id: aboutPage`): intro paragraphs, cities, The Sounds text + genre cloud (name + size s/m/l/xl), Formats (label + lines + media, 4 expected), Network text + media, SEO description.
 
 **Studio rules**: clear labels, help text on every field, required fields validated, dropdowns for city/status, singletons cannot be duplicated/deleted, media library plugin (search, tags, see where an image is used). The editor must be simple for a non-technical person.
 
@@ -124,7 +124,8 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - Missing content → visible `[PLACEHOLDER]` text in brackets, never plausible fake content.
 - Copy that appears in the mockups but not in the deck ("NEVER MISS THE NEXT ONE.", "THE NIGHT", "SCROLL — ARCHIVE", "PLAYING — REEL 2026", the empty-state lines…) is **sample text, not approved**: render it as `[PLACEHOLDER]` or make it an editable Sanity field.
 - Short functional UI labels from the mockups (EVENTS, LINE-UP, CREDITS, MORE EVENTS…) are kept; see `docs/phase-1-plan.md` → Build notes.
-- Phase 1 builds every photo/video section empty-ready (placeholder media); real photos and videos are added by Tom via Sanity later.
+- Photo/video sections show grain placeholders while empty; sections with no content at all (e.g. an event without photos) are hidden.
+- The site reads **published** content only. Seeded placeholder documents: events 01–03, artists [ARTIST 01–04] (page off), the three singletons.
 - Anything the team might want to change must be editable in Sanity without code.
 - Counts, "NEXT: <CITY>", years and "LATEST — 02" are computed from Sanity data, never hard-coded.
 

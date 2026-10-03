@@ -86,3 +86,12 @@ Rebuild-on-publish webhook, daily rebuild and backups (phase 5). Real content (p
 ## Needs from Tom
 
 - A **Sanity deploy token**: sanity.io/manage → project r0ttencore → API → Tokens → *Add token*, permission **Deploy Studio**. Save it as a **GitHub secret** named `SANITY_AUTH_TOKEN`: repo → Settings → Secrets and variables → Actions → *New repository secret*. Never paste it in chat.
+
+## Build notes (session 1)
+
+- Studio live at https://r0ttencore.sanity.studio (app id in `studio/sanity.cli.ts`). Deployed by `.github/workflows/deploy-studio.yml`; the job also installs the root packages because Sanity's schema upload reads the root `tsconfig.json`.
+- Content seeded through the Sanity connector: settings, homepage, about (deck copy), events 01/02 (past, Paris) and 03 (upcoming, Tokyo), 4 placeholder artists (page off). The low-res network photo was uploaded to Sanity; `public/images/` is gone.
+- Event galleries are empty in Sanity (no fake image items), so the PHOTOS section is hidden until real photos are added. The slideshow is unchanged and now a shared component (`Slideshow.astro`), also used by artist pages.
+- Artist genres are free tags (a dropdown fed by the Settings genre list would need a custom input).
+- Images: `src/lib/image.ts` builds `srcset` (320–2400 px, `auto=format` → WebP/AVIF) and turns the editor's hotspot into `object-position`. Verified: the CDN returns WebP at the requested width.
+- `npm run typegen` (in `studio/`) regenerates `src/sanity.types.ts` from the schemas and `src/lib/queries.ts`.
