@@ -1,0 +1,200 @@
+---
+/*
+ * Artist page. No mockup: built from the event page (E2) pieces.
+ * Hero (info + big media) → work slideshow → events with r0t. Sections alternate dark / light.
+ * Only generated for artists with "Show artist page" switched on in Sanity.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Media from '../../components/Media.astro';
+import Pill from '../../components/Pill.astro';
+import Slideshow from '../../components/Slideshow.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import EventRow from '../../components/EventRow.astro';
+import { getArtistsWithPage, getEventsForArtist } from '../../lib/content';
+import { alternate, instagramUrl } from '../../lib/format';
+import { paths } from '../../lib/paths';
+import { CREDIT_ROLES, type ArtistDoc } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const artists = await getArtistsWithPage();
+  return artists.map((artist) => ({ params: { slug: artist.slug }, props: { artist } }));
+}
+
+interface Props {
+  artist: ArtistDoc;
+}
+
+const { artist } = Astro.props;
+const events = await getEventsForArtist(artist.slug);
+
+// "PHOTOS — A · B   VIDEO — C" under the work slideshow.
+const creditLine = CREDIT_ROLES.map((role) => {
+  const names = artist.credits.filter((c) => c.role === role).map((c) => c.name);
+  return names.length ? `${role.toUpperCase()} — ${names.join(' · ')}` : '';
+})
+  .filter(Boolean)
+  .join('   ');
+
+const present = [artist.work.length > 0 && 'work', events.length > 0 && 'events'].filter(Boolean) as string[];
+const themes = alternate('dark', present.length);
+const themeOf = (key: string) => themes[present.indexOf(key)];
+
+const meta = [artist.basedIn?.toUpperCase(), ...artist.genres.map((g) => g.toUpperCase())].filter(Boolean);
+---
+
+<BaseLayout title={artist.name} description={artist.description || `${artist.name} — r0t`}>
+  <Header slot="header" split />
+
+  <section class="hero" aria-labelledby="artist-name">
+    <div class="hero-info theme-light">
+      <img class="hero-texture" src="/textures/texture-grain-splash.webp" alt="" decoding="async" />
+      <div class="hero-info-inner">
+        <a class="mono back" href={paths.artists}>← ALL ARTISTS</a>
+        <h1 id="artist-name" class="display name">{artist.name}</h1>
+        {meta.length > 0 && (
+          <p class="meta">
+            {meta.map((m) => <span>{m}</span>)}
+          </p>
+        )}
+        {artist.description && <p class="description">{artist.description}</p>}
+        {
+          artist.instagram && (
+            <div class="links">
+              <Pill href={instagramUrl(artist.instagram)} external>
+                @{artist.instagram} ↗
+              </Pill>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="hero-media theme-black">
+      <Media media={artist.portrait} label="[ARTIST PHOTO / VIDEO]" seed={3} class="hero-media-slot" eager sizes="(min-width: 900px) 50vw, 100vw" />
+    </div>
+  </section>
+
+  {
+    artist.work.length > 0 && (
+      <Slideshow id="work" title="WORK" theme={themeOf('work')} items={artist.work} credit={creditLine || undefined} />
+    )
+  }
+
+  {
+    events.length > 0 && (
+      <section class:list={['section', `theme-${themeOf('events')}`]} aria-labelledby="events-title">
+        <div class="wrap">
+          <SectionTitle id="events-title" title="EVENTS WITH r0t" size="title-s" />
+          <div class="event-list">
+            {events.map((e) => (
+              <EventRow event={e} variant="archive" />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+  }
+
+  .hero-info {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-texture {
+    position: absolute;
+    left: -120px;
+    bottom: -80px;
+    width: min(640px, 140vw);
+    max-width: none;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .hero-info-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 20px var(--gutter) clamp(40px, 3.3vw, 48px);
+  }
+
+  .back {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    letter-spacing: 0;
+  }
+
+  .back:hover {
+    opacity: 0.65;
+  }
+
+  .name {
+    font-size: clamp(64px, calc(64px + 96 * (100vw - 390px) / 1050), 160px);
+    line-height: 0.88;
+    margin-top: clamp(24px, 4vw, 64px);
+    overflow-wrap: anywhere;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+    font-family: var(--font-heavy);
+    font-size: clamp(14px, 1.2vw, 17px);
+  }
+
+  .description {
+    margin-top: 24px;
+    font-weight: 800;
+    font-size: var(--fs-lead);
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+    white-space: pre-line;
+  }
+
+  .links {
+    margin-top: 28px;
+  }
+
+  /* Same behaviour as the event page: a full-width square on phones, the whole right half on desktop. */
+  .hero-media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+  }
+
+  .hero-media :global(.hero-media-slot) {
+    position: absolute;
+    inset: 0;
+  }
+
+  @media (min-width: 900px) {
+    .hero {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      min-height: calc(min(100svh, 960px) - var(--header-h));
+    }
+
+    .hero-info-inner {
+      padding-top: 28px;
+    }
+
+    .hero-media {
+      aspect-ratio: auto;
+    }
+  }
+
+  .event-list {
+    margin-top: clamp(24px, 3vw, 40px);
+    border-top: 1px solid var(--line);
+  }
+</style>

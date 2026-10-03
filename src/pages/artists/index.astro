@@ -1,0 +1,221 @@
+---
+/*
+ * Artists listing. No mockup: built from the events listing (L1) pieces.
+ * Only artists with "Show artist page" switched on in Sanity are listed.
+ * Not linked in the header yet (decision in CLAUDE.md §3).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Media from '../../components/Media.astro';
+import Arrow from '../../components/icons/Arrow.astro';
+import { getArtistsWithPage, getSettings } from '../../lib/content';
+import { pad2 } from '../../lib/format';
+import { paths } from '../../lib/paths';
+
+const artists = await getArtistsWithPage();
+const { texts } = await getSettings();
+
+// Filter by the cities artists are based in (only cities that actually appear).
+const cities = [...new Set(artists.map((a) => a.basedIn?.trim().toUpperCase()).filter(Boolean))] as string[];
+const filters = ['ALL', ...cities];
+---
+
+<BaseLayout title="Artists" description={texts.artistsDescription}>
+  <Header slot="header" />
+
+  <section class="hero theme-dark" aria-labelledby="artists-title">
+    <img class="hero-texture" src="/textures/texture-grain-swoosh.webp" alt="" decoding="async" />
+    <div class="wrap hero-inner">
+      <div class="title-row">
+        <h1 id="artists-title" class="display title">ARTISTS</h1>
+        <span class="mono count" aria-live="polite" data-count>({pad2(artists.length)})</span>
+      </div>
+      {
+        cities.length > 1 && (
+          <div class="filters" data-filters role="group" aria-label="Filter artists by city">
+            {filters.map((f, i) => (
+              <button type="button" class="filter" data-filter={f} aria-pressed={i === 0 ? 'true' : 'false'}>
+                {f}
+              </button>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section theme-light" aria-label="Artists">
+    <div class="wrap">
+      <ul class="rows" data-rows>
+        {
+          artists.map((a, i) => (
+            <li data-city={a.basedIn?.trim().toUpperCase() ?? ''}>
+              <a class="row" href={paths.artist(a.slug)}>
+                <Media media={a.portrait?.kind === 'image' ? a.portrait : null} seed={i} class="row-thumb" sizes="120px" />
+                <span class="row-text">
+                  <span class="mono row-meta">
+                    {[a.basedIn?.toUpperCase(), ...a.genres.slice(0, 3).map((g) => g.toUpperCase())]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
+                  <span class="display row-name">{a.name}</span>
+                </span>
+                <Arrow class="row-arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="empty" data-empty hidden={artists.length > 0}>
+        <p class="display empty-title">{texts.emptyTitle}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../../scripts/event-filter';
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: clamp(40px, 4vw, 56px);
+  }
+
+  .hero-texture {
+    position: absolute;
+    right: -120px;
+    top: -40px;
+    width: min(900px, 140vw);
+    max-width: none;
+    filter: invert(1);
+    opacity: 0.14;
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: clamp(40px, 4.4vw, 64px);
+  }
+
+  .title {
+    font-size: var(--fs-mega);
+    line-height: 0.82;
+  }
+
+  .count {
+    padding-bottom: 0.8em;
+    font-size: clamp(12px, calc(12px + 6 * (100vw - 390px) / 1050), 18px);
+    letter-spacing: 0;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: clamp(24px, 2.5vw, 36px);
+  }
+
+  :global(html:not(.js)) .filters {
+    display: none;
+  }
+
+  .filter {
+    min-height: 44px;
+    padding: 0 clamp(14px, 1.5vw, 22px);
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--bg-light);
+    background: transparent;
+    color: var(--bg-light);
+    font-family: var(--font-heavy);
+    font-size: clamp(12px, 1vw, 13px);
+    cursor: pointer;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+
+  .filter[aria-pressed='true'],
+  .filter:hover {
+    background: var(--bg-light);
+    color: var(--ink);
+  }
+
+  .rows {
+    border-top: 2px solid var(--fg);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 84px 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    transition: opacity 0.2s var(--ease);
+  }
+
+  .row:hover {
+    opacity: 0.7;
+  }
+
+  .row :global(.row-thumb) {
+    width: 84px;
+    height: 104px;
+  }
+
+  .row-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .row-meta {
+    letter-spacing: 0;
+    color: var(--muted);
+  }
+
+  .row-name {
+    font-size: clamp(30px, calc(30px + 50 * (100vw - 390px) / 1050), 80px);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .row :global(.row-arrow) {
+    width: clamp(22px, 2vw, 28px);
+    height: clamp(22px, 2vw, 28px);
+  }
+
+  @media (min-width: 900px) {
+    .row {
+      grid-template-columns: 120px 1fr 40px;
+      gap: var(--col-gap);
+      padding: 20px 0;
+    }
+
+    .row :global(.row-thumb) {
+      width: 120px;
+      height: 148px;
+    }
+  }
+
+  .empty {
+    padding: clamp(48px, 5vw, 72px) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .empty-title {
+    font-size: clamp(40px, calc(40px + 24 * (100vw - 390px) / 1050), 64px);
+    line-height: 1;
+  }
+</style>
