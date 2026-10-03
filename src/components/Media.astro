@@ -1,0 +1,116 @@
+---
+/*
+ * One photo/video slot. Renders, depending on what the editor chose in Sanity:
+ *   - image   → <img> (responsive Sanity CDN srcset in phase 2)
+ *   - youtube → click-to-play YouTube facade
+ *   - null    → grain placeholder (grey radial gradient + mono label), as in the mockups
+ * The slot fills its box: set the size with `ratio` (e.g. "16 / 9") or with CSS on `class`.
+ */
+import Grain from './Grain.astro';
+import YouTubeFacade from './YouTubeFacade.astro';
+import PlayButton from './PlayButton.astro';
+import type { Media } from '../lib/types';
+
+interface Props {
+  media: Media;
+  /** Label shown on the placeholder, e.g. "[AFTERMOVIE — EVENT 02]". */
+  label?: string;
+  /** Where the placeholder label sits. */
+  labelPosition?: 'top' | 'bottom';
+  /** Show a (decorative) play button on the placeholder: for video slots. */
+  play?: boolean;
+  /** Varies the placeholder gradient so neighbouring slots don't look identical. */
+  seed?: number;
+  ratio?: string;
+  /** Load immediately (above the fold). Default: lazy. */
+  eager?: boolean;
+  sizes?: string;
+  class?: string;
+}
+
+const {
+  media,
+  label,
+  labelPosition = 'top',
+  play = false,
+  seed = 0,
+  ratio,
+  eager = false,
+  sizes = '100vw',
+  class: className,
+} = Astro.props;
+
+// Placeholder gradients, taken from the mockups.
+const highs = ['#7a7a76', '#8d8d88', '#9a9a95', '#6d6d69', '#a3a39f', '#85857f', '#b0b0ab', '#7c7c78'];
+const lows = ['#262626', '#1d1d1d', '#333331', '#222222', '#2e2e2e', '#1a1a1a', '#2a2a2a', '#161616'];
+const x = 30 + ((seed * 19) % 45);
+const y = 20 + ((seed * 29) % 40);
+const placeholderBg = `radial-gradient(ellipse at ${x}% ${y}%, ${highs[seed % highs.length]} 0%, ${lows[seed % lows.length]} 62%, #0c0c0c 100%)`;
+
+const style = ratio ? `aspect-ratio: ${ratio};` : undefined;
+---
+
+<div class:list={['media', className]} style={style}>
+  {
+    media?.kind === 'image' && (
+      <img
+        src={media.image.url}
+        width={media.image.width}
+        height={media.image.height}
+        alt={media.alt}
+        sizes={sizes}
+        loading={eager ? 'eager' : 'lazy'}
+        fetchpriority={eager ? 'high' : undefined}
+        decoding="async"
+      />
+    )
+  }
+
+  {media?.kind === 'youtube' && <YouTubeFacade url={media.url} title={media.title} poster={media.poster} />}
+
+  {
+    !media && (
+      <div class="media-ph" style={`background: ${placeholderBg}`}>
+        <Grain />
+        {label && <span class:list={['media-label mono', `media-label--${labelPosition}`]}>{label}</span>}
+        {play && <PlayButton decorative />}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .media {
+    position: relative;
+    overflow: hidden;
+    background: #0c0c0c;
+    color: var(--bg-light);
+  }
+
+  .media > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .media-ph {
+    position: absolute;
+    inset: 0;
+  }
+
+  .media-label {
+    position: absolute;
+    left: clamp(12px, 2vw, 20px);
+    font-size: clamp(10px, 1vw, 12px);
+    letter-spacing: 0;
+    color: var(--bg-light);
+  }
+
+  .media-label--top {
+    top: clamp(12px, 1.5vw, 18px);
+  }
+
+  .media-label--bottom {
+    bottom: clamp(12px, 1.5vw, 18px);
+  }
+</style>
