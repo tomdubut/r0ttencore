@@ -1,0 +1,58 @@
+# Builds the site and uploads it to Cloudflare when content changes in Sanity, plus once a day.
+# Why GitHub and not a Cloudflare deploy hook: Cloudflare's build service can stall
+# ("Build failed to initialize"), and publishes were then silently lost. Here every publish
+# is a visible run with logs, GitHub emails on failure, and Cloudflare only receives the
+# finished files (`wrangler deploy`), which doesn't depend on its build service.
+#
+# Triggers:
+# - repository_dispatch "sanity-publish": the Sanity webhook (sanity.io/manage → API → Webhooks)
+#   POSTs to https://api.github.com/repos/tomdubut/r0ttencore/dispatches.
+# - schedule: daily rebuild, so date rules (e.g. hiding "NEXT: TOKYO" once the event has passed)
+#   apply even when nobody publishes.
+# - workflow_dispatch: manual run (Actions → Deploy content → Run workflow).
+# Code pushes are still built by Cloudflare Workers Builds (production on main, branch previews).
+#
+# Secrets: CLOUDFLARE_API_TOKEN (template "Edit Cloudflare Workers"), CLOUDFLARE_ACCOUNT_ID.
+# Note: GitHub pauses scheduled workflows after 60 days without commits; it emails the repo owner
+# and a click on "Enable workflow" (Actions tab) turns it back on.
+name: Deploy content
+
+on:
+  repository_dispatch:
+    types: [sanity-publish]
+  schedule:
+    - cron: '15 0 * * *' # every day at 00:15 UTC (09:15 Tokyo, 01:15/02:15 Paris)
+  workflow_dispatch:
+
+# Bursts of publishes: at most one run in progress and one waiting. A newer publish replaces
+# the waiting run, and since every run fetches the latest content, nothing is lost.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Upload to Cloudflare
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

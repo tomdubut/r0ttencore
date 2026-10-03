@@ -63,7 +63,7 @@ Detailed plan: `docs/phase-2-plan.md`.
 
 ## Phase 5: Go live
 
-- ~~Sanity webhook → Cloudflare deploy hook~~ and daily rebuild: **moved earlier** (set up after phase 2, see `CLAUDE.md` → Rebuild).
+- ~~Sanity webhook → site rebuild~~ and daily rebuild: **moved earlier** (set up after phase 2, see `CLAUDE.md` → Rebuild).
 - Domain `r0ttencore.com` on Cloudflare: add only the web records (apex + `www`, redirect `www` → apex or the reverse). **Do not touch MX / mail TXT records (Hostinger email).** Check that email still works after the change.
 - Invite the co-founder to Sanity (editor role) and test an edit end-to-end.
 - One-page editor guide for the co-founder (how to add an event, photos, videos, announce the next one).
@@ -90,7 +90,7 @@ Same E2 template, switched by the event's status:
 - **Shown**: "the night" text (if filled), line-up, MORE EVENTS.
 - **Hidden** while upcoming: PHOTOS, VIDEOS, CREDITS (each section is hidden whenever it is empty, on any event).
 - **After the night**: the editor sets status to *past* and adds photos/videos; no code change.
-- **Safety net**: a free daily scheduled rebuild (GitHub Actions cron → Cloudflare deploy hook) plus a build rule: an "upcoming" event whose date has passed no longer appears in the NEXT pill. Prevents "NEXT: TOKYO" staying online after the event.
+- **Safety net**: a free daily scheduled rebuild (GitHub Actions cron → build + `wrangler deploy`) plus a build rule: an "upcoming" event whose date has passed no longer appears in the NEXT pill. Prevents "NEXT: TOKYO" staying online after the event.
 - Optional later: "Add to calendar" (.ics file generated at build).
 
 ## Open questions
