@@ -38,7 +38,10 @@ const pastEvent = (number: string): EventDoc => ({
   videos: placeholderVideos,
   lineup: placeholderLineup,
   text: '[2–3 lines about the night: the concept, the venue, the energy.]',
-  credits: { photographer: '[PHOTOGRAPHER]', videographer: '[VIDEOGRAPHER]' },
+  credits: [
+    { role: 'Photos', name: '[PHOTOGRAPHER]' },
+    { role: 'Video', name: '[VIDEOGRAPHER]' },
+  ],
 });
 
 export const events: EventDoc[] = [
@@ -59,7 +62,7 @@ export const events: EventDoc[] = [
     videos: [],
     lineup: placeholderLineup,
     text: '',
-    credits: {},
+    credits: [],
   },
 ];
 

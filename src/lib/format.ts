@@ -1,5 +1,5 @@
 /* Small display helpers. */
-import type { Media, Video } from './types';
+import type { Credit, CreditRole, EventDoc, Media, Video } from './types';
 
 /** "2026-11-14" → "14.11.2026". Null → the [DATE] placeholder. */
 export function formatDate(iso: string | null): string {
@@ -29,4 +29,16 @@ export function videoMedia(video: Video | undefined): Media {
 /** Alternating section themes: alternate('dark', 3) → ['dark', 'light', 'dark']. */
 export function alternate(first: 'dark' | 'light', count: number): ('dark' | 'light')[] {
   return Array.from({ length: count }, (_, i) => ((i % 2 === 0) === (first === 'dark') ? 'dark' : 'light'));
+}
+
+/** All people credited for a role, in the editor's order. */
+export function creditsFor(event: EventDoc, role: CreditRole): Credit[] {
+  return event.credits.filter((c) => c.role === role);
+}
+
+/** "NAME A · NAME B" for a role, or "" if nobody is credited. */
+export function creditLine(event: EventDoc, role: CreditRole): string {
+  return creditsFor(event, role)
+    .map((c) => c.name)
+    .join(' · ');
 }
