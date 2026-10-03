@@ -1,6 +1,6 @@
 /*
- * Content types. They mirror the planned Sanity schemas (CLAUDE.md §5),
- * so phase 2 only has to change where the data comes from (src/lib/content.ts).
+ * Content types used by the pages. src/lib/content.ts maps the Sanity query results
+ * (studio/schemaTypes) into these shapes, with [PLACEHOLDER] fallbacks for missing text.
  */
 
 export type City = 'Paris' | 'Tokyo' | 'Beijing';
@@ -8,11 +8,13 @@ export const CITIES: City[] = ['Paris', 'Tokyo', 'Beijing'];
 
 export type EventStatus = 'upcoming' | 'past';
 
-/** A resolved image: a URL plus its intrinsic size (Sanity CDN URL in phase 2). */
+/** A resolved image: default URL, size after cropping, responsive srcset and focal point (see lib/image.ts). */
 export interface ImageAsset {
   url: string;
   width: number;
   height: number;
+  srcset?: string;
+  position?: string; // CSS object-position from the editor's hotspot
 }
 
 /**
@@ -45,9 +47,22 @@ export interface Credit {
   instagram?: string; // handle without "@"
 }
 
+/** An artist as shown in line-ups. */
 export interface Artist {
   name: string;
+  slug: string;
   instagram?: string; // handle without "@"
+  showPage: boolean; // true → has a page at /artists/<slug>/
+}
+
+/** A full artist document (artist page). */
+export interface ArtistDoc extends Artist {
+  basedIn?: string;
+  genres: string[];
+  description: string;
+  portrait: Media;
+  work: Media[];
+  credits: Credit[];
 }
 
 export interface EventDoc {
@@ -68,14 +83,28 @@ export interface EventDoc {
   credits: Credit[];
 }
 
+/** Short sentences that are not in the deck: editable in Sanity (Settings → Short texts). */
+export interface SiteTexts {
+  ticketsSoon: string;
+  followCta: string;
+  emptyTitle: string;
+  emptyText: string;
+  nightLabel: string;
+  notFoundText: string;
+  eventsDescription: string;
+  artistsDescription: string;
+}
+
 export interface SiteSettings {
   email: string;
   instagram: string; // handle without "@"
   genres: string[];
+  texts: SiteTexts;
 }
 
 export interface HomePage {
   heroMedia: Media;
+  description: string;
   tagline: string[]; // one line per entry
   cities: string;
   whatIs: string[]; // paragraphs
@@ -100,4 +129,5 @@ export interface AboutPage {
   formats: Format[];
   networkText: string[];
   networkMedia: Media;
+  description: string;
 }

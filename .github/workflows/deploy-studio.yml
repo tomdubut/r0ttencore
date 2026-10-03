@@ -1,0 +1,41 @@
+# Deploys the Sanity Studio (studio/) to https://r0ttencore.sanity.studio
+# Runs when studio/ changes on main or on a claude/* working branch, or by hand (Actions → Deploy Studio → Run workflow).
+# Needs the repository secret SANITY_AUTH_TOKEN (Sanity project token with the "Deploy Studio" permission only).
+name: Deploy Studio
+
+on:
+  push:
+    branches: [main, 'claude/**']
+    paths: ['studio/**', '.github/workflows/deploy-studio.yml']
+  workflow_dispatch:
+
+# Never run two deploys at the same time.
+concurrency:
+  group: deploy-studio
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: studio
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            studio/package-lock.json
+      # The website's packages are needed too: the schema upload step reads the root tsconfig.json.
+      - run: npm ci
+        working-directory: .
+      - run: npm ci
+      - run: npx sanity deploy --url r0ttencore --yes
+        env:
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_AUTH_TOKEN }}

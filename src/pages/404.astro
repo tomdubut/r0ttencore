@@ -4,14 +4,17 @@ import { paths } from '../lib/paths';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Pill from '../components/Pill.astro';
+import { getSettings } from '../lib/content';
+
+const { texts } = await getSettings();
 ---
 
-<BaseLayout title="Page not found" description="[PLACEHOLDER — 404 description]">
+<BaseLayout title="Page not found" description={texts.notFoundText}>
   <Header slot="header" />
   <section class="section nf theme-dark" aria-labelledby="nf-title">
     <div class="wrap nf-inner">
       <h1 id="nf-title" class="display nf-title">404</h1>
-      <p class="lead">[PLACEHOLDER — page not found text]</p>
+      <p class="lead">{texts.notFoundText}</p>
       <Pill href={paths.events} size="l">EVENTS ↘</Pill>
     </div>
   </section>

@@ -21,7 +21,19 @@ const posterUrl = poster?.url ?? (id ? `https://i.ytimg.com/vi/${id}/hqdefault.j
 ---
 
 <a class="yt" href={url} data-yt-id={id} data-yt-title={title} target="_blank" rel="noopener">
-  {posterUrl && <img src={posterUrl} alt="" loading="lazy" decoding="async" />}
+  {
+    posterUrl && (
+      <img
+        src={posterUrl}
+        srcset={poster?.srcset}
+        sizes="(min-width: 900px) 66vw, 100vw"
+        alt=""
+        loading="lazy"
+        decoding="async"
+        style={poster?.position ? `object-position: ${poster.position}` : undefined}
+      />
+    )
+  }
   <Grain opacity={0.3} />
   <PlayButton />
   <span class="sr-only">Play video: {title}</span>

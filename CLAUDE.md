@@ -22,7 +22,8 @@ Phase plan: `docs/build-plan.md`. Design source: `design-reference/` (start with
 | Rebuild | Sanity webhook (on publish) → Workers Builds **Deploy Hook** URL (production branch). |
 | Videos | **All videos on YouTube**, linked from Sanity (URL field). Click-to-play embeds use a facade (poster + button; iframe only on click, `youtube-nocookie.com`). **Never** upload videos to the repo. Hero background video: see open question H1 in `docs/build-plan.md`. |
 | Media slots | Every place that shows a photo or a video uses one **"media" field in Sanity: the editor picks Image or YouTube video**, and the site renders whichever was chosen. Changing a photo to a video (or back) never needs code. |
-| Sanity Studio | Interface in **English**. **Standalone Studio hosted by Sanity** (`<name>.sanity.studio`), not embedded in the site. |
+| Sanity Studio | Interface in **English**. **Standalone Studio hosted by Sanity at `r0ttencore.sanity.studio`**, code in `studio/`, deployed by GitHub Actions (secret `SANITY_AUTH_TOKEN`, project token with *Deploy Studio* only). Free plan → only Administrator / Viewer roles: **the co-founder is an Administrator** (approved), automatic backups in phase 5. |
+| Images | **Served from the Sanity image CDN** (option A, approved). Free plan = hard cap of 100 GB bandwidth/month (≈25–50k visits): if reached, images stop loading until the 1st. Escape hatches: Growth plan, or build-time images served by Cloudflare (option B in `docs/phase-2-plan.md`). All image URLs go through one helper so switching is contained. |
 | Copy conflicts | When the deck and a mockup disagree on copy, **the deck wins** (e.g. About: 4 Network paragraphs, "CREATIVE COLLABORATIONS"). "Launching in 2026." is outdated and not used. |
 | Upcoming events | Same event template; status switches sections (see `docs/build-plan.md`, "Upcoming event page"). Daily scheduled rebuild + build rule: an upcoming event whose date has passed is not shown as NEXT. |
 | Backend | None. No database, no Supabase, no accounts, no forms. Contact = `mailto:` link. |
@@ -40,7 +41,9 @@ Phase plan: `docs/build-plan.md`. Design source: `design-reference/` (start with
 | About | `/about` | `about-AB1.html` |
 | Footer (all pages) | — | footer of `homepage-D-hybrid.html` **only** |
 | Mobile (all pages) | — | **No mobile mockup is used** (`homepage-D-mobile.html` is ignored). Mobile shows **the same content as desktop**, stacked in a single column, with the same dark/light sections. |
-| Contact | — | No page: `CONTACT` nav item → footer contact block (`#contact`) / `mailto:`. |
+| Artists listing | `/artists/` | **No mockup**: designed from existing pieces (approve via screenshots). City filter like `/events`. **Not linked in header or menu yet.** |
+| Artist page | `/artists/<slug>/` | **No mockup**: event-hero style (name + big media), work gallery (slideshow), videos, "events with r0t" (event rows), dark/light alternation. Reached via line-up links on event pages. |
+| Contact | — | No page: `CONTACT` nav item → footer contact block (`#contact`) / `mailto:`. (Contact form postponed: `docs/build-plan.md` H2.) |
 
 Mockups are fixed-width (1440 desktop / 390 mobile) with absolute positioning: **rebuild as responsive flex/grid**, never copy pixel positions. Ignore canvas tags (`<x-dc>`, `<helmet>`, `<sc-for>`, `<sc-if>`, `text/x-dc` scripts).
 
@@ -85,7 +88,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 **Motion**: subtle only (genre ticker scrolling, hover states, fade-ins). Everything respects `prefers-reduced-motion` (ticker static, no fades).
 
-## 5. Content model (Sanity) — draft, to refine in phase 2
+## 5. Content model (Sanity) — built in phase 2 (`studio/schemaTypes/`)
 
 **media** (reusable object, used for every photo/video slot): `type` radio = **Image** | **YouTube video**. Image → image (hotspot/crop) + alt text (required). YouTube → URL (validated as YouTube) + optional poster image + alt/label. Only the fields of the chosen type are shown. The site renders an image, or a click-to-play YouTube facade.
 
@@ -95,15 +98,23 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - heroMedia (media: fills the whole right half of the E2 hero on desktop, a full-width square on phones; cropped to fit → set the image hotspot; vertical videos get side bars)
 - gallery (array of images with alt, drag to reorder)
 - videos (array of media/YouTube: main aftermovie + clips, title each, reorderable)
-- line-up (array: artist name + Instagram handle, reorderable)
+- line-up (array of **references to artist documents**, reorderable)
 - short text, credits = list of { role (dropdown: Photos / Video / Location), name, optional Instagram handle }, several people per role, reorderable. Location falls back to the venue if empty.
 - SEO: optional title, description, share image (fallbacks: title / short text / cover)
 
-**homePage** (singleton): heroMedia (media), the homepage texts (not in the deck → editable).
+**artist**
+- name, slug, based in (free text city), genres (free tags; same spelling as Settings → Genres is asked in the help text), short description
+- portrait (media), work (array of media: images and/or YouTube, reorderable)
+- links: Instagram (+ SoundCloud / Spotify / Bandcamp later, platforms not decided)
+- **showPage** switch (default off): off → the artist appears in line-ups with an Instagram link only, no page; on → page published at `/artists/<slug>/` and line-up names link to it
+- "events with r0t" is **computed** (events whose line-up references the artist), never entered by hand
+- Rights: only material the artist has provided or approved; credit photographers (same credits list as events)
 
-**siteSettings** (singleton): contact email, Instagram handle, genre list (ticker / The Sounds), default share image, short UI sentences that are not in the deck (e.g. listing CTA, empty states).
+**homePage** (singleton, `_id: homePage`): heroMedia (media), tagline lines, cities line, "What is r0t?" paragraphs, SEO description.
 
-**aboutPage** (singleton): the About sections (hero texts, The Sounds text + genre cloud, Formats ×4 = media + label + text, Network text + media).
+**siteSettings** (singleton, `_id: siteSettings`): contact email, Instagram handle, genre list, default share image, **Short texts** (not in the deck, start as `[PLACEHOLDER]`): tickets-soon button, follow CTA, empty-state title/text, night label, 404 text, events/artists page descriptions.
+
+**aboutPage** (singleton, `_id: aboutPage`): intro paragraphs, cities, The Sounds text + genre cloud (name + size s/m/l/xl), Formats (label + lines + media, 4 expected), Network text + media, SEO description.
 
 **Studio rules**: clear labels, help text on every field, required fields validated, dropdowns for city/status, singletons cannot be duplicated/deleted, media library plugin (search, tags, see where an image is used). The editor must be simple for a non-technical person.
 
@@ -113,7 +124,8 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - Missing content → visible `[PLACEHOLDER]` text in brackets, never plausible fake content.
 - Copy that appears in the mockups but not in the deck ("NEVER MISS THE NEXT ONE.", "THE NIGHT", "SCROLL — ARCHIVE", "PLAYING — REEL 2026", the empty-state lines…) is **sample text, not approved**: render it as `[PLACEHOLDER]` or make it an editable Sanity field.
 - Short functional UI labels from the mockups (EVENTS, LINE-UP, CREDITS, MORE EVENTS…) are kept; see `docs/phase-1-plan.md` → Build notes.
-- Phase 1 builds every photo/video section empty-ready (placeholder media); real photos and videos are added by Tom via Sanity later.
+- Photo/video sections show grain placeholders while empty; sections with no content at all (e.g. an event without photos) are hidden.
+- The site reads **published** content only. Seeded placeholder documents: events 01–03, artists [ARTIST 01–04] (page off), the three singletons.
 - Anything the team might want to change must be editable in Sanity without code.
 - Counts, "NEXT: <CITY>", years and "LATEST — 02" are computed from Sanity data, never hard-coded.
 
