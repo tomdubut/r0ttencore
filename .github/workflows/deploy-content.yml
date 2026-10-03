@@ -12,7 +12,8 @@
 # - workflow_dispatch: manual run (Actions → Deploy content → Run workflow).
 # Code pushes are still built by Cloudflare Workers Builds (production on main, branch previews).
 #
-# Secrets: CLOUDFLARE_API_TOKEN (template "Edit Cloudflare Workers"), CLOUDFLARE_ACCOUNT_ID.
+# Secrets: CLOUDFLARE_API_TOKEN (custom token: Account → Workers Scripts → Edit, this account only),
+# CLOUDFLARE_ACCOUNT_ID.
 # Note: GitHub pauses scheduled workflows after 60 days without commits; it emails the repo owner
 # and a click on "Enable workflow" (Actions tab) turns it back on.
 name: Deploy content
@@ -33,16 +34,23 @@ concurrency:
 permissions:
   contents: read
 
+# Security notes:
+# - Two jobs: "build" runs the site's code and dependencies with NO secrets; "deploy" only
+#   uploads the built files. The Cloudflare token exists only in the deploy step.
+# - The deploy job installs packages with --ignore-scripts, so no package code runs at install time.
+# - Actions are pinned to exact commits (tag in the comment), so a moved tag can't change them.
+# - No pull_request trigger: forks can never reach these secrets.
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: main
+          persist-credentials: false
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
           cache: npm
@@ -50,6 +58,34 @@ jobs:
       - run: npm ci
 
       - run: npm run build
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: site
+          path: dist/
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: main
+          persist-credentials: false
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: site
+          path: dist/
+
+      # Wrangler at the version locked in package-lock.json, no install scripts.
+      - run: npm ci --ignore-scripts --no-audit --no-fund
 
       - name: Upload to Cloudflare
         run: npx wrangler deploy
