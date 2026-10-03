@@ -63,7 +63,7 @@ Detailed plan: `docs/phase-2-plan.md`.
 
 ## Phase 5: Go live
 
-- Sanity webhook (publish/unpublish/delete on `event`, `siteSettings`, `aboutPage`) → Cloudflare Workers Builds deploy hook for `main`.
+- ~~Sanity webhook → Cloudflare deploy hook~~ and daily rebuild: **moved earlier** (set up after phase 2, see `CLAUDE.md` → Rebuild).
 - Domain `r0ttencore.com` on Cloudflare: add only the web records (apex + `www`, redirect `www` → apex or the reverse). **Do not touch MX / mail TXT records (Hostinger email).** Check that email still works after the change.
 - Invite the co-founder to Sanity (editor role) and test an edit end-to-end.
 - One-page editor guide for the co-founder (how to add an event, photos, videos, announce the next one).
