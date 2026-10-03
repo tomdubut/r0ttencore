@@ -1,7 +1,7 @@
 ---
 /*
  * One photo/video slot. Renders, depending on what the editor chose in Sanity:
- *   - image   → <img> (responsive Sanity CDN srcset in phase 2)
+ *   - image   → <img> with a responsive Sanity CDN srcset; object-position = the editor's focal point
  *   - youtube → click-to-play YouTube facade
  *   - null    → grain placeholder (grey radial gradient + mono label), as in the mockups
  * The slot fills its box: set the size with `ratio` (e.g. "16 / 9") or with CSS on `class`.
@@ -55,10 +55,12 @@ const style = ratio ? `aspect-ratio: ${ratio};` : undefined;
     media?.kind === 'image' && (
       <img
         src={media.image.url}
+        srcset={media.image.srcset}
+        sizes={sizes}
         width={media.image.width}
         height={media.image.height}
         alt={media.alt}
-        sizes={sizes}
+        style={media.image.position ? `object-position: ${media.image.position}` : undefined}
         loading={eager ? 'eager' : 'lazy'}
         fetchpriority={eager ? 'high' : undefined}
         decoding="async"

@@ -21,7 +21,7 @@ const themeOf = (key: string) => themes[present.indexOf(key)];
 const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
 ---
 
-<BaseLayout title="Events" description="[PLACEHOLDER — events page description]">
+<BaseLayout title="Events" description={settings.texts.eventsDescription}>
   <Header slot="header" active="events" />
 
   <section class="hero theme-dark" aria-labelledby="events-title">
@@ -69,7 +69,7 @@ const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
             </Pill>
           ) : (
             <Pill variant="filled" size="l" class="upcoming-cta">
-              [TICKETS SOON]
+              {settings.texts.ticketsSoon}
             </Pill>
           )}
         </div>
@@ -86,15 +86,15 @@ const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
         {past.map((e) => <EventRow event={e} variant="index" />)}
       </div>
       <div class="empty" data-empty hidden={past.length > 0}>
-        <p class="display empty-title">[NOTHING HERE YET.]</p>
-        <p class="mono muted">[EMPTY-STATE TEXT]</p>
+        <p class="display empty-title">{settings.texts.emptyTitle}</p>
+        <p class="mono muted">{settings.texts.emptyText}</p>
       </div>
     </div>
   </section>
 
   <section class:list={['cta', `theme-${themeOf('cta')}`]} aria-label="Follow r0t">
     <div class="wrap cta-inner">
-      <p class="display cta-title">[NEVER MISS THE NEXT ONE.]</p>
+      <p class="display cta-title">{settings.texts.followCta}</p>
       <Pill href={instagramUrl(settings.instagram)} variant="filled" size="l" external>
         FOLLOW @{settings.instagram} ↗
       </Pill>

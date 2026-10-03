@@ -10,7 +10,7 @@ import { getAboutPage } from '../lib/content';
 const about = await getAboutPage();
 ---
 
-<BaseLayout title="About" description="[PLACEHOLDER — about page description]">
+<BaseLayout title="About" description={about.description}>
   <Header slot="header" active="about" />
 
   <!-- 1. What is r0t? (dark) -->

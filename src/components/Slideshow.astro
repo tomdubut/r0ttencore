@@ -1,0 +1,215 @@
+---
+/*
+ * Photo / work slideshow (event photos, artist work).
+ * A horizontal scroll-snap strip: swipeable and usable without JS. With JS
+ * (scripts/slideshow.ts): prev/next buttons, thumbnails, arrow keys and the "01 / 10" counter.
+ * Items can be images, YouTube videos (click-to-play inside the slide) or null (placeholder).
+ */
+import Media from './Media.astro';
+import SectionTitle from './SectionTitle.astro';
+import type { Media as MediaItem } from '../lib/types';
+import { youtubeId, pad2 } from '../lib/format';
+
+interface Props {
+  id: string;
+  title: string;
+  theme: 'dark' | 'light';
+  items: MediaItem[];
+  /** Line under the thumbnails, e.g. "PHOTOS — NAME A · NAME B". */
+  credit?: string;
+}
+
+const { id, title, theme, items, credit } = Astro.props;
+const total = pad2(items.length);
+
+/** Thumbnails are always plain images (a YouTube thumbnail for videos): no nested players or links. */
+const thumbOf = (m: MediaItem): MediaItem => {
+  if (m?.kind !== 'youtube') return m && { ...m, alt: '' };
+  const yt = youtubeId(m.url);
+  const image = m.poster ?? (yt ? { url: `https://i.ytimg.com/vi/${yt}/mqdefault.jpg`, width: 320, height: 180 } : null);
+  return image ? { kind: 'image', image, alt: '' } : null;
+};
+---
+
+<section class:list={['section', `theme-${theme}`]} aria-labelledby={`${id}-title`} data-slideshow>
+  <div class="wrap">
+    <SectionTitle id={`${id}-title`} title={title} size="title-s" meta={`01 / ${total}`} />
+
+    <div class="slides-wrap">
+      <ul class="slides" data-slides tabindex="0" aria-label={`${title} — swipe or use the arrow keys`}>
+        {
+          items.map((item, i) => (
+            <li class="slide" aria-label={`${pad2(i + 1)} of ${total}`}>
+              <Media
+                media={item}
+                label={item ? undefined : `[${title.replace(/S$/, '')} ${pad2(i + 1)}]`}
+                seed={i}
+                class="slide-media"
+                eager={i === 0}
+                sizes="(min-width: 1600px) 1520px, 100vw"
+              />
+            </li>
+          ))
+        }
+      </ul>
+      <button type="button" class="nav-btn nav-prev" data-prev aria-label="Previous">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M15 5l-7 7 7 7"></path>
+        </svg>
+      </button>
+      <button type="button" class="nav-btn nav-next" data-next aria-label="Next">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="thumbs" data-thumbs>
+      {
+        items.map((item, i) => (
+          <button type="button" class="thumb" data-index={i} aria-label={`Show ${pad2(i + 1)}`}>
+            <Media media={thumbOf(item)} seed={i} class="thumb-media" sizes="120px" />
+          </button>
+        ))
+      }
+    </div>
+
+    {credit && <p class="mono muted photo-credit">{credit}</p>}
+  </div>
+</section>
+
+<script>
+  import '../scripts/slideshow';
+</script>
+
+<style>
+  /* ---------- Photos ---------- */
+  .slides-wrap {
+    position: relative;
+    margin-top: 32px;
+  }
+
+  .slides {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .slides::-webkit-scrollbar {
+    display: none;
+  }
+
+  .slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+  }
+
+  .slide :global(.slide-media) {
+    aspect-ratio: 4 / 5;
+  }
+
+  @media (min-width: 768px) {
+    .slide :global(.slide-media) {
+      aspect-ratio: auto;
+      height: clamp(420px, 50vw, 720px);
+    }
+  }
+
+  /* Prev/next and thumbnails need JS: only shown when JS runs (html.js is set before first paint). */
+  .nav-btn,
+  .thumbs {
+    display: none !important;
+  }
+
+  :global(.js) .nav-btn {
+    display: flex !important;
+  }
+
+  :global(.js) .thumbs {
+    display: grid !important;
+  }
+
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: clamp(48px, 4.4vw, 64px);
+    height: clamp(48px, 4.4vw, 64px);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg-light);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--bg-light);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease);
+  }
+
+  .nav-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .nav-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .nav-prev {
+    left: clamp(12px, 1.4vw, 20px);
+  }
+
+  .nav-next {
+    right: clamp(12px, 1.4vw, 20px);
+  }
+
+  .thumbs {
+    position: relative;
+    grid-auto-flow: column;
+    grid-auto-columns: 72px;
+    gap: 8px;
+    margin-top: 12px;
+    overflow-x: auto;
+    padding: 4px 2px;
+    scrollbar-width: none;
+  }
+
+  @media (min-width: 900px) {
+    .thumbs {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      overflow: visible;
+    }
+  }
+
+  .thumb {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    opacity: 0.55;
+    outline-offset: 2px;
+    transition: opacity 0.2s var(--ease);
+  }
+
+  .thumb:hover,
+  .thumb[aria-current='true'] {
+    opacity: 1;
+  }
+
+  .thumb[aria-current='true'] {
+    outline: 2px solid var(--fg);
+  }
+
+  .thumb :global(.thumb-media) {
+    height: clamp(72px, 6.7vw, 96px);
+  }
+
+  .photo-credit {
+    margin-top: 20px;
+  }
+
+</style>

@@ -11,10 +11,11 @@ import Pill from '../components/Pill.astro';
 import SectionTitle from '../components/SectionTitle.astro';
 import EventRow from '../components/EventRow.astro';
 import Arrow from '../components/icons/Arrow.astro';
-import { getHomePage, getPastEvents, getUpcomingEvent } from '../lib/content';
+import { getHomePage, getPastEvents, getSettings, getUpcomingEvent } from '../lib/content';
 import { alternate, formatDate, pad2, videoMedia } from '../lib/format';
 
 const home = await getHomePage();
+const settings = await getSettings();
 const next = await getUpcomingEvent();
 const past = await getPastEvents();
 const latest = past[0];
@@ -27,7 +28,7 @@ const [nextTheme, archiveTheme, whatTheme] = [themeOf('next'), themeOf('archive'
 const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' · ');
 ---
 
-<BaseLayout description="[PLACEHOLDER — homepage description]">
+<BaseLayout description={home.description}>
   <Header slot="header" overlay />
 
   <!-- 1. Hero (dark): media slot + wordmark + deck tagline -->
@@ -63,7 +64,7 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
             </Pill>
           ) : (
             <Pill variant="filled" size="l" class="next-cta">
-              [TICKETS SOON]
+              {settings.texts.ticketsSoon}
             </Pill>
           )}
         </div>

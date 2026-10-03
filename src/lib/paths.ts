@@ -7,4 +7,6 @@ export const paths = {
   events: '/events/',
   about: '/about/',
   event: (slug: string) => `/events/${slug}/`,
+  artists: '/artists/',
+  artist: (slug: string) => `/artists/${slug}/`,
 };

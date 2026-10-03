@@ -12,8 +12,10 @@ import Media from '../../components/Media.astro';
 import Pill from '../../components/Pill.astro';
 import SectionTitle from '../../components/SectionTitle.astro';
 import EventCard from '../../components/EventCard.astro';
-import { getEvents, isEventUpcoming } from '../../lib/content';
-import { alternate, creditLine, creditsFor, formatDate, instagramUrl, pad2, videoMedia } from '../../lib/format';
+import Slideshow from '../../components/Slideshow.astro';
+import ArtistLink from '../../components/ArtistLink.astro';
+import { getEvents, getSettings, isEventUpcoming } from '../../lib/content';
+import { alternate, creditLine, creditsFor, formatDate, instagramUrl, videoMedia } from '../../lib/format';
 import { CREDIT_ROLES, type EventDoc } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -28,6 +30,7 @@ interface Props {
 const { event } = Astro.props;
 const upcoming = isEventUpcoming(event);
 const all = await getEvents();
+const { texts } = await getSettings();
 
 const photos = upcoming ? [] : event.gallery;
 const [mainVideo, ...clips] = upcoming ? [] : event.videos;
@@ -58,7 +61,7 @@ const themeOf = (key: string) => themes[present.indexOf(key)];
 const city = event.city.toUpperCase();
 ---
 
-<BaseLayout title={`${event.title} — ${event.city}`} description="[PLACEHOLDER — event description]">
+<BaseLayout title={`${event.title} — ${event.city}`} description={event.text || texts.eventsDescription}>
   <Header slot="header" active="events" split />
 
   <!-- 1. Hero: info panel (light) + media panel (black) -->
@@ -86,7 +89,7 @@ const city = event.city.toUpperCase();
                 </Pill>
               ) : (
                 <Pill variant="filled" size="l">
-                  [TICKETS SOON]
+                  {texts.ticketsSoon}
                 </Pill>
               )}
             </div>
@@ -100,13 +103,7 @@ const city = event.city.toUpperCase();
               <ul>
                 {event.lineup.map((artist) => (
                   <li>
-                    {artist.instagram ? (
-                      <a href={instagramUrl(artist.instagram)} target="_blank" rel="noopener">
-                        {artist.name} ↗<span class="sr-only"> on Instagram (opens in a new tab)</span>
-                      </a>
-                    ) : (
-                      <span>{artist.name}</span>
-                    )}
+                    <ArtistLink artist={artist} />
                   </li>
                 ))}
               </ul>
@@ -128,56 +125,16 @@ const city = event.city.toUpperCase();
     </div>
   </section>
 
-  <!-- 2. Photos: swipeable strip (works without JS) + prev/next/thumbnails with JS -->
+  <!-- 2. Photos -->
   {
     photos.length > 0 && (
-      <section class:list={['section', `theme-${themeOf('photos')}`]} aria-labelledby="photos-title" data-slideshow>
-        <div class="wrap">
-          <SectionTitle id="photos-title" title="PHOTOS" size="title-s" meta={`01 / ${pad2(photos.length)}`} />
-
-          <div class="slides-wrap">
-            <ul class="slides" data-slides tabindex="0" aria-label="Photos — swipe or use the arrow keys">
-              {photos.map((photo, i) => (
-                <li class="slide" aria-label={`Photo ${pad2(i + 1)} of ${pad2(photos.length)}`}>
-                  <Media
-                    media={photo.image ? { kind: 'image', image: photo.image, alt: photo.alt } : null}
-                    label={photo.image ? undefined : `[PHOTO ${pad2(i + 1)}]`}
-                    seed={i}
-                    class="slide-media"
-                    eager={i === 0}
-                    sizes="(min-width: 1600px) 1520px, 100vw"
-                  />
-                </li>
-              ))}
-            </ul>
-            <button type="button" class="nav-btn nav-prev" data-prev aria-label="Previous photo">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path d="M15 5l-7 7 7 7" />
-              </svg>
-            </button>
-            <button type="button" class="nav-btn nav-next" data-next aria-label="Next photo">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="thumbs" data-thumbs>
-            {photos.map((photo, i) => (
-              <button type="button" class="thumb" data-index={i} aria-label={`Show photo ${pad2(i + 1)}`}>
-                <Media
-                  media={photo.image ? { kind: 'image', image: photo.image, alt: '' } : null}
-                  seed={i}
-                  class="thumb-media"
-                  sizes="120px"
-                />
-              </button>
-            ))}
-          </div>
-
-          {photoCredit && <p class="mono muted photo-credit">PHOTOS — {photoCredit}</p>}
-        </div>
-      </section>
+      <Slideshow
+        id="photos"
+        title="PHOTOS"
+        theme={themeOf('photos')}
+        items={photos.map((p) => (p.image ? { kind: 'image', image: p.image, alt: p.alt } : null))}
+        credit={photoCredit ? `PHOTOS — ${photoCredit}` : undefined}
+      />
     )
   }
 
@@ -235,7 +192,7 @@ const city = event.city.toUpperCase();
         <div class="wrap night">
           {event.text && (
             <div class="night-text">
-              <p class="mono muted">[THE NIGHT]</p>
+              <p class="mono muted">{texts.nightLabel}</p>
               <p class="night-body">{event.text}</p>
             </div>
           )}
@@ -286,10 +243,6 @@ const city = event.city.toUpperCase();
     )
   }
 </BaseLayout>
-
-<script>
-  import '../../scripts/slideshow';
-</script>
 
 <style>
   /* ---------- Hero ---------- */
@@ -410,135 +363,6 @@ const city = event.city.toUpperCase();
     .hero-media {
       aspect-ratio: auto;
     }
-  }
-
-  /* ---------- Photos ---------- */
-  .slides-wrap {
-    position: relative;
-    margin-top: 32px;
-  }
-
-  .slides {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    overscroll-behavior-x: contain;
-  }
-
-  .slides::-webkit-scrollbar {
-    display: none;
-  }
-
-  .slide {
-    flex: 0 0 100%;
-    scroll-snap-align: start;
-  }
-
-  .slide :global(.slide-media) {
-    aspect-ratio: 4 / 5;
-  }
-
-  @media (min-width: 768px) {
-    .slide :global(.slide-media) {
-      aspect-ratio: auto;
-      height: clamp(420px, 50vw, 720px);
-    }
-  }
-
-  /* Prev/next and thumbnails need JS: only shown when JS runs (html.js is set before first paint). */
-  .nav-btn,
-  .thumbs {
-    display: none !important;
-  }
-
-  :global(.js) .nav-btn {
-    display: flex !important;
-  }
-
-  :global(.js) .thumbs {
-    display: grid !important;
-  }
-
-  .nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: clamp(48px, 4.4vw, 64px);
-    height: clamp(48px, 4.4vw, 64px);
-    border-radius: 50%;
-    border: 1.5px solid var(--bg-light);
-    background: rgba(0, 0, 0, 0.3);
-    color: var(--bg-light);
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s var(--ease);
-  }
-
-  .nav-btn:hover {
-    background: rgba(0, 0, 0, 0.6);
-  }
-
-  .nav-btn svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  .nav-prev {
-    left: clamp(12px, 1.4vw, 20px);
-  }
-
-  .nav-next {
-    right: clamp(12px, 1.4vw, 20px);
-  }
-
-  .thumbs {
-    position: relative;
-    grid-auto-flow: column;
-    grid-auto-columns: 72px;
-    gap: 8px;
-    margin-top: 12px;
-    overflow-x: auto;
-    padding: 4px 2px;
-    scrollbar-width: none;
-  }
-
-  @media (min-width: 900px) {
-    .thumbs {
-      grid-auto-flow: row;
-      grid-template-columns: repeat(10, minmax(0, 1fr));
-      grid-auto-columns: auto;
-      overflow: visible;
-    }
-  }
-
-  .thumb {
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-    opacity: 0.55;
-    outline-offset: 2px;
-    transition: opacity 0.2s var(--ease);
-  }
-
-  .thumb:hover,
-  .thumb[aria-current='true'] {
-    opacity: 1;
-  }
-
-  .thumb[aria-current='true'] {
-    outline: 2px solid var(--fg);
-  }
-
-  .thumb :global(.thumb-media) {
-    height: clamp(72px, 6.7vw, 96px);
-  }
-
-  .photo-credit {
-    margin-top: 20px;
   }
 
   /* ---------- Videos ---------- */
