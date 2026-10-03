@@ -1,6 +1,6 @@
 # Phase 2 plan — Sanity
 
-Status: **awaiting Tom's OK** (and the 3 decisions at the end). Rules: `/CLAUDE.md`. Phases: `docs/build-plan.md`.
+Status: **approved**. Decisions: 1 → A (Sanity image CDN), 2 → `r0ttencore.sanity.studio`, 3 → co-founder Administrator. Deploy token added as GitHub secret `SANITY_AUTH_TOKEN`. Rules: `/CLAUDE.md`. Phases: `docs/build-plan.md`.
 
 ## Goal
 
