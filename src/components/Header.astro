@@ -1,0 +1,161 @@
+---
+/*
+ * Site header.
+ * Desktop: logo (cup + r0t) + EVENTS / ABOUT / CONTACT on the left, NEXT pill on the right.
+ * Mobile (<768px): two rows, no JS — row 1 = logo + NEXT pill, row 2 = the 3 nav links.
+ * `overlay` = transparent, positioned over a dark hero (homepage).
+ */
+import Logo from './Logo.astro';
+import Pill from './Pill.astro';
+import { getUpcomingEvent } from '../lib/content';
+
+interface Props {
+  active?: 'events' | 'about';
+  theme?: 'dark' | 'light';
+  overlay?: boolean;
+}
+
+const { active, theme = 'dark', overlay = false } = Astro.props;
+const next = await getUpcomingEvent();
+
+const links = [
+  { href: '/events', label: 'EVENTS', key: 'events' },
+  { href: '/about', label: 'ABOUT', key: 'about' },
+  { href: '#contact', label: 'CONTACT', key: 'contact' },
+];
+---
+
+<header
+  class:list={['site-header', theme === 'light' ? 'theme-light' : 'theme-dark', overlay && 'site-header--overlay']}
+>
+  <div class="wrap header-inner">
+    <a href="/" class="home-link" aria-label="r0t — home">
+      <Logo height={48} heightMobile={40} wordmark />
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <ul>
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} aria-current={active === l.key ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    {
+      next && (
+        <Pill href={`/events/${next.slug}`} class="next-pill" size="m">
+          NEXT: {next.city.toUpperCase()} ↗
+        </Pill>
+      )
+    }
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: relative;
+    z-index: 10;
+  }
+
+  .site-header--overlay {
+    position: absolute;
+    inset: 0 0 auto;
+    background: transparent;
+  }
+
+  .header-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'logo pill'
+      'nav nav';
+    align-items: center;
+  }
+
+  .home-link {
+    grid-area: logo;
+    display: inline-flex;
+    align-items: center;
+    min-height: 64px;
+    padding-block: 10px;
+  }
+
+  .next-pill {
+    grid-area: pill;
+    justify-self: end;
+  }
+
+  .nav {
+    grid-area: nav;
+    border-top: 1px solid var(--line-on-dark-soft);
+    border-bottom: 1px solid var(--line-on-dark-soft);
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+
+  .theme-light .nav {
+    border-color: var(--ink);
+  }
+
+  .nav ul {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 800;
+    font-size: var(--fs-nav);
+    letter-spacing: 1px;
+    border-bottom: 2px solid transparent;
+    transition: opacity 0.2s var(--ease);
+  }
+
+  .nav a:hover {
+    opacity: 0.65;
+  }
+
+  .nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  @media (min-width: 768px) {
+    .header-inner {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas: 'logo nav pill';
+      column-gap: 36px;
+      height: var(--header-h);
+      border-bottom: 1px solid var(--line-on-dark-soft);
+    }
+
+    .theme-light .header-inner {
+      border-color: var(--ink);
+    }
+
+    .home-link {
+      min-height: 0;
+      padding: 0;
+    }
+
+    .nav {
+      border: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav ul {
+      justify-content: flex-start;
+      gap: 36px;
+    }
+  }
+</style>

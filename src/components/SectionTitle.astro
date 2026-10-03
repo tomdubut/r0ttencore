@@ -1,0 +1,62 @@
+---
+/* Huge Anton title + small mono meta on the right, on a bottom-ruled row (ARCHIVE (02)…, PHOTOS 01 / 10…). */
+interface Props {
+  title: string;
+  meta?: string;
+  as?: 'h1' | 'h2';
+  size?: 'mega' | 'title' | 'title-s';
+  rule?: 'thin' | 'thick' | 'none';
+  id?: string;
+}
+const { title, meta, as: Tag = 'h2', size = 'title', rule = 'thin', id } = Astro.props;
+---
+
+<div class:list={['section-title', `rule-${rule}`]}>
+  <Tag class:list={['display', `size-${size}`]} id={id}>{title}</Tag>
+  {meta && <span class="mono meta" data-counter>{meta}</span>}
+  <slot />
+</div>
+
+<style>
+  .section-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: clamp(12px, 1.2vw, 16px);
+  }
+
+  .rule-thin {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rule-thick {
+    border-bottom: 2px solid var(--fg);
+  }
+
+  h1,
+  h2 {
+    line-height: 0.85;
+    overflow-wrap: anywhere;
+  }
+
+  .size-mega {
+    font-size: var(--fs-mega);
+    line-height: 0.82;
+  }
+
+  .size-title {
+    font-size: var(--fs-title);
+  }
+
+  .size-title-s {
+    font-size: var(--fs-title-s);
+  }
+
+  .meta {
+    flex-shrink: 0;
+    padding-bottom: 0.4em;
+    font-size: clamp(11px, calc(11px + 7 * (100vw - 390px) / 1050), 18px);
+    letter-spacing: 0;
+  }
+</style>

@@ -1,0 +1,88 @@
+---
+/*
+ * Rounded pill button/link (NEXT: TOKYO ↗, TICKETS ↗, filters…).
+ * Renders <a> when `href` is set, otherwise a non-interactive <span> (e.g. "tickets soon").
+ */
+interface Props {
+  href?: string;
+  variant?: 'outline' | 'filled';
+  size?: 's' | 'm' | 'l';
+  external?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { href, variant = 'outline', size = 'm', external = false, class: className, ...rest } = Astro.props;
+const Tag = href ? 'a' : 'span';
+const linkProps = href && external ? { target: '_blank', rel: 'noopener' } : {};
+---
+
+<Tag
+  class:list={['pill', `pill--${variant}`, `pill--${size}`, !href && 'pill--static', className]}
+  href={href}
+  {...linkProps}
+  {...rest}
+>
+  <slot />
+  {external && <span class="sr-only"> (opens in a new tab)</span>}
+</Tag>
+
+<style>
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid currentColor;
+    font-family: var(--font-heavy);
+    white-space: nowrap;
+    transition:
+      background-color 0.2s var(--ease),
+      color 0.2s var(--ease),
+      opacity 0.2s var(--ease);
+  }
+
+  .pill--s {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+
+  .pill--m {
+    min-height: 44px;
+    padding: 0 22px;
+    font-size: 13px;
+  }
+
+  .pill--l {
+    min-height: 56px;
+    padding: 0 32px;
+    font-size: 15px;
+  }
+
+  .pill--filled {
+    background: var(--pill-fill-bg);
+    color: var(--pill-fill-fg);
+    border-color: var(--pill-fill-bg);
+  }
+
+  a.pill--outline:hover {
+    background: var(--fg);
+    color: var(--pill-fill-fg);
+    border-color: var(--fg);
+  }
+
+  .theme-light a.pill--outline:hover {
+    color: var(--bg-light);
+  }
+
+  a.pill--filled:hover {
+    opacity: 0.8;
+  }
+
+  .pill--static {
+    opacity: 0.7;
+    cursor: default;
+  }
+</style>
