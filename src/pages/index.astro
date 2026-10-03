@@ -168,7 +168,7 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
     flex-direction: column;
     justify-content: space-between;
     padding-top: calc(108px + 48px);
-    padding-bottom: clamp(24px, 4vw, 56px);
+    padding-bottom: 0;
   }
 
   .hero-tagline {
@@ -180,22 +180,31 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
     line-height: 1.04;
   }
 
+  /*
+   * "r0t" and the cities sit flush on the bottom edge of the hero.
+   * With line-height: 1, the space under the letters is a fixed share of the font size
+   * (measured from the fonts' metrics), so a negative bottom margin in em removes it:
+   *   Archivo Black: 0.15em · Anton: 0.065em.
+   * Phone: cities above, "r0t" on the bottom edge. Desktop: side by side, both on the edge.
+   */
   .hero-bottom {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
   }
 
   .hero-word {
     font-family: var(--font-heavy);
     font-weight: 400;
     font-size: clamp(170px, 32vw, 460px);
-    line-height: 0.82;
+    line-height: 1;
     letter-spacing: -0.065em;
     margin-left: -0.04em;
+    margin-bottom: -0.15em;
   }
 
   .hero-cities {
+    order: -1;
     font-size: clamp(30px, calc(30px + 34 * (100vw - 390px) / 1050), 64px);
     line-height: 1;
   }
@@ -213,8 +222,9 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
     }
 
     .hero-cities {
+      order: 0;
       text-align: right;
-      padding-bottom: 0.15em;
+      margin-bottom: -0.065em;
     }
   }
 
