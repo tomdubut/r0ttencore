@@ -70,6 +70,8 @@ public/
 
 Text in `[BRACKETS]` is a placeholder. Never replace it with invented content: real text comes from the brand deck or from Sanity.
 
+Photo / video credits: add the people once in an event's (or artist's) **Credits**, then pick them in **Photo by** / **Video by** on each photo or video. Left on "Automatic", the only person credited for that role is used. Captions are rendered by `components/CreditCaption.astro`.
+
 ## Deploy
 
 Cloudflare builds the repo on every push (Workers Builds):
