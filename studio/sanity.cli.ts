@@ -7,6 +7,7 @@ export default defineCliConfig({
   },
   deployment: {
     // Hosted at https://r0ttencore.sanity.studio, deployed by .github/workflows/deploy-studio.yml
+    appId: 'b7ydnp929vzjf9mqi9r6gtst',
     autoUpdates: true,
   },
   typegen: {
