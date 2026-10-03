@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
 import {CalendarIcon} from '@sanity/icons/Calendar'
+import {creditByField} from '../shared/creditBy'
 
 export const CITIES = [
   {title: 'Paris', value: 'Paris'},
@@ -152,6 +153,7 @@ export const event = defineType({
               type: 'string',
               validation: (rule) => rule.required(),
             }),
+            creditByField('Photo by'),
           ],
         }),
       ],
@@ -181,7 +183,8 @@ export const event = defineType({
       title: 'Credits',
       type: 'array',
       group: 'people',
-      description: 'Photographers, videographers, location. Several people per role is fine.',
+      description:
+        'Photographers, videographers, location. Several people per role is fine. Each photo and video can then be credited to one of them ("Photo by" / "Video by").',
       of: [defineArrayMember({type: 'credit'})],
     }),
 

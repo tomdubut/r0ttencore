@@ -1,6 +1,7 @@
 import {defineField, defineType} from 'sanity'
 import {PlayIcon} from '@sanity/icons/Play'
 import {isYouTubeUrl} from '../shared/validation'
+import {creditByField} from '../shared/creditBy'
 
 /** A YouTube video with a title (event videos: aftermovie + clips). */
 export const video = defineType({
@@ -24,6 +25,7 @@ export const video = defineType({
       validation: (rule) =>
         rule.custom((value) => !value || isYouTubeUrl(value) || 'This doesn’t look like a YouTube link.'),
     }),
+    creditByField('Video by'),
   ],
   preview: {
     select: {title: 'title', subtitle: 'url'},
