@@ -1,0 +1,32 @@
+---
+/* Not found page. Served by Cloudflare for unknown URLs (wrangler.jsonc: not_found_handling). */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Pill from '../components/Pill.astro';
+---
+
+<BaseLayout title="Page not found" description="[PLACEHOLDER — 404 description]">
+  <Header slot="header" />
+  <section class="section nf theme-dark" aria-labelledby="nf-title">
+    <div class="wrap nf-inner">
+      <h1 id="nf-title" class="display nf-title">404</h1>
+      <p class="lead">[PLACEHOLDER — page not found text]</p>
+      <Pill href="/events" size="l">EVENTS ↘</Pill>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+    min-height: 50svh;
+  }
+
+  .nf-title {
+    font-size: var(--fs-mega);
+    line-height: 0.82;
+  }
+</style>
