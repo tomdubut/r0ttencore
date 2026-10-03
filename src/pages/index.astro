@@ -3,6 +3,7 @@
  * Homepage — mockup homepage-A-archive.html, adapted (CLAUDE.md §3):
  * hero = media slot (image now, video later); sections alternate dark / light.
  */
+import { paths } from '../lib/paths';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Media from '../components/Media.astro';
@@ -50,7 +51,7 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
       <section class:list={['next', `theme-${nextTheme}`]} aria-label="Next event">
         <div class="wrap next-inner">
           <span class="mono next-label">NEXT EVENT</span>
-          <a class="display next-city" href={`/events/${next.slug}`}>
+          <a class="display next-city" href={paths.event(next.slug)}>
             {next.city.toUpperCase()}
           </a>
           <span class="next-meta">
@@ -99,7 +100,7 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
                 </p>
                 {latest.text && <p class="latest-body">{latest.text}</p>}
               </div>
-              <a class="text-link" href={`/events/${latest.slug}`}>
+              <a class="text-link" href={paths.event(latest.slug)}>
                 SEE PHOTOS &amp; VIDEOS ↘
               </a>
             </div>
@@ -123,7 +124,7 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
         <div class="lead">
           {home.whatIs.map((p) => <p>{p}</p>)}
         </div>
-        <a class="text-link" href="/about">ABOUT r0t ↘</a>
+        <a class="text-link" href={paths.about}>ABOUT r0t ↘</a>
       </div>
     </div>
   </section>

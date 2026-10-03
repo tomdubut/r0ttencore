@@ -5,6 +5,7 @@
  * variant "index"   (events L1):  NO · CITY · NAME · DATE · media info · ↘
  * Mobile: thumbnail + "02 · PARIS · DATE" + name + arrow (stacked).
  */
+import { paths } from '../lib/paths';
 import Arrow from './icons/Arrow.astro';
 import Media from './Media.astro';
 import type { EventDoc } from '../lib/types';
@@ -25,7 +26,7 @@ const mediaInfo = [event.videos.length > 0 && '▶ AFTERMOVIE', event.gallery.le
 
 <a
   class:list={['event-row', `event-row--${variant}`]}
-  href={`/events/${event.slug}`}
+  href={paths.event(event.slug)}
   data-city={event.city}
 >
   <Media media={event.cover} seed={seed} class="row-thumb-m" sizes="84px" />

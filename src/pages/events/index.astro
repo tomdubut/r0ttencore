@@ -1,5 +1,6 @@
 ---
 /* Events listing — mockup events-listing-L1.html. */
+import { paths } from '../../lib/paths';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Pill from '../../components/Pill.astro';
@@ -53,7 +54,7 @@ const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
         <div class="wrap upcoming-inner">
           <span class="mono upcoming-label">UPCOMING</span>
           <div class="upcoming-city">
-            <a id="upcoming-city" class="display" href={`/events/${next.slug}`}>
+            <a id="upcoming-city" class="display" href={paths.event(next.slug)}>
               {next.city.toUpperCase()}
             </a>
             <span class="mono">{next.number}</span>

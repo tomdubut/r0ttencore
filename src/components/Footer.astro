@@ -3,6 +3,7 @@
  * Footer on every page — from homepage-D-hybrid.html (desktop), stacked on mobile.
  * Holds the contact block (#contact), target of the CONTACT nav link.
  */
+import { paths } from '../lib/paths';
 import Logo from './Logo.astro';
 import Pill from './Pill.astro';
 import { getSettings, getUpcomingEvent } from '../lib/content';
@@ -29,12 +30,12 @@ const year = new Date().getFullYear();
       </div>
 
       <nav class="footer-nav" aria-label="Footer">
-        <a href="/events">EVENTS</a>
-        <a href="/about">ABOUT</a>
+        <a href={paths.events}>EVENTS</a>
+        <a href={paths.about}>ABOUT</a>
         <a href={`mailto:${settings.email}`}>CONTACT</a>
         {
           next && (
-            <Pill href={`/events/${next.slug}`} class="footer-next" size="m">
+            <Pill href={paths.event(next.slug)} class="footer-next" size="m">
               NEXT: {next.city.toUpperCase()} ↗
             </Pill>
           )

@@ -5,6 +5,7 @@
  * Upcoming event: hero with TICKETS; photos / videos / credits are hidden.
  * Any section without content is hidden, on any event.
  */
+import { paths } from '../../lib/paths';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Media from '../../components/Media.astro';
@@ -63,7 +64,7 @@ const city = event.city.toUpperCase();
     <div class="hero-info theme-light">
       <img class="hero-texture" src="/textures/texture-grain-splash.webp" alt="" decoding="async" />
       <div class="hero-info-inner">
-        <a class="mono back" href="/events">← ALL EVENTS</a>
+        <a class="mono back" href={paths.events}>← ALL EVENTS</a>
         <p class="display number" aria-hidden="true">{event.number}</p>
         <h1 id="event-title" class="display name">
           <span class="sr-only">Event {event.number}: </span>{event.title}
