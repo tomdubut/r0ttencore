@@ -1,0 +1,5 @@
+# Cloudflare static assets headers (https://developers.cloudflare.com/workers/static-assets/headers/).
+# Files in /_astro/ have a content hash in their name (it changes when the file changes),
+# so browsers can keep them for a year. Other files keep Cloudflare's default (always revalidated).
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

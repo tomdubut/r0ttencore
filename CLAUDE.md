@@ -92,11 +92,11 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 **event**
 - title, slug (from title), number (string, e.g. `02`), city (dropdown: Paris / Tokyo / Beijing), date, venue, status (dropdown: upcoming / past), ticket link (URL)
 - coverImage (required image + alt: used for cards, lists and share cards)
-- heroMedia (media: right-hand poster panel of E2; flyer/teaser before the event, aftermovie after)
+- heroMedia (media: fills the whole right half of the E2 hero on desktop, a full-width square on phones; cropped to fit → set the image hotspot; vertical videos get side bars)
 - gallery (array of images with alt, drag to reorder)
 - videos (array of media/YouTube: main aftermovie + clips, title each, reorderable)
 - line-up (array: artist name + Instagram handle, reorderable)
-- short text, credits (photographer, videographer)
+- short text, credits = list of { role (dropdown: Photos / Video / Location), name, optional Instagram handle }, several people per role, reorderable. Location falls back to the venue if empty.
 - SEO: optional title, description, share image (fallbacks: title / short text / cover)
 
 **homePage** (singleton): heroMedia (media), the homepage texts (not in the deck → editable).

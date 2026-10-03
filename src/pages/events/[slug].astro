@@ -5,6 +5,7 @@
  * Upcoming event: hero with TICKETS; photos / videos / credits are hidden.
  * Any section without content is hidden, on any event.
  */
+import { paths } from '../../lib/paths';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Media from '../../components/Media.astro';
@@ -12,8 +13,8 @@ import Pill from '../../components/Pill.astro';
 import SectionTitle from '../../components/SectionTitle.astro';
 import EventCard from '../../components/EventCard.astro';
 import { getEvents, isEventUpcoming } from '../../lib/content';
-import { alternate, formatDate, instagramUrl, pad2, videoMedia } from '../../lib/format';
-import type { EventDoc } from '../../lib/types';
+import { alternate, creditLine, creditsFor, formatDate, instagramUrl, pad2, videoMedia } from '../../lib/format';
+import { CREDIT_ROLES, type EventDoc } from '../../lib/types';
 
 export async function getStaticPaths() {
   const events = await getEvents();
@@ -30,12 +31,14 @@ const all = await getEvents();
 
 const photos = upcoming ? [] : event.gallery;
 const [mainVideo, ...clips] = upcoming ? [] : event.videos;
-const credits = [
-  ['PHOTOS', event.credits.photographer],
-  ['VIDEO', event.credits.videographer],
-  ['VENUE', event.venue],
-].filter(([, value]) => value) as [string, string][];
-const showCredits = !upcoming && (event.credits.photographer || event.credits.videographer);
+// Credits grouped by role (several people per role possible). Location falls back to the venue.
+const creditRows = CREDIT_ROLES.map((role) => {
+  const people = creditsFor(event, role);
+  return { role, people: people.length || role !== 'Location' ? people : [{ role, name: event.venue }] };
+}).filter((row) => row.people.length > 0);
+const showCredits = !upcoming && event.credits.length > 0;
+const photoCredit = creditLine(event, 'Photos');
+const videoCredit = creditLine(event, 'Video');
 const showNight = Boolean(event.text) || showCredits;
 
 // More events: the upcoming one first (if it isn't this one), then the most recent others. Max 2.
@@ -63,7 +66,7 @@ const city = event.city.toUpperCase();
     <div class="hero-info theme-light">
       <img class="hero-texture" src="/textures/texture-grain-splash.webp" alt="" decoding="async" />
       <div class="hero-info-inner">
-        <a class="mono back" href="/events">← ALL EVENTS</a>
+        <a class="mono back" href={paths.events}>← ALL EVENTS</a>
         <p class="display number" aria-hidden="true">{event.number}</p>
         <h1 id="event-title" class="display name">
           <span class="sr-only">Event {event.number}: </span>{event.title}
@@ -116,13 +119,11 @@ const city = event.city.toUpperCase();
     <div class="hero-media theme-black">
       <Media
         media={event.heroMedia}
-        label={upcoming ? '[FLYER / TEASER 9:16]' : '[VERTICAL AFTERMOVIE 9:16]'}
-        play={!upcoming}
+        label="[HERO IMAGE / VIDEO]"
         seed={Number(event.number)}
         class="hero-media-slot"
-        ratio="9 / 16"
         eager
-        sizes="(min-width: 900px) 460px, 90vw"
+        sizes="(min-width: 900px) 50vw, 100vw"
       />
     </div>
   </section>
@@ -174,9 +175,7 @@ const city = event.city.toUpperCase();
             ))}
           </div>
 
-          {event.credits.photographer && (
-            <p class="mono muted photo-credit">PHOTOS — {event.credits.photographer}</p>
-          )}
+          {photoCredit && <p class="mono muted photo-credit">PHOTOS — {photoCredit}</p>}
         </div>
       </section>
     )
@@ -192,7 +191,7 @@ const city = event.city.toUpperCase();
             title="VIDEOS"
             size="title-s"
             rule="thick"
-            meta={event.credits.videographer ? `VIDEO — ${event.credits.videographer}` : undefined}
+            meta={videoCredit ? `VIDEO — ${videoCredit}` : undefined}
           />
           <div class="videos">
             <Media
@@ -244,10 +243,23 @@ const city = event.city.toUpperCase();
             <div class="credits mono">
               <h2 class="credits-head muted">CREDITS</h2>
               <dl>
-                {credits.map(([role, name]) => (
+                {creditRows.map(({ role, people }) => (
                   <div class="credit">
-                    <dt>{role}</dt>
-                    <dd>{name}</dd>
+                    <dt>{role.toUpperCase()}</dt>
+                    <dd>
+                      {people.map((person, i) => (
+                        <>
+                          {i > 0 && <span aria-hidden="true"> · </span>}
+                          {person.instagram ? (
+                            <a href={instagramUrl(person.instagram)} target="_blank" rel="noopener">
+                              {person.name} ↗<span class="sr-only"> on Instagram (opens in a new tab)</span>
+                            </a>
+                          ) : (
+                            <span>{person.name}</span>
+                          )}
+                        </>
+                      ))}
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -308,6 +320,8 @@ const city = event.city.toUpperCase();
   }
 
   .back {
+    position: relative;
+    z-index: 1;
     align-self: flex-start;
     display: inline-flex;
     align-items: center;
@@ -319,7 +333,9 @@ const city = event.city.toUpperCase();
     opacity: 0.65;
   }
 
+  /* Decorative: let clicks pass through (its text box overlaps the back link above). */
   .number {
+    pointer-events: none;
     font-size: var(--fs-mega);
     line-height: 0.8;
     margin-top: 16px;
@@ -369,23 +385,16 @@ const city = event.city.toUpperCase();
     opacity: 0.65;
   }
 
+  /* The media fills its whole panel (cropped to fit): a full-width square on phones,
+     the entire right half on desktop. */
   .hero-media {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 var(--gutter) 40px;
-  }
-
-  /* Mobile: the media sits on the light panel, so the hero stays one light block
-     and the next (dark) section keeps the dark/light alternation. */
-  @media (max-width: 899px) {
-    .hero-media {
-      background: var(--bg-light);
-    }
+    position: relative;
+    aspect-ratio: 1 / 1;
   }
 
   .hero-media :global(.hero-media-slot) {
-    width: min(100%, 360px);
+    position: absolute;
+    inset: 0;
   }
 
   @media (min-width: 900px) {
@@ -399,11 +408,7 @@ const city = event.city.toUpperCase();
     }
 
     .hero-media {
-      padding: 40px;
-    }
-
-    .hero-media :global(.hero-media-slot) {
-      width: min(100%, 460px, calc((min(100svh, 960px) - var(--header-h) - 80px) * 9 / 16));
+      aspect-ratio: auto;
     }
   }
 
@@ -631,6 +636,22 @@ const city = event.city.toUpperCase();
   .credit dd {
     margin: 0;
     text-align: right;
+  }
+
+  .credit dd a:hover {
+    opacity: 0.65;
+  }
+
+  /* Phone: long lists of names go under the role. */
+  @media (max-width: 599px) {
+    .credit {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .credit dd {
+      text-align: left;
+    }
   }
 
   @media (min-width: 900px) {

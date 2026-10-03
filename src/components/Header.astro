@@ -6,6 +6,7 @@
  * `overlay` = transparent, positioned over a dark hero (homepage).
  * `split`   = event page (E2): light left half / black right half on desktop.
  */
+import { paths } from '../lib/paths';
 import Logo from './Logo.astro';
 import Pill from './Pill.astro';
 import { getUpcomingEvent } from '../lib/content';
@@ -21,8 +22,8 @@ const { active, theme = 'dark', overlay = false, split = false } = Astro.props;
 const next = await getUpcomingEvent();
 
 const links = [
-  { href: '/events', label: 'EVENTS', key: 'events' },
-  { href: '/about', label: 'ABOUT', key: 'about' },
+  { href: paths.events, label: 'EVENTS', key: 'events' },
+  { href: paths.about, label: 'ABOUT', key: 'about' },
   { href: '#contact', label: 'CONTACT', key: 'contact' },
 ];
 ---
@@ -56,7 +57,7 @@ const links = [
 
     {
       next && (
-        <Pill href={`/events/${next.slug}`} class="next-pill" size="m">
+        <Pill href={paths.event(next.slug)} class="next-pill" size="m">
           NEXT: {next.city.toUpperCase()} ↗
         </Pill>
       )

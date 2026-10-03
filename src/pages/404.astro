@@ -1,5 +1,6 @@
 ---
 /* Not found page. Served by Cloudflare for unknown URLs (wrangler.jsonc: not_found_handling). */
+import { paths } from '../lib/paths';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Pill from '../components/Pill.astro';
@@ -11,7 +12,7 @@ import Pill from '../components/Pill.astro';
     <div class="wrap nf-inner">
       <h1 id="nf-title" class="display nf-title">404</h1>
       <p class="lead">[PLACEHOLDER — page not found text]</p>
-      <Pill href="/events" size="l">EVENTS ↘</Pill>
+      <Pill href={paths.events} size="l">EVENTS ↘</Pill>
     </div>
   </section>
 </BaseLayout>

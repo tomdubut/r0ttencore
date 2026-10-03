@@ -34,6 +34,17 @@ export interface Video {
   url: string | null; // YouTube URL; null = placeholder
 }
 
+/** Credit roles, in display order. */
+export const CREDIT_ROLES = ['Photos', 'Video', 'Location'] as const;
+export type CreditRole = (typeof CREDIT_ROLES)[number];
+
+/** One credited person (or venue). Several people can share a role. */
+export interface Credit {
+  role: CreditRole;
+  name: string;
+  instagram?: string; // handle without "@"
+}
+
 export interface Artist {
   name: string;
   instagram?: string; // handle without "@"
@@ -54,7 +65,7 @@ export interface EventDoc {
   videos: Video[]; // first one = main aftermovie
   lineup: Artist[];
   text: string;
-  credits: { photographer?: string; videographer?: string };
+  credits: Credit[];
 }
 
 export interface SiteSettings {

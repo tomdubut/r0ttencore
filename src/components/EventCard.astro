@@ -4,6 +4,7 @@
  * Past event: cover media + "01 · PARIS · DATE" + name ↘.
  * Upcoming event: black card with the logo + "03 · COMING" / "TOKYO · DATE" / "NEXT UP ↗".
  */
+import { paths } from '../lib/paths';
 import Logo from './Logo.astro';
 import Media from './Media.astro';
 import Grain from './Grain.astro';
@@ -19,7 +20,7 @@ const { event } = Astro.props;
 const upcoming = isEventUpcoming(event);
 ---
 
-<a class:list={['event-card', upcoming && 'event-card--next theme-ink']} href={`/events/${event.slug}`}>
+<a class:list={['event-card', upcoming && 'event-card--next theme-ink']} href={paths.event(event.slug)}>
   {
     upcoming ? (
       <>
