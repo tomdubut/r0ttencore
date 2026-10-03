@@ -1,0 +1,385 @@
+---
+/*
+ * Homepage — mockup homepage-A-archive.html, adapted (CLAUDE.md §3):
+ * hero = media slot (image now, video later); sections alternate dark / light.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Media from '../components/Media.astro';
+import Pill from '../components/Pill.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import EventRow from '../components/EventRow.astro';
+import Arrow from '../components/icons/Arrow.astro';
+import { getHomePage, getPastEvents, getUpcomingEvent } from '../lib/content';
+import { alternate, formatDate, pad2, videoMedia } from '../lib/format';
+
+const home = await getHomePage();
+const next = await getUpcomingEvent();
+const past = await getPastEvents();
+const latest = past[0];
+
+// Hero is dark; the following sections alternate light / dark, whichever ones are present.
+const present = [next && 'next', latest && 'archive', 'what'].filter(Boolean) as string[];
+const themes = alternate('light', present.length);
+const themeOf = (key: string) => themes[present.indexOf(key)];
+const [nextTheme, archiveTheme, whatTheme] = [themeOf('next'), themeOf('archive'), themeOf('what')];
+const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' · ');
+---
+
+<BaseLayout description="[PLACEHOLDER — homepage description]">
+  <Header slot="header" overlay />
+
+  <!-- 1. Hero (dark): media slot + wordmark + deck tagline -->
+  <section class="hero theme-dark" aria-labelledby="hero-title">
+    <Media media={home.heroMedia} label="[HERO IMAGE / VIDEO]" class="hero-media" eager seed={1} />
+    <div class="hero-scrim" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <p class="display hero-tagline">
+        {home.tagline.map((line) => <span>{line}</span>)}
+      </p>
+      <div class="hero-bottom">
+        <h1 id="hero-title" class="hero-word">r0t</h1>
+        <p class="display hero-cities">{home.cities}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Next event (light) — only when an upcoming event exists -->
+  {
+    next && (
+      <section class:list={['next', `theme-${nextTheme}`]} aria-label="Next event">
+        <div class="wrap next-inner">
+          <span class="mono next-label">NEXT EVENT</span>
+          <a class="display next-city" href={`/events/${next.slug}`}>
+            {next.city.toUpperCase()}
+          </a>
+          <span class="next-meta">
+            {formatDate(next.date)} · {next.venue}
+          </span>
+          {next.ticketUrl ? (
+            <Pill href={next.ticketUrl} variant="filled" size="l" external class="next-cta">
+              TICKETS ↗
+            </Pill>
+          ) : (
+            <Pill variant="filled" size="l" class="next-cta">
+              [TICKETS SOON]
+            </Pill>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 3. Archive (dark): latest event + list of past events -->
+  {
+    latest && (
+      <section class:list={['section archive', `theme-${archiveTheme}`]} aria-labelledby="archive-title">
+        <div class="wrap">
+          <SectionTitle
+            id="archive-title"
+            title="ARCHIVE"
+            meta={`(${pad2(past.length)}) EVENTS — ${pastCities}`}
+          />
+
+          <div class="latest" data-reveal>
+            <Media
+              media={videoMedia(latest.videos[0])}
+              label={`[AFTERMOVIE — EVENT ${latest.number}]`}
+              play
+              seed={2}
+              class="latest-media"
+              sizes="(min-width: 900px) 66vw, 100vw"
+            />
+            <div class="latest-text">
+              <div>
+                <p class="mono muted">LATEST — {latest.number}</p>
+                <h3 class="display latest-name">{latest.title}</h3>
+                <p class="latest-meta">
+                  {latest.city.toUpperCase()} · {formatDate(latest.date)} · {latest.venue}
+                </p>
+                {latest.text && <p class="latest-body">{latest.text}</p>}
+              </div>
+              <a class="text-link" href={`/events/${latest.slug}`}>
+                SEE PHOTOS &amp; VIDEOS ↘
+              </a>
+            </div>
+          </div>
+
+          <div class="archive-list">
+            {past.map((e) => <EventRow event={e} variant="archive" />)}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 4. What is r0t? (light) — deck copy -->
+  <section class:list={['section what', `theme-${whatTheme}`]} aria-labelledby="what-title">
+    <img class="what-texture" src="/textures/texture-grain-swoosh.webp" alt="" loading="lazy" decoding="async" />
+    <div class="wrap what-inner">
+      <h2 id="what-title" class="display what-title">WHAT IS<br />r0t?</h2>
+      <div class="what-text" data-reveal>
+        <Arrow size={48} stroke={1.4} />
+        <div class="lead">
+          {home.whatIs.map((p) => <p>{p}</p>)}
+        </div>
+        <a class="text-link" href="/about">ABOUT r0t ↘</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    min-height: min(100svh, 900px);
+    display: flex;
+    overflow: hidden;
+  }
+
+  .hero :global(.hero-media) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Keep the placeholder label clear of the overlaid header. */
+  .hero :global(.hero-media .media-label) {
+    top: 124px;
+  }
+
+  @media (min-width: 768px) {
+    .hero :global(.hero-media .media-label) {
+      top: calc(var(--header-h) + 20px);
+    }
+  }
+
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 45%);
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: calc(108px + 48px);
+    padding-bottom: clamp(24px, 4vw, 56px);
+  }
+
+  .hero-tagline {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+    text-align: right;
+    font-size: clamp(34px, calc(34px + 18 * (100vw - 390px) / 1050), 52px);
+    line-height: 1.04;
+  }
+
+  .hero-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hero-word {
+    font-family: var(--font-heavy);
+    font-weight: 400;
+    font-size: clamp(170px, 32vw, 460px);
+    line-height: 0.82;
+    letter-spacing: -0.065em;
+    margin-left: -0.04em;
+  }
+
+  .hero-cities {
+    font-size: clamp(30px, calc(30px + 34 * (100vw - 390px) / 1050), 64px);
+    line-height: 1;
+  }
+
+  @media (min-width: 768px) {
+    .hero-inner {
+      padding-top: calc(var(--header-h) + 72px);
+    }
+
+    .hero-bottom {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .hero-cities {
+      text-align: right;
+      padding-bottom: 0.15em;
+    }
+  }
+
+  /* ---------- Next event strip ---------- */
+  .next {
+    padding-block: 36px;
+  }
+
+  .next-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .next-label {
+    color: var(--muted);
+  }
+
+  .next-city {
+    font-size: var(--fs-display);
+    line-height: 1;
+  }
+
+  .next-city:hover {
+    opacity: 0.7;
+  }
+
+  .next-meta {
+    font-weight: 700;
+    font-size: clamp(17px, calc(17px + 5 * (100vw - 390px) / 1050), 22px);
+  }
+
+  .next :global(.next-cta) {
+    margin-top: 16px;
+    justify-self: stretch;
+  }
+
+  @media (min-width: 900px) {
+    .next-inner {
+      grid-template-columns: auto auto 1fr auto;
+      column-gap: 32px;
+    }
+
+    .next :global(.next-cta) {
+      margin-top: 0;
+      align-self: center;
+    }
+  }
+
+  /* ---------- Archive ---------- */
+  .latest {
+    display: grid;
+    gap: 20px;
+    margin-top: 32px;
+  }
+
+  .latest :global(.latest-media) {
+    aspect-ratio: 4 / 5;
+  }
+
+  .latest-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .latest-name {
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    margin-top: 12px;
+  }
+
+  .latest-meta {
+    font-weight: 700;
+    font-size: clamp(16px, calc(16px + 4 * (100vw - 390px) / 1050), 20px);
+    margin-top: 14px;
+  }
+
+  .latest-body {
+    font-weight: 600;
+    font-size: var(--fs-body);
+    line-height: 1.45;
+    letter-spacing: -0.2px;
+    margin-top: 16px;
+    color: var(--muted-2);
+  }
+
+  .theme-light .latest-body {
+    color: var(--ink);
+  }
+
+  .archive-list {
+    margin-top: clamp(40px, 4vw, 56px);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 900px) {
+    .latest {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+    }
+
+    .latest :global(.latest-media) {
+      grid-column: span 8;
+      aspect-ratio: auto;
+      height: clamp(420px, 39vw, 560px);
+    }
+
+    .latest-text {
+      grid-column: span 4;
+    }
+  }
+
+  /* ---------- What is r0t? ---------- */
+  .what {
+    padding-bottom: calc(var(--space-section) * 1.2);
+  }
+
+  .what-texture {
+    position: absolute;
+    right: -160px;
+    top: 40px;
+    width: min(980px, 120vw);
+    max-width: none;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .theme-dark .what-texture {
+    filter: invert(1);
+    opacity: 0.22;
+  }
+
+  .what-inner {
+    position: relative;
+    display: grid;
+    gap: 36px;
+  }
+
+  .what-title {
+    font-size: var(--fs-title-s);
+    line-height: 0.85;
+  }
+
+  .what-text {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  @media (min-width: 900px) {
+    .what-inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+    }
+
+    .what-title {
+      grid-column: 1 / span 5;
+    }
+
+    .what-text {
+      grid-column: 7 / span 6;
+      padding-top: 60px;
+      gap: 28px;
+    }
+  }
+</style>

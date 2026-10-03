@@ -22,7 +22,8 @@ const { title, meta, as: Tag = 'h2', size = 'title', rule = 'thin', id } = Astro
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 8px 16px;
     padding-bottom: clamp(12px, 1.2vw, 16px);
   }
 
@@ -37,7 +38,6 @@ const { title, meta, as: Tag = 'h2', size = 'title', rule = 'thin', id } = Astro
   h1,
   h2 {
     line-height: 0.85;
-    overflow-wrap: anywhere;
   }
 
   .size-mega {

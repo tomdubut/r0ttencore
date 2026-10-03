@@ -35,7 +35,7 @@
 
   /* Type scale (mobile → desktop) */
   --fs-mega: clamp(96px, calc(96px + 204 * (100vw - 390px) / 1050), 300px);  /* EVENTS listing h1, event number */
-  --fs-title: clamp(88px, calc(88px + 132 * (100vw - 390px) / 1050), 220px); /* section titles: ARCHIVE, FORMATS… */
+  --fs-title: clamp(80px, calc(80px + 140 * (100vw - 390px) / 1050), 220px); /* section titles: ARCHIVE, FORMATS… */
   --fs-title-s: clamp(64px, calc(64px + 116 * (100vw - 390px) / 1050), 180px); /* PHOTOS, VIDEOS */
   --fs-display-l: clamp(48px, calc(48px + 40 * (100vw - 390px) / 1050), 88px);
   --fs-display: clamp(40px, calc(40px + 32 * (100vw - 390px) / 1050), 72px);
