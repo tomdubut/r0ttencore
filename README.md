@@ -35,7 +35,17 @@ npm run typegen   # after changing a schema or a query in src/lib/queries.ts
 - Schemas: `studio/schemaTypes/` (documents: event, artist, homePage, aboutPage, siteSettings; objects: media, video, credit, seo).
 - Sidebar: `studio/structure.ts`. Settings, Homepage and About are single pages (fixed IDs, can't be deleted or duplicated).
 - Deploy: automatic via GitHub Actions (`.github/workflows/deploy-studio.yml`) when `studio/` changes, using the repo secret `SANITY_AUTH_TOKEN` (Sanity project token with the *Deploy Studio* permission only).
-- The website only reads **published** content. Publishing in the Studio doesn't rebuild the site yet (rebuild webhook: phase 5); until then, redeploy from Cloudflare.
+- The website only reads **published** content.
+
+## Publishing → live site
+
+The site is static: every **Publish** in the Studio triggers a rebuild, live about 2 minutes later.
+
+- Sanity webhook (sanity.io/manage → API → Webhooks): Create/Update/Delete, drafts **off**, filter `_type in ["event", "artist", "homePage", "aboutPage", "siteSettings"]`, POST to the Cloudflare deploy hook.
+- Cloudflare deploy hook (Workers & Pages → r0ttencore → Settings → Builds → Deploy Hooks), branch `main`. The URL is a secret.
+- Daily rebuild at 00:15 UTC: `.github/workflows/daily-rebuild.yml` (repo secret `CLOUDFLARE_DEPLOY_HOOK`). Manual run: Actions → Daily rebuild → Run workflow.
+- A failed build keeps the previous version online. Cloudflare → Notifications emails on failures.
+- Several publishes in a row are merged into one or two builds; the final version always includes everything published.
 
 ## Where things are
 

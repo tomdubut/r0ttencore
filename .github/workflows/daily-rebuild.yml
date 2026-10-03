@@ -1,0 +1,31 @@
+# Rebuilds the live site once a day, even if nobody published in Sanity.
+# Why: the site is static, so time-based rules (e.g. hiding "NEXT: TOKYO" once the event date
+# has passed) only apply at build time. Also catches any publish whose webhook was missed.
+#
+# Needs the repository secret CLOUDFLARE_DEPLOY_HOOK: the Cloudflare Workers Builds deploy hook
+# URL for the main branch (Workers & Pages → r0ttencore → Settings → Builds → Deploy Hooks).
+# Note: GitHub pauses scheduled workflows after 60 days without commits; it emails the repo owner
+# and a click on "Enable workflow" (Actions tab) turns it back on.
+name: Daily rebuild
+
+on:
+  schedule:
+    - cron: '15 0 * * *' # every day at 00:15 UTC (09:15 Tokyo, 01:15/02:15 Paris)
+  workflow_dispatch: # manual run: Actions → Daily rebuild → Run workflow
+
+permissions: {}
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare build of main
+        env:
+          HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::Repository secret CLOUDFLARE_DEPLOY_HOOK is missing."
+            exit 1
+          fi
+          curl --fail --silent --show-error --retry 3 --retry-delay 10 -X POST "$HOOK" > /dev/null
+          echo "Build requested."
