@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>r0t — Event page, poster</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Archivo+Black&amp;family=Archivo:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#101010;font-family:'Archivo',sans-serif;color:#EFEFEB}
+a{color:inherit;text-decoration:none}a:hover{opacity:0.7}
+button{font:inherit}
+</style>
+</helmet>
+<div style="width: 1440px; height: 4900px; box-sizing: border-box; background: #101010; color: #EFEFEB; display: flex; flex-direction: column; position: relative; overflow: hidden">
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><filter id="gP"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter></svg>
+
+<section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); height: 960px; flex-shrink: 0">
+<div style="background: #EFEFEB; color: #141414; display: flex; flex-direction: column; padding: 0 40px 48px; position: relative; overflow: hidden">
+<img src="../assets/texture-grain-splash.webp" alt="" style="position: absolute; left: -120px; bottom: -80px; width: 640px; opacity: 0.35">
+<header style="position: relative; height: 72px; display: flex; align-items: center; gap: 36px; border-bottom: 1px solid #141414">
+<a href="#" aria-label="r0t — home"><img src="../assets/logo-ascii-cup_LOWRES.png" alt="r0t logo" style="display: block; height: 48px"></a>
+<nav style="display: flex; gap: 36px; font-weight: 800; font-size: 14px; letter-spacing: 1px">
+<a href="#" style="border-bottom: 2px solid #141414; padding-bottom: 2px">EVENTS</a>
+<a href="#">ABOUT</a>
+<a href="#">CONTACT</a>
+</nav>
+</header>
+<a href="#" style="position: relative; margin-top: 28px; font-family: 'JetBrains Mono', monospace; font-size: 13px">← ALL EVENTS</a>
+<div style="position: relative; font-family: 'Anton', sans-serif; font-size: 320px; line-height: 0.8; margin-top: 24px">02</div>
+<div style="position: relative; font-family: 'Anton', sans-serif; font-size: 88px; line-height: 0.92; margin-top: 20px">[EVENT NAME]</div>
+<div style="position: relative; display: flex; gap: 28px; margin-top: 20px; padding-bottom: 20px; border-bottom: 2px solid #141414; font-family: 'Archivo Black', sans-serif; font-size: 17px">
+<span>PARIS</span><span>[DATE]</span><span>[VENUE]</span>
+</div>
+<div style="position: relative; margin-top: 24px; display: flex; flex-direction: column; gap: 2px; font-family: 'Archivo Black', sans-serif; font-size: 34px; line-height: 1.12">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; margin-bottom: 8px">LINE-UP</span>
+<a href="#">[ARTIST 01] ↗</a>
+<a href="#">[ARTIST 02] ↗</a>
+<a href="#">[ARTIST 03] ↗</a>
+<a href="#">[ARTIST 04] ↗</a>
+</div>
+</div>
+<div style="position: relative; background: #000000; overflow: hidden; display: flex; align-items: center; justify-content: center">
+<a href="#" style="position: absolute; right: 40px; top: 14px; display: flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 999px; border: 1.5px solid #EFEFEB; font-family: 'Archivo Black', sans-serif; font-size: 13px">NEXT: TOKYO ↗</a>
+<div style="position: relative; width: 460px; height: 818px; margin-top: 60px; background: radial-gradient(ellipse at 50% 30%, #8d8d88 0%, #333331 45%, #0c0c0c 100%); overflow: hidden">
+<svg style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.5; mix-blend-mode: overlay" aria-hidden="true"><rect width="100%" height="100%" filter="url(#gP)"></rect></svg>
+<span style="position: absolute; left: 16px; top: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px">[VERTICAL AFTERMOVIE 9:16]</span>
+<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 88px; height: 88px; border-radius: 50%; border: 1.5px solid #EFEFEB; display: flex; align-items: center; justify-content: center">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="#EFEFEB" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 16px; height: 3px; background: rgba(239,239,235,0.3)"><div style="width: 35%; height: 3px; background: #EFEFEB"></div></div>
+</div>
+</div>
+</section>
+
+<section style="padding: 112px 40px 96px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid rgba(239,239,235,0.35); padding-bottom: 16px">
+<h2 style="margin: 0; font-family: 'Anton', sans-serif; font-weight: 400; font-size: 180px; line-height: 0.85">PHOTOS</h2>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 18px">{{counter}}</span>
+</div>
+<div style="position: relative; height: 720px; margin-top: 32px; background: {{current.bg}}; overflow: hidden">
+<svg style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.45; mix-blend-mode: overlay" aria-hidden="true"><rect width="100%" height="100%" filter="url(#gP)"></rect></svg>
+<span style="position: absolute; left: 20px; top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px">[PHOTO {{current.n}}]</span>
+<button type="button" aria-label="Previous photo" onClick="{{prev}}" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 64px; height: 64px; border-radius: 50%; border: 1.5px solid #EFEFEB; background: rgba(0,0,0,0.3); color: #EFEFEB; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EFEFEB" stroke-width="1.8" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+</button>
+<button type="button" aria-label="Next photo" onClick="{{next}}" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 64px; height: 64px; border-radius: 50%; border: 1.5px solid #EFEFEB; background: rgba(0,0,0,0.3); color: #EFEFEB; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#EFEFEB" stroke-width="1.8" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 8px; margin-top: 12px">
+<sc-for list="{{frames}}" as="f" hint-placeholder-count="10">
+<button type="button" aria-label="Show photo {{f.n}}" onClick="{{f.pick}}" style="height: 96px; padding: 0; border: 0; cursor: pointer; background: {{f.bg}}; outline: {{f.ring}}; outline-offset: 2px; opacity: {{f.op}}"></button>
+</sc-for>
+</div>
+<div style="margin-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A8A8A2">PHOTOS — [PHOTOGRAPHER]</div>
+</section>
+
+<section style="background: #EFEFEB; color: #141414; padding: 112px 40px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 2px solid #141414; padding-bottom: 16px">
+<h2 style="margin: 0; font-family: 'Anton', sans-serif; font-weight: 400; font-size: 180px; line-height: 0.85">VIDEOS</h2>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">VIDEO — [VIDEOGRAPHER]</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; margin-top: 32px">
+<div style="grid-column: span 8; position: relative; height: 500px; background: radial-gradient(ellipse at 45% 30%, #7a7a76 0%, #262626 62%, #0c0c0c 100%); overflow: hidden; color: #EFEFEB">
+<svg style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.45; mix-blend-mode: overlay" aria-hidden="true"><rect width="100%" height="100%" filter="url(#gP)"></rect></svg>
+<div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 96px; height: 96px; border-radius: 50%; border: 1.5px solid #EFEFEB; display: flex; align-items: center; justify-content: center">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="#EFEFEB" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+</div>
+<span style="position: absolute; left: 20px; bottom: 18px; font-family: 'Archivo Black', sans-serif; font-size: 15px">AFTERMOVIE 16:9 — [DURATION]</span>
+</div>
+<div style="grid-column: span 4; display: flex; flex-direction: column; border-top: 2px solid #141414">
+<a href="#" style="display: flex; justify-content: space-between; align-items: center; height: 100px; border-bottom: 1px solid #141414"><span style="font-family: 'Anton', sans-serif; font-size: 36px">▶ [CLIP 01]</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">[0:00]</span></a>
+<a href="#" style="display: flex; justify-content: space-between; align-items: center; height: 100px; border-bottom: 1px solid #141414"><span style="font-family: 'Anton', sans-serif; font-size: 36px">▶ [CLIP 02]</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">[0:00]</span></a>
+<a href="#" style="display: flex; justify-content: space-between; align-items: center; height: 100px; border-bottom: 1px solid #141414"><span style="font-family: 'Anton', sans-serif; font-size: 36px">▶ [CLIP 03]</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">[0:00]</span></a>
+<a href="#" style="display: flex; justify-content: space-between; align-items: center; height: 100px; border-bottom: 1px solid #141414"><span style="font-family: 'Anton', sans-serif; font-size: 36px">▶ [CLIP 04]</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 13px">[0:00]</span></a>
+</div>
+</div>
+</section>
+
+<section style="padding: 112px 40px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px">
+<div style="grid-column: span 6; display: flex; flex-direction: column; gap: 20px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 1px; color: #A8A8A2">THE NIGHT</span>
+<p style="margin: 0; font-weight: 800; font-size: 30px; line-height: 1.28; letter-spacing: -0.6px">[2–3 lines about the night: the concept, the venue, the energy.]</p>
+</div>
+<div style="grid-column: 8 / span 5; display: flex; flex-direction: column; gap: 14px; font-family: 'JetBrains Mono', monospace; font-size: 14px">
+<span style="font-size: 13px; letter-spacing: 1px; color: #A8A8A2">CREDITS</span>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #3a3a38; padding-bottom: 12px"><span>PHOTOS</span><span>[PHOTOGRAPHER]</span></div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #3a3a38; padding-bottom: 12px"><span>VIDEO</span><span>[VIDEOGRAPHER]</span></div>
+<div style="display: flex; justify-content: space-between; border-bottom: 1px solid #3a3a38; padding-bottom: 12px"><span>VENUE</span><span>[VENUE]</span></div>
+</div>
+</section>
+
+<section style="background: #EFEFEB; color: #141414; padding: 96px 40px 112px">
+<h2 style="margin: 0; font-family: 'Anton', sans-serif; font-weight: 400; font-size: 120px; line-height: 0.9">MORE EVENTS</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 40px">
+<a href="#" style="position: relative; height: 460px; overflow: hidden; background: radial-gradient(ellipse at 50% 25%, #9a9a95 0%, #3a3a38 45%, #141414 90%); color: #EFEFEB; display: block">
+<svg style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.5; mix-blend-mode: overlay" aria-hidden="true"><rect width="100%" height="100%" filter="url(#gP)"></rect></svg>
+<div style="position: absolute; left: 24px; right: 24px; bottom: 24px">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px">01 · PARIS · [DATE]</div>
+<div style="font-family: 'Anton', sans-serif; font-size: 64px; line-height: 1; margin-top: 8px">[EVENT NAME] ↘</div>
+</div>
+</a>
+<a href="#" style="position: relative; height: 460px; box-sizing: border-box; overflow: hidden; background: #141414; color: #EFEFEB; display: flex; flex-direction: column; justify-content: space-between; padding: 24px">
+<img src="../assets/logo-ascii-cup_LOWRES.png" alt="" style="position: absolute; right: 40px; top: 30px; height: 400px; filter: invert(1); opacity: 0.9">
+<span style="position: relative; font-family: 'JetBrains Mono', monospace; font-size: 13px">03 · COMING</span>
+<div style="position: relative">
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 13px">TOKYO · [DATE]</div>
+<div style="font-family: 'Anton', sans-serif; font-size: 64px; line-height: 1; margin-top: 8px">NEXT UP ↗</div>
+</div>
+</a>
+</div>
+</section>
+
+<footer style="margin-top: auto; background: #000000; padding: 72px 40px 0">
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: end">
+<a href="#" aria-label="r0t — home" style="grid-column: span 3; display: block"><img src="../assets/logo-ascii-cup_LOWRES.png" alt="r0t logo" style="display: block; height: 220px; filter: invert(1)"></a>
+<div style="grid-column: span 6; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 1px; color: #A8A8A2">CONTACT / BOOKINGS</span>
+<a href="#" style="font-family: 'Anton', sans-serif; font-size: 64px; line-height: 1">contact@r0ttencore.com</a>
+<a href="#" style="font-family: 'Anton', sans-serif; font-size: 32px; line-height: 1; color: #cfcfca">@r0tten.corp</a>
+</div>
+<nav style="grid-column: span 3; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; font-weight: 800; font-size: 14px; letter-spacing: 1px">
+<a href="#">EVENTS</a>
+<a href="#">ABOUT</a>
+<a href="#">CONTACT</a>
+</nav>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; height: 64px; margin-top: 64px; border-top: 1px solid #3a3a38; font-size: 14px; color: #A8A8A2">
+<span>© 2026 r0ttencore</span>
+<span>PARIS — TOKYO — BEIJING</span>
+<span style="font-size: 22px; letter-spacing: -0.6px; color: #EFEFEB">presented by r0ttencore</span>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":4900}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { i: 0 }; }
+renderVals() {
+var self = this;
+var tones = ['#2a2a2a','#1d1d1d','#333333','#222222','#2e2e2e','#191919','#262626','#151515','#303030','#1a1a1a'];
+var hi = ['#8d8d88','#6d6d69','#9a9a96','#7c7c78','#a3a39f','#65655f','#85857f','#8a8a86','#77776f','#95958f'];
+var n = tones.length;
+var i = this.state.i;
+var frames = tones.map(function (c, k) {
+var num = (k + 1 < 10 ? '0' : '') + (k + 1);
+return {
+n: num,
+bg: 'radial-gradient(ellipse at ' + (30 + (k * 19) % 45) + '% ' + (20 + (k * 29) % 50) + '%, ' + hi[k] + ', ' + c + ' 75%)',
+ring: k === i ? '2px solid #EFEFEB' : 'none',
+op: k === i ? '1' : '0.55',
+pick: function () { self.setState({ i: k }); }
+};
+});
+return {
+frames: frames,
+current: frames[i],
+counter: frames[i].n + ' / [N]',
+prev: function () { self.setState({ i: (i - 1 + n) % n }); },
+next: function () { self.setState({ i: (i + 1) % n }); }
+};
+}
+}
+</script>
+</body>
+</html>

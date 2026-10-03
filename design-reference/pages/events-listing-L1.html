@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>r0t — Events, index list</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Archivo+Black&amp;family=Archivo:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#101010;font-family:'Archivo',sans-serif;color:#EFEFEB}
+a{color:inherit;text-decoration:none}a:hover{opacity:0.7}
+button{font:inherit}
+</style>
+</helmet>
+<div style="width: 1440px; height: 2160px; box-sizing: border-box; background: #101010; color: #EFEFEB; display: flex; flex-direction: column; position: relative; overflow: hidden">
+<svg width="0" height="0" style="position: absolute" aria-hidden="true"><filter id="gL"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter></svg>
+
+<section style="position: relative; height: 620px; flex-shrink: 0; overflow: hidden; padding: 0 40px; box-sizing: border-box">
+<img src="../assets/texture-grain-swoosh.webp" alt="" style="position: absolute; right: -120px; top: -40px; width: 900px; filter: invert(1); opacity: 0.14">
+<header style="position: relative; height: 72px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(239,239,235,0.25)">
+<div style="display: flex; align-items: center; gap: 36px">
+<a href="#" aria-label="r0t — home"><img src="../assets/logo-ascii-cup_LOWRES.png" alt="r0t logo" style="display: block; height: 48px; filter: invert(1)"></a>
+<nav style="display: flex; gap: 36px; font-weight: 800; font-size: 14px; letter-spacing: 1px">
+<a href="#" style="border-bottom: 2px solid #EFEFEB; padding-bottom: 2px">EVENTS</a>
+<a href="#">ABOUT</a>
+<a href="#">CONTACT</a>
+</nav>
+</div>
+<a href="#" style="display: flex; align-items: center; height: 44px; padding: 0 22px; border-radius: 999px; border: 1.5px solid #EFEFEB; font-family: 'Archivo Black', sans-serif; font-size: 13px">NEXT: TOKYO ↗</a>
+</header>
+<div style="position: relative; display: flex; align-items: flex-end; justify-content: space-between; margin-top: 64px">
+<h1 style="margin: 0; font-family: 'Anton', sans-serif; font-weight: 400; font-size: 300px; line-height: 0.82">EVENTS</h1>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 18px; padding-bottom: 14px">({{count}})</span>
+</div>
+<div style="position: relative; display: flex; align-items: center; justify-content: space-between; margin-top: 36px">
+<div style="display: flex; gap: 10px">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+<button type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="height: 44px; padding: 0 22px; border-radius: 999px; border: 1.5px solid #EFEFEB; background: {{f.bg}}; color: {{f.fg}}; font-family: 'Archivo Black', sans-serif; font-size: 13px; cursor: pointer">{{f.label}}</button>
+</sc-for>
+</div>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A8A8A2">sorted by date ↓</span>
+</div>
+</section>
+
+<section style="background: #EFEFEB; color: #141414; padding: 56px 40px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: center">
+<div style="grid-column: span 2; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 1px">UPCOMING</div>
+<div style="grid-column: span 6; display: flex; align-items: baseline; gap: 28px">
+<span style="font-family: 'Anton', sans-serif; font-size: 120px; line-height: 0.9">TOKYO</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">03</span>
+</div>
+<div style="grid-column: span 2; display: flex; flex-direction: column; gap: 6px; font-family: 'Archivo Black', sans-serif; font-size: 17px">
+<span>[DATE]</span><span>[VENUE]</span>
+</div>
+<a href="#" style="grid-column: span 2; justify-self: end; display: flex; align-items: center; height: 56px; padding: 0 30px; border-radius: 999px; background: #141414; color: #EFEFEB; font-family: 'Archivo Black', sans-serif; font-size: 14px">TICKETS ↗</a>
+</section>
+
+<section style="padding: 96px 40px 112px">
+<div style="display: grid; grid-template-columns: 80px 140px minmax(0, 1fr) 200px 220px 40px; gap: 24px; padding-bottom: 14px; border-bottom: 2px solid #EFEFEB; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 1px; color: #A8A8A2">
+<span>NO.</span><span>CITY</span><span>EVENT</span><span>DATE</span><span>MEDIA</span><span></span>
+</div>
+<sc-for list="{{rows}}" as="e" hint-placeholder-count="2">
+<a href="#" style="position: relative; display: grid; grid-template-columns: 80px 140px minmax(0, 1fr) 200px 220px 40px; gap: 24px; align-items: center; height: 168px; border-bottom: 1px solid rgba(239,239,235,0.35)">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">{{e.n}}</span>
+<span style="font-weight: 800; font-size: 16px; letter-spacing: 1px">{{e.city}}</span>
+<span style="font-family: 'Anton', sans-serif; font-size: 80px; line-height: 1">{{e.name}}</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 14px">{{e.date}}</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #A8A8A2">▶ AFTERMOVIE · PHOTOS</span>
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#EFEFEB" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 8v11H8"></path></svg>
+</a>
+</sc-for>
+<sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+<div style="padding: 72px 0; border-bottom: 1px solid rgba(239,239,235,0.35); display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'Anton', sans-serif; font-size: 64px; line-height: 1">NOTHING HERE YET.</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #A8A8A2">{{emptyText}}</span>
+</div>
+</sc-if>
+</section>
+
+<section style="background: #EFEFEB; color: #141414; padding: 72px 40px; display: flex; align-items: center; justify-content: space-between">
+<div style="font-family: 'Anton', sans-serif; font-size: 72px; line-height: 0.95">NEVER MISS<br>THE NEXT ONE.</div>
+<a href="#" style="display: flex; align-items: center; height: 60px; padding: 0 34px; border-radius: 999px; background: #141414; color: #EFEFEB; font-family: 'Archivo Black', sans-serif; font-size: 15px">FOLLOW @r0tten.corp ↗</a>
+</section>
+
+<footer style="margin-top: auto; background: #000000; padding: 72px 40px 0">
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; align-items: end">
+<a href="#" aria-label="r0t — home" style="grid-column: span 3; display: block"><img src="../assets/logo-ascii-cup_LOWRES.png" alt="r0t logo" style="display: block; height: 220px; filter: invert(1)"></a>
+<div style="grid-column: span 6; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 1px; color: #A8A8A2">CONTACT / BOOKINGS</span>
+<a href="#" style="font-family: 'Anton', sans-serif; font-size: 64px; line-height: 1">contact@r0ttencore.com</a>
+<a href="#" style="font-family: 'Anton', sans-serif; font-size: 32px; line-height: 1; color: #cfcfca">@r0tten.corp</a>
+</div>
+<nav style="grid-column: span 3; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; font-weight: 800; font-size: 14px; letter-spacing: 1px">
+<a href="#">EVENTS</a>
+<a href="#">ABOUT</a>
+<a href="#">CONTACT</a>
+</nav>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; height: 64px; margin-top: 64px; border-top: 1px solid #3a3a38; font-size: 14px; color: #A8A8A2">
+<span>© 2026 r0ttencore</span>
+<span>PARIS — TOKYO — BEIJING</span>
+<span style="font-size: 22px; letter-spacing: -0.6px; color: #EFEFEB">presented by r0ttencore</span>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2160}}'>
+class Component extends DCLogic {
+constructor(props) { super(props); this.state = { city: 'ALL' }; }
+renderVals() {
+var self = this;
+var city = this.state.city;
+var events = [
+{ n: '02', city: 'PARIS', name: '[EVENT NAME]', date: '[DATE]', bg: 'radial-gradient(ellipse at 50% 30%, #9a9a95, #1c1c1c 75%)', preview: true },
+{ n: '01', city: 'PARIS', name: '[EVENT NAME]', date: '[DATE]', bg: 'radial-gradient(ellipse at 40% 60%, #85857f, #161616 75%)', preview: false }
+];
+var rows = events.filter(function (e) { return city === 'ALL' || e.city === city; });
+var filters = ['ALL', 'PARIS', 'TOKYO', 'BEIJING'].map(function (c) {
+var on = c === city;
+return { label: c, pressed: on ? 'true' : 'false', bg: on ? '#EFEFEB' : 'transparent', fg: on ? '#141414' : '#EFEFEB', pick: function () { self.setState({ city: c }); } };
+});
+var emptyText = city === 'TOKYO' ? 'First Tokyo event: [DATE] — see Upcoming above.' : 'Beijing is next on the map. Follow @r0tten.corp.';
+return { rows: rows, filters: filters, count: (rows.length < 10 ? '0' : '') + rows.length, empty: rows.length === 0, emptyText: emptyText };
+}
+}
+</script>
+</body>
+</html>
