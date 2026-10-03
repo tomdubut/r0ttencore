@@ -4,9 +4,11 @@
  * A horizontal scroll-snap strip: swipeable and usable without JS. With JS
  * (scripts/slideshow.ts): prev/next buttons, thumbnails, arrow keys and the "01 / 10" counter.
  * Items can be images, YouTube videos (click-to-play inside the slide) or null (placeholder).
+ * Each slide shows its own credit ("PHOTO — NAME") under the media when one is set in Sanity.
  */
 import Media from './Media.astro';
 import SectionTitle from './SectionTitle.astro';
+import CreditCaption from './CreditCaption.astro';
 import type { Media as MediaItem } from '../lib/types';
 import { youtubeId, pad2 } from '../lib/format';
 
@@ -15,11 +17,9 @@ interface Props {
   title: string;
   theme: 'dark' | 'light';
   items: MediaItem[];
-  /** Line under the thumbnails, e.g. "PHOTOS — NAME A · NAME B". */
-  credit?: string;
 }
 
-const { id, title, theme, items, credit } = Astro.props;
+const { id, title, theme, items } = Astro.props;
 const total = pad2(items.length);
 
 /** Thumbnails are always plain images (a YouTube thumbnail for videos): no nested players or links. */
@@ -48,6 +48,7 @@ const thumbOf = (m: MediaItem): MediaItem => {
                 eager={i === 0}
                 sizes="(min-width: 1600px) 1520px, 100vw"
               />
+              <CreditCaption credit={item?.credit} kind={item?.kind === 'youtube' ? 'video' : 'photo'} class="slide-credit" />
             </li>
           ))
         }
@@ -73,8 +74,6 @@ const thumbOf = (m: MediaItem): MediaItem => {
         ))
       }
     </div>
-
-    {credit && <p class="mono muted photo-credit">{credit}</p>}
   </div>
 </section>
 
@@ -208,8 +207,8 @@ const thumbOf = (m: MediaItem): MediaItem => {
     height: clamp(72px, 6.7vw, 96px);
   }
 
-  .photo-credit {
-    margin-top: 20px;
+  .slide :global(.slide-credit) {
+    margin-top: 12px;
   }
 
 </style>

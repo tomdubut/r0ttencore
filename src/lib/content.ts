@@ -17,18 +17,28 @@ interface SanityMedia {
   youtubeUrl: string | null;
   title: string | null;
   poster: SanityImageInput | null;
+  by?: string | null;
 }
 
+/** Looks up who is credited for one photo/video: see creditResolver(). */
+type CreditOf = (by: string | null | undefined, role: 'Photos' | 'Video') => Credit | undefined;
+
 /** A Sanity "media" object → what <Media> renders. Incomplete media → null (grain placeholder). */
-function toMedia(m: SanityMedia | null | undefined): Media {
+function toMedia(m: SanityMedia | null | undefined, creditOf?: CreditOf): Media {
   if (!m) return null;
   if (m.kind === 'youtube') {
     return m.youtubeUrl
-      ? { kind: 'youtube', url: m.youtubeUrl, title: m.title ?? 'Video', poster: toImageAsset(m.poster) ?? undefined }
+      ? {
+          kind: 'youtube',
+          url: m.youtubeUrl,
+          title: m.title ?? 'Video',
+          poster: toImageAsset(m.poster) ?? undefined,
+          credit: creditOf?.(m.by, 'Video'),
+        }
       : null;
   }
   const image = toImageAsset(m.image);
-  return image ? { kind: 'image', image, alt: m.image?.alt ?? '' } : null;
+  return image ? { kind: 'image', image, alt: m.image?.alt ?? '', credit: creditOf?.(m.by, 'Photos') } : null;
 }
 
 /** A plain image field with alt (e.g. event cover) → media. */
@@ -37,8 +47,26 @@ function imageMedia(img: (SanityImageInput & { alt?: string | null }) | null | u
   return image ? { kind: 'image', image, alt: img?.alt ?? '' } : null;
 }
 
-const toCredits = (credits: { role: Credit['role']; name: string; instagram: string | null }[] | null): Credit[] =>
-  (credits ?? []).map((c) => ({ role: c.role, name: c.name, instagram: c.instagram ?? undefined }));
+type SanityCredit = { _key: string; role: Credit['role']; name: string; instagram: string | null };
+
+const toCredit = (c: SanityCredit): Credit => ({ role: c.role, name: c.name, instagram: c.instagram ?? undefined });
+
+const toCredits = (credits: SanityCredit[] | null): Credit[] => (credits ?? []).map(toCredit);
+
+/**
+ * Who is credited for one photo/video of a document:
+ * the person picked in "Photo by" / "Video by" (stored as their Credits _key), otherwise,
+ * if exactly one person is credited for that role on the document, that person. Else nobody.
+ */
+function creditResolver(credits: SanityCredit[] | null): CreditOf {
+  const list = credits ?? [];
+  return (by, role) => {
+    const picked = by ? list.find((c) => c._key === by) : undefined;
+    if (picked) return toCredit(picked);
+    const forRole = list.filter((c) => c.role === role);
+    return forRole.length === 1 ? toCredit(forRole[0]) : undefined;
+  };
+}
 
 const toArtist = (a: { name: string; slug: string; instagram: string | null; showPage: boolean }): Artist => ({
   name: a.name,
@@ -57,25 +85,28 @@ function once<T>(load: () => Promise<T>): () => Promise<T> {
 
 const loadEvents = once(async (): Promise<EventDoc[]> => {
   const rows = await sanityClient.fetch(EVENTS_QUERY);
-  return rows.map((e) => ({
-    slug: e.slug,
-    number: e.number ?? '[NO.]',
-    title: e.title ?? '[EVENT NAME]',
-    city: e.city,
-    date: e.date,
-    venue: e.venue || '[VENUE]',
-    status: e.status,
-    ticketUrl: e.ticketUrl ?? undefined,
-    cover: imageMedia(e.cover),
-    heroMedia: toMedia(e.heroMedia),
-    gallery: (e.gallery ?? [])
-      .map((g) => ({ image: toImageAsset(g), alt: g.alt ?? '' }))
-      .filter((g) => g.image !== null),
-    videos: (e.videos ?? []).map((v) => ({ title: v.title, url: v.url })),
-    lineup: (e.lineup ?? []).filter(Boolean).map(toArtist),
-    text: e.text ?? '',
-    credits: toCredits(e.credits),
-  }));
+  return rows.map((e) => {
+    const creditOf = creditResolver(e.credits);
+    return {
+      slug: e.slug,
+      number: e.number ?? '[NO.]',
+      title: e.title ?? '[EVENT NAME]',
+      city: e.city,
+      date: e.date,
+      venue: e.venue || '[VENUE]',
+      status: e.status,
+      ticketUrl: e.ticketUrl ?? undefined,
+      cover: imageMedia(e.cover),
+      heroMedia: toMedia(e.heroMedia, creditOf),
+      gallery: (e.gallery ?? [])
+        .map((g) => ({ image: toImageAsset(g), alt: g.alt ?? '', credit: creditOf(g.by, 'Photos') }))
+        .filter((g) => g.image !== null),
+      videos: (e.videos ?? []).map((v) => ({ title: v.title, url: v.url, credit: creditOf(v.by, 'Video') })),
+      lineup: (e.lineup ?? []).filter(Boolean).map(toArtist),
+      text: e.text ?? '',
+      credits: toCredits(e.credits),
+    };
+  });
 });
 
 /** "Today" at build time, as YYYY-MM-DD. The site is rebuilt daily (phase 5), so this stays current. */
@@ -106,15 +137,18 @@ export function isEventUpcoming(e: EventDoc): boolean {
 
 const loadArtists = once(async (): Promise<ArtistDoc[]> => {
   const rows = await sanityClient.fetch(ARTISTS_QUERY);
-  return rows.map((a) => ({
-    ...toArtist(a),
-    basedIn: a.basedIn ?? undefined,
-    genres: a.genres ?? [],
-    description: a.description ?? '',
-    portrait: toMedia(a.portrait),
-    work: (a.work ?? []).map(toMedia).filter((m) => m !== null),
-    credits: toCredits(a.credits),
-  }));
+  return rows.map((a) => {
+    const creditOf = creditResolver(a.credits);
+    return {
+      ...toArtist(a),
+      basedIn: a.basedIn ?? undefined,
+      genres: a.genres ?? [],
+      description: a.description ?? '',
+      portrait: toMedia(a.portrait, creditOf),
+      work: (a.work ?? []).map((m) => toMedia(m, creditOf)).filter((m) => m !== null),
+      credits: toCredits(a.credits),
+    };
+  });
 });
 
 /** Artists whose page is switched on ("Show artist page" in Sanity). */

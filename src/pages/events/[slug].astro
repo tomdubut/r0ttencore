@@ -14,8 +14,9 @@ import SectionTitle from '../../components/SectionTitle.astro';
 import EventCard from '../../components/EventCard.astro';
 import Slideshow from '../../components/Slideshow.astro';
 import ArtistLink from '../../components/ArtistLink.astro';
+import CreditCaption from '../../components/CreditCaption.astro';
 import { getEvents, getSettings, isEventUpcoming } from '../../lib/content';
-import { alternate, creditLine, creditsFor, formatDate, instagramUrl, videoMedia } from '../../lib/format';
+import { alternate, creditsFor, formatDate, instagramUrl, videoMedia } from '../../lib/format';
 import { CREDIT_ROLES, type EventDoc } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -34,14 +35,14 @@ const { texts } = await getSettings();
 
 const photos = upcoming ? [] : event.gallery;
 const [mainVideo, ...clips] = upcoming ? [] : event.videos;
+// One videographer for every video → their name once, under the main video, not on each clip.
+const clipCredits = new Set(event.videos.map((v) => v.credit?.name)).size > 1;
 // Credits grouped by role (several people per role possible). Location falls back to the venue.
 const creditRows = CREDIT_ROLES.map((role) => {
   const people = creditsFor(event, role);
   return { role, people: people.length || role !== 'Location' ? people : [{ role, name: event.venue }] };
 }).filter((row) => row.people.length > 0);
 const showCredits = !upcoming && event.credits.length > 0;
-const photoCredit = creditLine(event, 'Photos');
-const videoCredit = creditLine(event, 'Video');
 const showNight = Boolean(event.text) || showCredits;
 
 // More events: the upcoming one first (if it isn't this one), then the most recent others. Max 2.
@@ -122,6 +123,12 @@ const city = event.city.toUpperCase();
         eager
         sizes="(min-width: 900px) 50vw, 100vw"
       />
+      <CreditCaption
+        credit={event.heroMedia?.credit}
+        kind={event.heroMedia?.kind === 'youtube' ? 'video' : 'photo'}
+        variant="overlay"
+        class="hero-credit"
+      />
     </div>
   </section>
 
@@ -132,8 +139,7 @@ const city = event.city.toUpperCase();
         id="photos"
         title="PHOTOS"
         theme={themeOf('photos')}
-        items={photos.map((p) => (p.image ? { kind: 'image', image: p.image, alt: p.alt } : null))}
-        credit={photoCredit ? `PHOTOS — ${photoCredit}` : undefined}
+        items={photos.map((p) => (p.image ? { kind: 'image', image: p.image, alt: p.alt, credit: p.credit } : null))}
       />
     )
   }
@@ -148,19 +154,21 @@ const city = event.city.toUpperCase();
             title="VIDEOS"
             size="title-s"
             rule="thick"
-            meta={videoCredit ? `VIDEO — ${videoCredit}` : undefined}
           />
           <div class="videos">
-            <Media
-              media={videoMedia(mainVideo)}
-              label={`${mainVideo.title} — 16:9`}
-              labelPosition="bottom"
-              play
-              seed={5}
-              class="video-main"
-              ratio="16 / 9"
-              sizes="(min-width: 900px) 66vw, 100vw"
-            />
+            <div class="video-main-wrap">
+              <Media
+                media={videoMedia(mainVideo)}
+                label={`${mainVideo.title} — 16:9`}
+                labelPosition="bottom"
+                play
+                seed={5}
+                class="video-main"
+                ratio="16 / 9"
+                sizes="(min-width: 900px) 66vw, 100vw"
+              />
+              <CreditCaption credit={mainVideo.credit} kind="video" class="video-credit" />
+            </div>
             {clips.length > 0 && (
               <ul class="clips">
                 {clips.map((clip) => (
@@ -175,6 +183,7 @@ const city = event.city.toUpperCase();
                         <span class="display">▶ {clip.title}</span>
                       </span>
                     )}
+                    {clipCredits && <CreditCaption credit={clip.credit} kind="video" class="clip-credit" />}
                   </li>
                 ))}
               </ul>
@@ -376,12 +385,32 @@ const city = event.city.toUpperCase();
     border-top: 2px solid var(--fg);
   }
 
+  .clips li {
+    border-bottom: 1px solid var(--fg);
+  }
+
   .clip {
     display: flex;
     align-items: center;
     min-height: clamp(72px, 7vw, 100px);
-    border-bottom: 1px solid var(--fg);
     font-size: var(--fs-display-s);
+  }
+
+  .video-main-wrap :global(.video-credit) {
+    margin-top: 12px;
+  }
+
+  .clips :global(.clip-credit) {
+    margin-top: -8px;
+    padding-bottom: 16px;
+  }
+
+  /* Over the bottom-left corner of the hero photo/video. */
+  .hero-media :global(.hero-credit) {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    margin: 0;
   }
 
   a.clip:hover {
@@ -395,7 +424,7 @@ const city = event.city.toUpperCase();
       align-items: start;
     }
 
-    .videos :global(.video-main) {
+    .video-main-wrap {
       grid-column: span 8;
     }
 

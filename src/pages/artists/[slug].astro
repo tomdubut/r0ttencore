@@ -11,10 +11,11 @@ import Pill from '../../components/Pill.astro';
 import Slideshow from '../../components/Slideshow.astro';
 import SectionTitle from '../../components/SectionTitle.astro';
 import EventRow from '../../components/EventRow.astro';
+import CreditCaption from '../../components/CreditCaption.astro';
 import { getArtistsWithPage, getEventsForArtist } from '../../lib/content';
 import { alternate, instagramUrl } from '../../lib/format';
 import { paths } from '../../lib/paths';
-import { CREDIT_ROLES, type ArtistDoc } from '../../lib/types';
+import type { ArtistDoc } from '../../lib/types';
 
 export async function getStaticPaths() {
   const artists = await getArtistsWithPage();
@@ -27,14 +28,6 @@ interface Props {
 
 const { artist } = Astro.props;
 const events = await getEventsForArtist(artist.slug);
-
-// "PHOTOS — A · B   VIDEO — C" under the work slideshow.
-const creditLine = CREDIT_ROLES.map((role) => {
-  const names = artist.credits.filter((c) => c.role === role).map((c) => c.name);
-  return names.length ? `${role.toUpperCase()} — ${names.join(' · ')}` : '';
-})
-  .filter(Boolean)
-  .join('   ');
 
 const present = [artist.work.length > 0 && 'work', events.length > 0 && 'events'].filter(Boolean) as string[];
 const themes = alternate('dark', present.length);
@@ -72,12 +65,18 @@ const meta = [artist.basedIn?.toUpperCase(), ...artist.genres.map((g) => g.toUpp
 
     <div class="hero-media theme-black">
       <Media media={artist.portrait} label="[ARTIST PHOTO / VIDEO]" seed={3} class="hero-media-slot" eager sizes="(min-width: 900px) 50vw, 100vw" />
+      <CreditCaption
+        credit={artist.portrait?.credit}
+        kind={artist.portrait?.kind === 'youtube' ? 'video' : 'photo'}
+        variant="overlay"
+        class="hero-credit"
+      />
     </div>
   </section>
 
   {
     artist.work.length > 0 && (
-      <Slideshow id="work" title="WORK" theme={themeOf('work')} items={artist.work} credit={creditLine || undefined} />
+      <Slideshow id="work" title="WORK" theme={themeOf('work')} items={artist.work} />
     )
   }
 
@@ -176,6 +175,14 @@ const meta = [artist.basedIn?.toUpperCase(), ...artist.genres.map((g) => g.toUpp
   .hero-media :global(.hero-media-slot) {
     position: absolute;
     inset: 0;
+  }
+
+  /* Over the bottom-left corner of the portrait. */
+  .hero-media :global(.hero-credit) {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    margin: 0;
   }
 
   @media (min-width: 900px) {

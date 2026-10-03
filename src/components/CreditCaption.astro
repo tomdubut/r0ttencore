@@ -1,0 +1,63 @@
+---
+/*
+ * "PHOTO — NAME ↗" under (or over) one photo or video. Nothing is rendered without a credit.
+ * The name links to the person's Instagram when the handle is filled in Sanity → Credits.
+ */
+import { instagramUrl } from '../lib/format';
+import type { Credit } from '../lib/types';
+
+interface Props {
+  credit?: Credit;
+  kind: 'photo' | 'video';
+  /** "overlay" = light text on a dark chip, for captions placed over media. */
+  variant?: 'inline' | 'overlay';
+  class?: string;
+}
+
+const { credit, kind, variant = 'inline', class: className } = Astro.props;
+const label = kind === 'photo' ? 'PHOTO' : 'VIDEO';
+---
+
+{
+  credit && (
+    <p class:list={['mono', 'caption', variant, className]}>
+      <span class="label">{label} — </span>
+      {credit.instagram ? (
+        <a href={instagramUrl(credit.instagram)} target="_blank" rel="noopener">
+          {credit.name} ↗<span class="sr-only"> on Instagram (opens in a new tab)</span>
+        </a>
+      ) : (
+        <span>{credit.name}</span>
+      )}
+    </p>
+  )
+}
+
+<style>
+  .caption {
+    font-size: clamp(11px, 0.4vw + 9.5px, 13px);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .inline .label {
+    color: var(--muted);
+  }
+
+  .caption a {
+    display: inline-block;
+    padding-block: 12px; /* 44px tap target without changing the line height */
+    margin-block: -12px;
+  }
+
+  .caption a:hover {
+    opacity: 0.65;
+  }
+
+  .overlay {
+    display: inline-block;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--bg-light);
+  }
+</style>

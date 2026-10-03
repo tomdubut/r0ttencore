@@ -90,7 +90,7 @@ export const artist = defineType({
       title: 'Photo / video credits',
       type: 'array',
       group: 'work',
-      description: 'Who took the photos and videos above.',
+      description: 'Who took the photos and videos above. Each one can then be credited to one of them ("Photo / video by").',
       of: [defineArrayMember({type: 'credit'})],
     }),
   ],

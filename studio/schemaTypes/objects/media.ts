@@ -1,6 +1,7 @@
 import {defineField, defineType} from 'sanity'
 import {ImageIcon} from '@sanity/icons/Image'
 import {isYouTubeUrl} from '../shared/validation'
+import {creditByField} from '../shared/creditBy'
 
 /**
  * One photo-or-video slot. The editor picks "Image" or "YouTube video";
@@ -85,6 +86,7 @@ export const media = defineType({
       options: {hotspot: true},
       hidden: ({parent}) => parent?.kind !== 'youtube',
     }),
+    creditByField('Photo / video by'),
   ],
   preview: {
     select: {kind: 'kind', image: 'image', alt: 'image.alt', title: 'title', url: 'youtubeUrl', poster: 'poster'},

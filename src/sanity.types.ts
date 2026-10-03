@@ -46,6 +46,7 @@ export type Video = {
   _type: "video";
   title: string;
   url?: string;
+  by?: string;
 };
 
 export type Media = {
@@ -68,6 +69,7 @@ export type Media = {
     crop?: SanityImageCrop;
     _type: "image";
   };
+  by?: string;
 };
 
 export type SiteSettings = {
@@ -223,6 +225,7 @@ export type Event = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt: string;
+    by?: string;
     _type: "image";
     _key: string;
   }>;
@@ -396,7 +399,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../src/lib/queries.ts
 // Variable: EVENTS_QUERY
-// Query: *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },    gallery[] { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },    videos[]{ _key, title, url },    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },    credits[]{ _key, role, name, instagram }  }
+// Query: *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },    videos[]{ _key, title, url, by },    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },    credits[]{ _key, role, name, instagram }  }
 export type EVENTS_QUERY_RESULT = Array<{
   slug: string;
   number: string;
@@ -453,6 +456,7 @@ export type EVENTS_QUERY_RESULT = Array<{
       hotspot: SanityImageHotspot | null;
       alt: null;
     } | null;
+    by: string | null;
   } | null;
   gallery: Array<{
     asset: {
@@ -467,11 +471,13 @@ export type EVENTS_QUERY_RESULT = Array<{
     crop: SanityImageCrop | null;
     hotspot: SanityImageHotspot | null;
     alt: string;
+    by: string | null;
   }> | null;
   videos: Array<{
     _key: string;
     title: string;
     url: string | null;
+    by: string | null;
   }> | null;
   lineup: Array<{
     name: string;
@@ -489,7 +495,7 @@ export type EVENTS_QUERY_RESULT = Array<{
 
 // Source: ../src/lib/queries.ts
 // Variable: ARTISTS_QUERY
-// Query: *[_type == "artist" && defined(slug.current)] | order(lower(name) asc) {    name, "slug": slug.current, instagram, "showPage": showPage == true,    basedIn, genres, description,    portrait { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },    work[] { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },    credits[]{ _key, role, name, instagram }  }
+// Query: *[_type == "artist" && defined(slug.current)] | order(lower(name) asc) {    name, "slug": slug.current, instagram, "showPage": showPage == true,    basedIn, genres, description,    portrait { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },    work[] { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },    credits[]{ _key, role, name, instagram }  }
 export type ARTISTS_QUERY_RESULT = Array<{
   name: string;
   slug: string;
@@ -530,6 +536,7 @@ export type ARTISTS_QUERY_RESULT = Array<{
       hotspot: SanityImageHotspot | null;
       alt: null;
     } | null;
+    by: string | null;
   } | null;
   work: Array<{
     kind: "image" | "youtube" | null;
@@ -563,6 +570,7 @@ export type ARTISTS_QUERY_RESULT = Array<{
       hotspot: SanityImageHotspot | null;
       alt: null;
     } | null;
+    by: string | null;
   }> | null;
   credits: Array<{
     _key: string;
@@ -593,7 +601,7 @@ export type SETTINGS_QUERY_RESULT = {
 
 // Source: ../src/lib/queries.ts
 // Variable: HOME_QUERY
-// Query: *[_type == "homePage" && _id == "homePage"][0]{ heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }, tagline, cities, whatIs, seoDescription }
+// Query: *[_type == "homePage" && _id == "homePage"][0]{ heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by }, tagline, cities, whatIs, seoDescription }
 export type HOME_QUERY_RESULT = {
   heroMedia: {
     kind: "image" | "youtube" | null;
@@ -627,6 +635,7 @@ export type HOME_QUERY_RESULT = {
       hotspot: SanityImageHotspot | null;
       alt: null;
     } | null;
+    by: string | null;
   } | null;
   tagline: Array<string> | null;
   cities: string | null;
@@ -636,7 +645,7 @@ export type HOME_QUERY_RESULT = {
 
 // Source: ../src/lib/queries.ts
 // Variable: ABOUT_QUERY
-// Query: *[_type == "aboutPage" && _id == "aboutPage"][0]{    intro, cities, soundsText,    genreCloud[]{ name, size },    formats[]{ label, text, media { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } } },    networkText,    networkMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },    seoDescription  }
+// Query: *[_type == "aboutPage" && _id == "aboutPage"][0]{    intro, cities, soundsText,    genreCloud[]{ name, size },    formats[]{ label, text, media { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by } },    networkText,    networkMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },    seoDescription  }
 export type ABOUT_QUERY_RESULT = {
   intro: Array<string> | null;
   cities: string | null;
@@ -680,6 +689,7 @@ export type ABOUT_QUERY_RESULT = {
         hotspot: SanityImageHotspot | null;
         alt: null;
       } | null;
+      by: string | null;
     } | null;
   }> | null;
   networkText: Array<string> | null;
@@ -715,6 +725,7 @@ export type ABOUT_QUERY_RESULT = {
       hotspot: SanityImageHotspot | null;
       alt: null;
     } | null;
+    by: string | null;
   } | null;
   seoDescription: string | null;
 } | null;
@@ -722,11 +733,11 @@ export type ABOUT_QUERY_RESULT = {
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {\n    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,\n    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },\n    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },\n    gallery[] { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },\n    videos[]{ _key, title, url },\n    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },\n    credits[]{ _key, role, name, instagram }\n  }\n': EVENTS_QUERY_RESULT;
-    '\n  *[_type == "artist" && defined(slug.current)] | order(lower(name) asc) {\n    name, "slug": slug.current, instagram, "showPage": showPage == true,\n    basedIn, genres, description,\n    portrait { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },\n    work[] { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },\n    credits[]{ _key, role, name, instagram }\n  }\n': ARTISTS_QUERY_RESULT;
+    '\n  *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {\n    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,\n    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },\n    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },\n    videos[]{ _key, title, url, by },\n    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },\n    credits[]{ _key, role, name, instagram }\n  }\n': EVENTS_QUERY_RESULT;
+    '\n  *[_type == "artist" && defined(slug.current)] | order(lower(name) asc) {\n    name, "slug": slug.current, instagram, "showPage": showPage == true,\n    basedIn, genres, description,\n    portrait { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    work[] { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    credits[]{ _key, role, name, instagram }\n  }\n': ARTISTS_QUERY_RESULT;
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{ email, instagram, genres, texts }\n': SETTINGS_QUERY_RESULT;
-    '\n  *[_type == "homePage" && _id == "homePage"][0]{ heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }, tagline, cities, whatIs, seoDescription }\n': HOME_QUERY_RESULT;
-    '\n  *[_type == "aboutPage" && _id == "aboutPage"][0]{\n    intro, cities, soundsText,\n    genreCloud[]{ name, size },\n    formats[]{ label, text, media { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } } },\n    networkText,\n    networkMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } },\n    seoDescription\n  }\n': ABOUT_QUERY_RESULT;
+    '\n  *[_type == "homePage" && _id == "homePage"][0]{ heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by }, tagline, cities, whatIs, seoDescription }\n': HOME_QUERY_RESULT;
+    '\n  *[_type == "aboutPage" && _id == "aboutPage"][0]{\n    intro, cities, soundsText,\n    genreCloud[]{ name, size },\n    formats[]{ label, text, media { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by } },\n    networkText,\n    networkMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    seoDescription\n  }\n': ABOUT_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

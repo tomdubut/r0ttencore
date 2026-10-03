@@ -22,18 +22,20 @@ export interface ImageAsset {
  * `null` = nothing chosen yet → the site shows a grain placeholder.
  */
 export type Media =
-  | { kind: 'image'; image: ImageAsset; alt: string }
-  | { kind: 'youtube'; url: string; title: string; poster?: ImageAsset }
+  | { kind: 'image'; image: ImageAsset; alt: string; credit?: Credit }
+  | { kind: 'youtube'; url: string; title: string; poster?: ImageAsset; credit?: Credit }
   | null;
 
 export interface GalleryImage {
   image: ImageAsset | null; // null = placeholder frame
   alt: string;
+  credit?: Credit; // who took it ("Photo by" in Sanity, or the only Photos credit)
 }
 
 export interface Video {
   title: string;
   url: string | null; // YouTube URL; null = placeholder
+  credit?: Credit; // who filmed it ("Video by" in Sanity, or the only Video credit)
 }
 
 /** Credit roles, in display order. */
