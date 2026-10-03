@@ -32,6 +32,7 @@ Decisions and design rules live in `/CLAUDE.md`.
 - Deploy schema; GROQ queries; typed data layer; build-time fetch (published content only, CDN API).
 - Replace mock data on all pages; image pipeline via `@sanity/image-url` (format auto, srcset, hotspot/crop respected).
 - Reusable `media` field (Image | YouTube video) used by every photo/video slot.
+- **Artists** (decided in session 1, built in this phase because it changes the line-up model): `artist` schema, line-ups reference artists, "Show artist page" switch, `/artists/` + `/artists/<slug>/` templates (no mockup → screenshots for approval), line-up names link to published artist pages. Not in the header/menu yet. Music platform links: undecided (Instagram + YouTube only for now). Music embeds, if ever added, load on click only.
 - Studio interface in English.
 
 **Done when**: changing a field in Studio and rebuilding updates the preview site.

@@ -40,7 +40,9 @@ Phase plan: `docs/build-plan.md`. Design source: `design-reference/` (start with
 | About | `/about` | `about-AB1.html` |
 | Footer (all pages) | — | footer of `homepage-D-hybrid.html` **only** |
 | Mobile (all pages) | — | **No mobile mockup is used** (`homepage-D-mobile.html` is ignored). Mobile shows **the same content as desktop**, stacked in a single column, with the same dark/light sections. |
-| Contact | — | No page: `CONTACT` nav item → footer contact block (`#contact`) / `mailto:`. |
+| Artists listing | `/artists/` | **No mockup**: designed from existing pieces (approve via screenshots). City filter like `/events`. **Not linked in header or menu yet.** |
+| Artist page | `/artists/<slug>/` | **No mockup**: event-hero style (name + big media), work gallery (slideshow), videos, "events with r0t" (event rows), dark/light alternation. Reached via line-up links on event pages. |
+| Contact | — | No page: `CONTACT` nav item → footer contact block (`#contact`) / `mailto:`. (Contact form postponed: `docs/build-plan.md` H2.) |
 
 Mockups are fixed-width (1440 desktop / 390 mobile) with absolute positioning: **rebuild as responsive flex/grid**, never copy pixel positions. Ignore canvas tags (`<x-dc>`, `<helmet>`, `<sc-for>`, `<sc-if>`, `text/x-dc` scripts).
 
@@ -95,9 +97,17 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - heroMedia (media: fills the whole right half of the E2 hero on desktop, a full-width square on phones; cropped to fit → set the image hotspot; vertical videos get side bars)
 - gallery (array of images with alt, drag to reorder)
 - videos (array of media/YouTube: main aftermovie + clips, title each, reorderable)
-- line-up (array: artist name + Instagram handle, reorderable)
+- line-up (array of **references to artist documents**, reorderable)
 - short text, credits = list of { role (dropdown: Photos / Video / Location), name, optional Instagram handle }, several people per role, reorderable. Location falls back to the venue if empty.
 - SEO: optional title, description, share image (fallbacks: title / short text / cover)
+
+**artist**
+- name, slug, based in (city), genres (picked from the siteSettings genre list), short description
+- portrait (media), work (array of media: images and/or YouTube, reorderable)
+- links: Instagram (+ SoundCloud / Spotify / Bandcamp later, platforms not decided)
+- **showPage** switch (default off): off → the artist appears in line-ups with an Instagram link only, no page; on → page published at `/artists/<slug>/` and line-up names link to it
+- "events with r0t" is **computed** (events whose line-up references the artist), never entered by hand
+- Rights: only material the artist has provided or approved; credit photographers (same credits list as events)
 
 **homePage** (singleton): heroMedia (media), the homepage texts (not in the deck → editable).
 
