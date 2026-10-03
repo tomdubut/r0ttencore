@@ -22,10 +22,12 @@ Phase plan: `docs/build-plan.md`. Design source: `design-reference/` (start with
 | Rebuild | Sanity webhook (on publish) → Workers Builds **Deploy Hook** URL (production branch). |
 | Videos | **All videos on YouTube**, linked from Sanity (URL field). Click-to-play embeds use a facade (poster + button; iframe only on click, `youtube-nocookie.com`). **Never** upload videos to the repo. Hero background video: see open question H1 in `docs/build-plan.md`. |
 | Media slots | Every place that shows a photo or a video uses one **"media" field in Sanity: the editor picks Image or YouTube video**, and the site renders whichever was chosen. Changing a photo to a video (or back) never needs code. |
-| Sanity Studio | Interface in **English**. |
+| Sanity Studio | Interface in **English**. **Standalone Studio hosted by Sanity** (`<name>.sanity.studio`), not embedded in the site. |
+| Copy conflicts | When the deck and a mockup disagree on copy, **the deck wins** (e.g. About: 4 Network paragraphs, "CREATIVE COLLABORATIONS"). "Launching in 2026." is outdated and not used. |
+| Upcoming events | Same event template; status switches sections (see `docs/build-plan.md`, "Upcoming event page"). Daily scheduled rebuild + build rule: an upcoming event whose date has passed is not shown as NEXT. |
 | Backend | None. No database, no Supabase, no accounts, no forms. Contact = `mailto:` link. |
 | DNS | Email is hosted on **Hostinger**. When connecting the domain, **never touch MX, SPF/DKIM/DMARC TXT, or any mail-related record**. |
-| Fonts | Self-hosted via Fontsource: Anton, Archivo Black, Archivo (400/600/700/800), JetBrains Mono (400/600). No Google Fonts CDN. |
+| Fonts | Archivo for body (not the deck's Public Sans). Self-hosted via Fontsource: Anton, Archivo Black, Archivo (400/600/700/800), JetBrains Mono (400/600). No Google Fonts CDN. |
 | Logo | ASCII cup. Placeholder now: `design-reference/assets/logo-ascii-cup_v2.png` (better one coming from Tom). Rendered through **one component** (`Logo`) so it can be swapped in one place. The **"r0t" text wordmark (Archivo Black) stays** alongside the cup. |
 
 ## 3. Page → mockup mapping
@@ -78,7 +80,8 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 **Dark/light alternation (all pages, including the homepage)**: consecutive sections always alternate dark (`#101010`/`#141414`) and light (`#EFEFEB`). The footer is black (`#000`) with its top rule.
 
-**Header**: logo + EVENTS / ABOUT / CONTACT + `NEXT: <CITY> ↗` pill (**only when an upcoming event exists**). Transparent over dark heroes. Active nav item underlined. Mobile layout: to be confirmed (see open question H3 in `docs/build-plan.md`).
+**Header**: logo + EVENTS / ABOUT / CONTACT + `NEXT: <CITY> ↗` pill (**only when an upcoming event exists**). Transparent over dark heroes. Active nav item underlined. Header logo = ASCII cup + "r0t" wordmark side by side. The NEXT pill links to the **upcoming event page** (not the ticket link).
+**Mobile header** (two rows, no hamburger, no JS): row 1 = logo + NEXT pill; row 2 = EVENTS / ABOUT / CONTACT spread across the width, 44px tall. The header scrolls away with the page (not sticky).
 
 **Motion**: subtle only (genre ticker scrolling, hover states, fade-ins). Everything respects `prefers-reduced-motion` (ticker static, no fades).
 
@@ -130,4 +133,4 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 ## 9. Open questions (remove when answered)
 
-See "Open questions" in `docs/build-plan.md` (H1–H7) and the upcoming-event-page recommendation.
+See "Open questions" in `docs/build-plan.md`.

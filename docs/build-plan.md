@@ -7,7 +7,7 @@ Decisions and design rules live in `/CLAUDE.md`.
 
 ## Phase 1: Base
 
-**Goal**: the site skeleton, deployed, with placeholder content that matches the mockups.
+**Goal**: the site skeleton, deployed, with placeholder content that matches the mockups. Detailed plan: `docs/phase-1-plan.md`.
 
 - Astro project (static output), TypeScript, plain CSS with design tokens (custom properties). No UI framework unless a need appears.
 - Self-hosted fonts via Fontsource (Anton, Archivo Black, Archivo, JetBrains Mono), with preload for the display fonts.
@@ -80,7 +80,7 @@ Decisions and design rules live in `/CLAUDE.md`.
 - **Videos: all on YouTube**, linked from Sanity. Every media slot lets the editor choose Image or YouTube video.
 - **Sanity Studio in English.**
 
-## Recommendation: upcoming event page (Q5, awaiting OK)
+## Upcoming event page (approved)
 
 Same E2 template, switched by the event's status:
 - **Hero**: left panel identical (number, name, city · date · venue, line-up). Right panel shows `heroMedia`: the flyer, or a YouTube teaser. A big **TICKETS ↗** pill under the meta row; if no ticket link yet, a non-clickable "TICKETS SOON" pill (wording to approve).
@@ -93,9 +93,5 @@ Same E2 template, switched by the event's status:
 ## Open questions
 
 - **H1. Homepage hero video on YouTube**: fine for click-to-play videos, but a poor fit for an autoplaying background loop. The YouTube player adds ~0.5–1 MB of scripts (puts Lighthouse 90+ at risk), shows YouTube branding/controls on load, and often won't autoplay on phones in low-power mode. Recommendation: hero = image now; when you want a video, either (a) a click-to-play YouTube reel, or (b) the single exception of a small muted MP4 (< 3 MB) uploaded in the hero media field. Decide when the video exists.
-- **H2. NEXT pill target** (Q8, unanswered): the upcoming event page (recommended: line-up + tickets in one place) or the ticket link directly?
-- **H3. Mobile header**: logo + r0t + 3 nav items + NEXT pill don't fit in 390px. Recommendation: logo + NEXT pill + menu button opening a full-screen menu (dark, Anton nav items).
-- **H4. Header logo**: cup image + "r0t" wordmark side by side on every page (recommended), or cup in the header and "r0t" only as the big hero text?
-- **H5. About copy vs deck**: the deck's NETWORK slide has a 4th paragraph and says "CREATIVE COLLABORATIONS"; the mockup has 3 paragraphs and "COLLABORATIONS". Recommendation: follow the deck (it is the approved copy). "Launching in 2026." is left out as outdated.
-- **H6. Body font**: deck body text is Public Sans Bold, mockups use Archivo. Recommendation: Archivo, as briefed.
-- **H7. Studio location**: recommendation: standalone Studio hosted by Sanity (`<name>.sanity.studio`), keeps the site 100% static.
+
+Answered in session 1 (now in `CLAUDE.md`): NEXT pill → event page · mobile header = two rows (logo + NEXT pill, then the 3 nav links) · header = cup + "r0t" · deck wins on copy · Archivo body · standalone Studio.
