@@ -112,6 +112,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - All copy comes **from the deck (`design-reference/brand/r0t-deck.pdf`) or from Sanity**. Never invent text, artist names, dates, venues, numbers or durations.
 - Missing content → visible `[PLACEHOLDER]` text in brackets, never plausible fake content.
 - Copy that appears in the mockups but not in the deck ("NEVER MISS THE NEXT ONE.", "THE NIGHT", "SCROLL — ARCHIVE", "PLAYING — REEL 2026", the empty-state lines…) is **sample text, not approved**: render it as `[PLACEHOLDER]` or make it an editable Sanity field.
+- Short functional UI labels from the mockups (EVENTS, LINE-UP, CREDITS, MORE EVENTS…) are kept; see `docs/phase-1-plan.md` → Build notes.
 - Phase 1 builds every photo/video section empty-ready (placeholder media); real photos and videos are added by Tom via Sanity later.
 - Anything the team might want to change must be editable in Sanity without code.
 - Counts, "NEXT: <CITY>", years and "LATEST — 02" are computed from Sanity data, never hard-coded.

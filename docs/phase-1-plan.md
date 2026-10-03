@@ -1,6 +1,6 @@
 # Phase 1 plan — Base
 
-Status: **awaiting Tom's OK**. Rules and decisions: `/CLAUDE.md`. Overall phases: `docs/build-plan.md`.
+Status: **approved and built** (session 1). Remaining: connect Cloudflare (Tom), review on the preview URL. Rules and decisions: `/CLAUDE.md`. Overall phases: `docs/build-plan.md`.
 
 ## Goal
 
@@ -99,3 +99,10 @@ After the first push I'll give step-by-step instructions: Cloudflare dashboard �
 ## Not in phase 1
 
 Sanity (phase 2), real content (phase 3), SEO tags / sitemap / JSON-LD and Lighthouse tuning (phase 4), domain and rebuild webhook (phase 5). The daily scheduled rebuild is set up in phase 5 with the webhook.
+
+## Build notes (what differs from the plan)
+
+- No `Section.astro`: section themes are plain classes (`theme-dark` / `theme-light` / `theme-ink` / `theme-black` in `base.css`); pages compute the alternation so it holds even when a section is hidden.
+- Clip rows on the event page open the clip on YouTube (new tab). Playing a clip inside the main player can come in phase 4.
+- Short functional UI labels from the mockups are kept as is (EVENTS, NEXT EVENT, LATEST — 02, LINE-UP, CREDITS, MORE EVENTS, NEXT UP, ← ALL EVENTS, sorted by date ↓, SEE PHOTOS & VIDEOS ↘). Sentences and editorial labels not in the deck are `[BRACKETED]` placeholders: "[NEVER MISS THE NEXT ONE.]", "[THE NIGHT]", "[NOTHING HERE YET.]", "[TICKETS SOON]".
+- First Lighthouse (mobile, local): performance 91–98, accessibility / best practices / SEO 100 on every template, CLS 0.
