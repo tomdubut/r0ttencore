@@ -140,7 +140,7 @@ const meta = [artist.basedIn?.toUpperCase(), ...artist.genres.map((g) => g.toUpp
     font-size: clamp(64px, calc(64px + 96 * (100vw - 390px) / 1050), 160px);
     line-height: 0.88;
     margin-top: clamp(24px, 4vw, 64px);
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word; /* break only a single word that is too long for the column */
   }
 
   .meta {
