@@ -23,6 +23,8 @@ Decisions and design rules live in `/CLAUDE.md`.
 
 ## Phase 2: Sanity
 
+Detailed plan: `docs/phase-2-plan.md`.
+
 **Goal**: all content comes from Sanity; the co-founder could edit it.
 
 - Embedded or standalone Studio (decide at phase start; standalone hosted on `*.sanity.studio` keeps the site 100% static).
