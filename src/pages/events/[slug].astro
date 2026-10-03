@@ -1,0 +1,668 @@
+---
+/*
+ * Event page — mockup event-page-E2.html.
+ * Past event: hero (info + media) → photos → videos → the night + credits → more events.
+ * Upcoming event: hero with TICKETS; photos / videos / credits are hidden.
+ * Any section without content is hidden, on any event.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Media from '../../components/Media.astro';
+import Pill from '../../components/Pill.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import EventCard from '../../components/EventCard.astro';
+import { getEvents, isEventUpcoming } from '../../lib/content';
+import { alternate, formatDate, instagramUrl, pad2, videoMedia } from '../../lib/format';
+import type { EventDoc } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const events = await getEvents();
+  return events.map((event) => ({ params: { slug: event.slug }, props: { event } }));
+}
+
+interface Props {
+  event: EventDoc;
+}
+
+const { event } = Astro.props;
+const upcoming = isEventUpcoming(event);
+const all = await getEvents();
+
+const photos = upcoming ? [] : event.gallery;
+const [mainVideo, ...clips] = upcoming ? [] : event.videos;
+const credits = [
+  ['PHOTOS', event.credits.photographer],
+  ['VIDEO', event.credits.videographer],
+  ['VENUE', event.venue],
+].filter(([, value]) => value) as [string, string][];
+const showCredits = !upcoming && (event.credits.photographer || event.credits.videographer);
+const showNight = Boolean(event.text) || showCredits;
+
+// More events: the upcoming one first (if it isn't this one), then the most recent others. Max 2.
+const others = all.filter((e) => e.slug !== event.slug);
+const more = [...others.filter(isEventUpcoming), ...others.filter((e) => !isEventUpcoming(e))].slice(0, 2);
+
+// Sections after the hero alternate dark / light, whichever are present.
+const present = [
+  photos.length > 0 && 'photos',
+  mainVideo && 'videos',
+  showNight && 'night',
+  more.length > 0 && 'more',
+].filter(Boolean) as string[];
+const themes = alternate('dark', present.length);
+const themeOf = (key: string) => themes[present.indexOf(key)];
+
+const city = event.city.toUpperCase();
+---
+
+<BaseLayout title={`${event.title} — ${event.city}`} description="[PLACEHOLDER — event description]">
+  <Header slot="header" active="events" split />
+
+  <!-- 1. Hero: info panel (light) + media panel (black) -->
+  <section class="hero" aria-labelledby="event-title">
+    <div class="hero-info theme-light">
+      <img class="hero-texture" src="/textures/texture-grain-splash.webp" alt="" decoding="async" />
+      <div class="hero-info-inner">
+        <a class="mono back" href="/events">← ALL EVENTS</a>
+        <p class="display number" aria-hidden="true">{event.number}</p>
+        <h1 id="event-title" class="display name">
+          <span class="sr-only">Event {event.number}: </span>{event.title}
+        </h1>
+        <p class="meta">
+          <span>{city}</span>
+          <span>{formatDate(event.date)}</span>
+          <span>{event.venue}</span>
+        </p>
+
+        {
+          upcoming && (
+            <div class="tickets">
+              {event.ticketUrl ? (
+                <Pill href={event.ticketUrl} variant="filled" size="l" external>
+                  TICKETS ↗
+                </Pill>
+              ) : (
+                <Pill variant="filled" size="l">
+                  [TICKETS SOON]
+                </Pill>
+              )}
+            </div>
+          )
+        }
+
+        {
+          event.lineup.length > 0 && (
+            <div class="lineup">
+              <h2 class="mono lineup-label">LINE-UP</h2>
+              <ul>
+                {event.lineup.map((artist) => (
+                  <li>
+                    {artist.instagram ? (
+                      <a href={instagramUrl(artist.instagram)} target="_blank" rel="noopener">
+                        {artist.name} ↗<span class="sr-only"> on Instagram (opens in a new tab)</span>
+                      </a>
+                    ) : (
+                      <span>{artist.name}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="hero-media theme-black">
+      <Media
+        media={event.heroMedia}
+        label={upcoming ? '[FLYER / TEASER 9:16]' : '[VERTICAL AFTERMOVIE 9:16]'}
+        play={!upcoming}
+        seed={Number(event.number)}
+        class="hero-media-slot"
+        ratio="9 / 16"
+        eager
+        sizes="(min-width: 900px) 460px, 90vw"
+      />
+    </div>
+  </section>
+
+  <!-- 2. Photos: swipeable strip (works without JS) + prev/next/thumbnails with JS -->
+  {
+    photos.length > 0 && (
+      <section class:list={['section', `theme-${themeOf('photos')}`]} aria-labelledby="photos-title" data-slideshow>
+        <div class="wrap">
+          <SectionTitle id="photos-title" title="PHOTOS" size="title-s" meta={`01 / ${pad2(photos.length)}`} />
+
+          <div class="slides-wrap">
+            <ul class="slides" data-slides tabindex="0" aria-label="Photos — swipe or use the arrow keys">
+              {photos.map((photo, i) => (
+                <li class="slide" aria-label={`Photo ${pad2(i + 1)} of ${pad2(photos.length)}`}>
+                  <Media
+                    media={photo.image ? { kind: 'image', image: photo.image, alt: photo.alt } : null}
+                    label={photo.image ? undefined : `[PHOTO ${pad2(i + 1)}]`}
+                    seed={i}
+                    class="slide-media"
+                    eager={i === 0}
+                    sizes="(min-width: 1600px) 1520px, 100vw"
+                  />
+                </li>
+              ))}
+            </ul>
+            <button type="button" class="nav-btn nav-prev" data-prev aria-label="Previous photo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M15 5l-7 7 7 7" />
+              </svg>
+            </button>
+            <button type="button" class="nav-btn nav-next" data-next aria-label="Next photo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="thumbs" data-thumbs>
+            {photos.map((photo, i) => (
+              <button type="button" class="thumb" data-index={i} aria-label={`Show photo ${pad2(i + 1)}`}>
+                <Media
+                  media={photo.image ? { kind: 'image', image: photo.image, alt: '' } : null}
+                  seed={i}
+                  class="thumb-media"
+                  sizes="120px"
+                />
+              </button>
+            ))}
+          </div>
+
+          {event.credits.photographer && (
+            <p class="mono muted photo-credit">PHOTOS — {event.credits.photographer}</p>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 3. Videos: main aftermovie + clips -->
+  {
+    mainVideo && (
+      <section class:list={['section', `theme-${themeOf('videos')}`]} aria-labelledby="videos-title">
+        <div class="wrap">
+          <SectionTitle
+            id="videos-title"
+            title="VIDEOS"
+            size="title-s"
+            rule="thick"
+            meta={event.credits.videographer ? `VIDEO — ${event.credits.videographer}` : undefined}
+          />
+          <div class="videos">
+            <Media
+              media={videoMedia(mainVideo)}
+              label={`${mainVideo.title} — 16:9`}
+              labelPosition="bottom"
+              play
+              seed={5}
+              class="video-main"
+              ratio="16 / 9"
+              sizes="(min-width: 900px) 66vw, 100vw"
+            />
+            {clips.length > 0 && (
+              <ul class="clips">
+                {clips.map((clip) => (
+                  <li>
+                    {clip.url ? (
+                      <a class="clip" href={clip.url} target="_blank" rel="noopener">
+                        <span class="display">▶ {clip.title}</span>
+                        <span class="sr-only"> (YouTube, opens in a new tab)</span>
+                      </a>
+                    ) : (
+                      <span class="clip">
+                        <span class="display">▶ {clip.title}</span>
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 4. The night + credits -->
+  {
+    showNight && (
+      <section class:list={['section', `theme-${themeOf('night')}`]} aria-label="About the night">
+        <div class="wrap night">
+          {event.text && (
+            <div class="night-text">
+              <p class="mono muted">[THE NIGHT]</p>
+              <p class="night-body">{event.text}</p>
+            </div>
+          )}
+          {showCredits && (
+            <div class="credits mono">
+              <h2 class="credits-head muted">CREDITS</h2>
+              <dl>
+                {credits.map(([role, name]) => (
+                  <div class="credit">
+                    <dt>{role}</dt>
+                    <dd>{name}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 5. More events -->
+  {
+    more.length > 0 && (
+      <section class:list={['section', `theme-${themeOf('more')}`]} aria-labelledby="more-title">
+        <div class="wrap">
+          <h2 id="more-title" class="display more-title">MORE EVENTS</h2>
+          <div class="more-grid">
+            {more.map((e) => (
+              <EventCard event={e} />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<script>
+  import '../../scripts/slideshow';
+</script>
+
+<style>
+  /* ---------- Hero ---------- */
+  .hero {
+    display: grid;
+  }
+
+  .hero-info {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-texture {
+    position: absolute;
+    left: -120px;
+    bottom: -80px;
+    width: min(640px, 140vw);
+    max-width: none;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .hero-info-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 20px var(--gutter) clamp(40px, 3.3vw, 48px);
+  }
+
+  .back {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    letter-spacing: 0;
+  }
+
+  .back:hover {
+    opacity: 0.65;
+  }
+
+  .number {
+    font-size: var(--fs-mega);
+    line-height: 0.8;
+    margin-top: 16px;
+  }
+
+  .name {
+    font-size: var(--fs-display-l);
+    line-height: 0.92;
+    margin-top: 20px;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 28px;
+    margin-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--ink);
+    font-family: var(--font-heavy);
+    font-size: clamp(15px, 1.2vw, 17px);
+  }
+
+  .tickets {
+    margin-top: 24px;
+  }
+
+  .lineup {
+    margin-top: 24px;
+  }
+
+  .lineup-label {
+    font-weight: 400;
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .lineup ul {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: var(--font-heavy);
+    font-size: clamp(24px, calc(24px + 10 * (100vw - 390px) / 1050), 34px);
+    line-height: 1.12;
+  }
+
+  .lineup a:hover {
+    opacity: 0.65;
+  }
+
+  .hero-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--gutter) 40px;
+  }
+
+  /* Mobile: the media sits on the light panel, so the hero stays one light block
+     and the next (dark) section keeps the dark/light alternation. */
+  @media (max-width: 899px) {
+    .hero-media {
+      background: var(--bg-light);
+    }
+  }
+
+  .hero-media :global(.hero-media-slot) {
+    width: min(100%, 360px);
+  }
+
+  @media (min-width: 900px) {
+    .hero {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      min-height: calc(min(100svh, 960px) - var(--header-h));
+    }
+
+    .hero-info-inner {
+      padding-top: 28px;
+    }
+
+    .hero-media {
+      padding: 40px;
+    }
+
+    .hero-media :global(.hero-media-slot) {
+      width: min(100%, 460px, calc((min(100svh, 960px) - var(--header-h) - 80px) * 9 / 16));
+    }
+  }
+
+  /* ---------- Photos ---------- */
+  .slides-wrap {
+    position: relative;
+    margin-top: 32px;
+  }
+
+  .slides {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .slides::-webkit-scrollbar {
+    display: none;
+  }
+
+  .slide {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+  }
+
+  .slide :global(.slide-media) {
+    aspect-ratio: 4 / 5;
+  }
+
+  @media (min-width: 768px) {
+    .slide :global(.slide-media) {
+      aspect-ratio: auto;
+      height: clamp(420px, 50vw, 720px);
+    }
+  }
+
+  /* Prev/next and thumbnails need JS: only shown when JS runs (html.js is set before first paint). */
+  .nav-btn,
+  .thumbs {
+    display: none !important;
+  }
+
+  :global(.js) .nav-btn {
+    display: flex !important;
+  }
+
+  :global(.js) .thumbs {
+    display: grid !important;
+  }
+
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: clamp(48px, 4.4vw, 64px);
+    height: clamp(48px, 4.4vw, 64px);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg-light);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--bg-light);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease);
+  }
+
+  .nav-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .nav-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .nav-prev {
+    left: clamp(12px, 1.4vw, 20px);
+  }
+
+  .nav-next {
+    right: clamp(12px, 1.4vw, 20px);
+  }
+
+  .thumbs {
+    position: relative;
+    grid-auto-flow: column;
+    grid-auto-columns: 72px;
+    gap: 8px;
+    margin-top: 12px;
+    overflow-x: auto;
+    padding: 4px 2px;
+    scrollbar-width: none;
+  }
+
+  @media (min-width: 900px) {
+    .thumbs {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-auto-columns: auto;
+      overflow: visible;
+    }
+  }
+
+  .thumb {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    opacity: 0.55;
+    outline-offset: 2px;
+    transition: opacity 0.2s var(--ease);
+  }
+
+  .thumb:hover,
+  .thumb[aria-current='true'] {
+    opacity: 1;
+  }
+
+  .thumb[aria-current='true'] {
+    outline: 2px solid var(--fg);
+  }
+
+  .thumb :global(.thumb-media) {
+    height: clamp(72px, 6.7vw, 96px);
+  }
+
+  .photo-credit {
+    margin-top: 20px;
+  }
+
+  /* ---------- Videos ---------- */
+  .videos {
+    display: grid;
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .clips {
+    border-top: 2px solid var(--fg);
+  }
+
+  .clip {
+    display: flex;
+    align-items: center;
+    min-height: clamp(72px, 7vw, 100px);
+    border-bottom: 1px solid var(--fg);
+    font-size: var(--fs-display-s);
+  }
+
+  a.clip:hover {
+    opacity: 0.65;
+  }
+
+  @media (min-width: 900px) {
+    .videos {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      align-items: start;
+    }
+
+    .videos :global(.video-main) {
+      grid-column: span 8;
+    }
+
+    .clips {
+      grid-column: span 4;
+    }
+  }
+
+  /* ---------- The night + credits ---------- */
+  .night {
+    display: grid;
+    gap: 48px;
+  }
+
+  .night-text {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .night-body {
+    font-weight: 800;
+    font-size: clamp(22px, calc(22px + 8 * (100vw - 390px) / 1050), 30px);
+    line-height: 1.28;
+    letter-spacing: -0.6px;
+  }
+
+  .credits {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+    font-size: 14px;
+    letter-spacing: 0;
+  }
+
+  .credits dl {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+  }
+
+  .credits-head {
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  .credit {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule-footer);
+  }
+
+  .theme-light .credit {
+    border-color: var(--ink);
+  }
+
+  .credit dd {
+    margin: 0;
+    text-align: right;
+  }
+
+  @media (min-width: 900px) {
+    .night {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+    }
+
+    .night-text {
+      grid-column: span 6;
+    }
+
+    .credits {
+      grid-column: 8 / span 5;
+    }
+  }
+
+  /* ---------- More events ---------- */
+  .more-title {
+    font-size: clamp(64px, calc(64px + 56 * (100vw - 390px) / 1050), 120px);
+    line-height: 0.9;
+  }
+
+  .more-grid {
+    display: grid;
+    gap: 16px;
+    margin-top: clamp(24px, 2.8vw, 40px);
+  }
+
+  @media (min-width: 768px) {
+    .more-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

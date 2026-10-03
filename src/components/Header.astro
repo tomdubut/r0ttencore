@@ -4,6 +4,7 @@
  * Desktop: logo (cup + r0t) + EVENTS / ABOUT / CONTACT on the left, NEXT pill on the right.
  * Mobile (<768px): two rows, no JS — row 1 = logo + NEXT pill, row 2 = the 3 nav links.
  * `overlay` = transparent, positioned over a dark hero (homepage).
+ * `split`   = event page (E2): light left half / black right half on desktop.
  */
 import Logo from './Logo.astro';
 import Pill from './Pill.astro';
@@ -13,9 +14,10 @@ interface Props {
   active?: 'events' | 'about';
   theme?: 'dark' | 'light';
   overlay?: boolean;
+  split?: boolean;
 }
 
-const { active, theme = 'dark', overlay = false } = Astro.props;
+const { active, theme = 'dark', overlay = false, split = false } = Astro.props;
 const next = await getUpcomingEvent();
 
 const links = [
@@ -26,7 +28,12 @@ const links = [
 ---
 
 <header
-  class:list={['site-header', theme === 'light' ? 'theme-light' : 'theme-dark', overlay && 'site-header--overlay']}
+  class:list={[
+    'site-header',
+    theme === 'light' || split ? 'theme-light' : 'theme-dark',
+    overlay && 'site-header--overlay',
+    split && 'site-header--split',
+  ]}
 >
   <div class="wrap header-inner">
     <a href="/" class="home-link" aria-label="r0t — home">
@@ -156,6 +163,42 @@ const links = [
     .nav ul {
       justify-content: flex-start;
       gap: 36px;
+    }
+  }
+
+  /* Event page: header spans a light left half and a black right half (desktop). */
+  @media (min-width: 900px) {
+    .site-header--split {
+      background: linear-gradient(90deg, var(--bg-light) 50%, var(--black) 50%);
+    }
+
+    .site-header--split .header-inner {
+      border-bottom: 0;
+      max-width: none;
+    }
+
+    .site-header--split .home-link,
+    .site-header--split .nav {
+      position: relative;
+    }
+
+    .site-header--split::after {
+      content: '';
+      position: absolute;
+      left: var(--gutter);
+      width: calc(50% - 2 * var(--gutter));
+      bottom: 0;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .site-header--split .next-pill {
+      color: var(--bg-light);
+      --fg: var(--bg-light);
+      --pill-fill-fg: var(--ink);
+    }
+
+    .site-header--split .next-pill:hover {
+      color: var(--ink);
     }
   }
 </style>
