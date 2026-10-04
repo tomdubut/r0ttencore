@@ -18,6 +18,8 @@ import CreditCaption from '../../components/CreditCaption.astro';
 import { getEvents, getSettings, isEventUpcoming } from '../../lib/content';
 import { alternate, creditsFor, formatDate, instagramUrl, videoMedia } from '../../lib/format';
 import { CREDIT_ROLES, type EventDoc } from '../../lib/types';
+import Arrow from '../../components/icons/Arrow.astro';
+import Play from '../../components/icons/Play.astro';
 
 export async function getStaticPaths() {
   const events = await getEvents();
@@ -86,7 +88,7 @@ const city = event.city.toUpperCase();
             <div class="tickets">
               {event.ticketUrl ? (
                 <Pill href={event.ticketUrl} variant="filled" size="l" external>
-                  TICKETS ↗
+                  TICKETS<Arrow inline direction="up-right" />
                 </Pill>
               ) : (
                 <Pill variant="filled" size="l">
@@ -175,12 +177,12 @@ const city = event.city.toUpperCase();
                   <li>
                     {clip.url ? (
                       <a class="clip" href={clip.url} target="_blank" rel="noopener">
-                        <span class="display">▶ {clip.title}</span>
+                        <span class="display"><Play />{clip.title}</span>
                         <span class="sr-only"> (YouTube, opens in a new tab)</span>
                       </a>
                     ) : (
                       <span class="clip">
-                        <span class="display">▶ {clip.title}</span>
+                        <span class="display"><Play />{clip.title}</span>
                       </span>
                     )}
                     {clipCredits && <CreditCaption credit={clip.credit} kind="video" class="clip-credit" />}
@@ -218,7 +220,7 @@ const city = event.city.toUpperCase();
                           {i > 0 && <span aria-hidden="true"> · </span>}
                           {person.instagram ? (
                             <a href={instagramUrl(person.instagram)} target="_blank" rel="noopener">
-                              {person.name} ↗<span class="sr-only"> on Instagram (opens in a new tab)</span>
+                              {person.name}<Arrow inline direction="up-right" /><span class="sr-only"> on Instagram (opens in a new tab)</span>
                             </a>
                           ) : (
                             <span>{person.name}</span>

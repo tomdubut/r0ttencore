@@ -1,0 +1,21 @@
+---
+/* Small play triangle sized to the surrounding text (instead of the ▶ character, an emoji on iPhones). Decorative. */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<svg class:list={['play-glyph', className]} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+  <path d="M6 4l14 8-14 8z"></path>
+</svg>
+
+<style>
+  .play-glyph {
+    display: inline-block;
+    width: 0.75em;
+    height: 0.75em;
+    margin-right: 0.25em;
+    vertical-align: 0;
+  }
+</style>

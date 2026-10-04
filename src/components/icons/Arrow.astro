@@ -1,22 +1,27 @@
 ---
-/* The diagonal arrow from the deck (↘). Rotate with `direction`. Decorative. */
+/*
+ * The diagonal arrow from the deck (↘). Rotate with `direction`. Decorative.
+ * `inline`: sized to the surrounding text (use instead of the ↗ / ↘ characters,
+ * which iPhones draw as colored emoji because our fonts don't include them).
+ */
 interface Props {
   size?: number;
   stroke?: number;
   direction?: 'down-right' | 'up-right';
+  inline?: boolean;
   class?: string;
 }
-const { size = 28, stroke = 1.6, direction = 'down-right', class: className } = Astro.props;
+const { size = 28, stroke, direction = 'down-right', inline = false, class: className } = Astro.props;
 ---
 
 <svg
-  class:list={['arrow', direction === 'up-right' && 'arrow--up', className]}
-  width={size}
-  height={size}
+  class:list={['arrow', direction === 'up-right' && 'arrow--up', inline && 'arrow--inline', className]}
+  width={inline ? undefined : size}
+  height={inline ? undefined : size}
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
-  stroke-width={stroke}
+  stroke-width={stroke ?? (inline ? 2.6 : 1.6)}
   aria-hidden="true"
   focusable="false"
 >
@@ -29,5 +34,13 @@ const { size = 28, stroke = 1.6, direction = 'down-right', class: className } = 
   }
   .arrow--up {
     transform: rotate(-90deg);
+  }
+  /* The drawn shape fills ~60% of its box: a 1.1em box ≈ the height of a capital letter. */
+  .arrow--inline {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    margin-left: 0.15em;
+    vertical-align: -0.2em;
   }
 </style>

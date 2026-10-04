@@ -11,6 +11,7 @@ import Grain from './Grain.astro';
 import type { EventDoc } from '../lib/types';
 import { formatDate } from '../lib/format';
 import { isEventUpcoming } from '../lib/content';
+import Arrow from './icons/Arrow.astro';
 
 interface Props {
   event: EventDoc;
@@ -32,7 +33,7 @@ const upcoming = isEventUpcoming(event);
           <span class="mono">
             {event.city.toUpperCase()} · {formatDate(event.date)}
           </span>
-          <span class="display card-name">NEXT UP ↗</span>
+          <span class="display card-name">NEXT UP<Arrow inline direction="up-right" /></span>
         </span>
       </>
     ) : (
@@ -43,7 +44,7 @@ const upcoming = isEventUpcoming(event);
           <span class="mono">
             {event.number} · {event.city.toUpperCase()} · {formatDate(event.date)}
           </span>
-          <span class="display card-name">{event.title} ↘</span>
+          <span class="display card-name">{event.title}<Arrow inline /></span>
         </span>
       </>
     )

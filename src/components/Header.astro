@@ -10,6 +10,7 @@ import { paths } from '../lib/paths';
 import Logo from './Logo.astro';
 import Pill from './Pill.astro';
 import { getUpcomingEvent } from '../lib/content';
+import Arrow from './icons/Arrow.astro';
 
 interface Props {
   active?: 'events' | 'about';
@@ -58,7 +59,7 @@ const links = [
     {
       next && (
         <Pill href={paths.event(next.slug)} class="next-pill" size="m">
-          NEXT: {next.city.toUpperCase()} ↗
+          NEXT: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
         </Pill>
       )
     }

@@ -16,6 +16,7 @@ import { getArtistsWithPage, getEventsForArtist } from '../../lib/content';
 import { alternate, instagramUrl } from '../../lib/format';
 import { paths } from '../../lib/paths';
 import type { ArtistDoc } from '../../lib/types';
+import Arrow from '../../components/icons/Arrow.astro';
 
 export async function getStaticPaths() {
   const artists = await getArtistsWithPage();
@@ -55,7 +56,7 @@ const meta = [artist.basedIn?.toUpperCase(), ...artist.genres.map((g) => g.toUpp
           artist.instagram && (
             <div class="links">
               <Pill href={instagramUrl(artist.instagram)} external>
-                @{artist.instagram} ↗
+                @{artist.instagram}<Arrow inline direction="up-right" />
               </Pill>
             </div>
           )
