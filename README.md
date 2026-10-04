@@ -74,8 +74,16 @@ Photo / video credits: add the people once in an event's (or artist's) **Credits
 
 ## Deploy
 
-Cloudflare builds the repo on every push (Workers Builds):
+Cloudflare builds the repo on every push (Workers Builds). Settings (Workers & Pages → r0ttencore → Settings → Builds), to re-enter if the repository is ever reconnected:
 
-- build command: `npm run build`
-- deploy command: `npx wrangler deploy`
-- `main` → production; other branches → preview URLs.
+| Setting | Value |
+|---|---|
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Non-production branch deploy command | `npx wrangler preview` (needs `"previews": {}` in `wrangler.jsonc`) |
+| Root directory | `/` |
+| Production branch | `main` |
+| Builds for non-production branches | on → preview URL per branch |
+| API token | "Create new token" (never delete the token selected here: builds fail with "Invalid access token") |
+
+Domains: `r0ttencore.com` + `www` are Workers custom domains (Settings → Domains & Routes); `www` redirects to the apex (zone Redirect Rule). Content publishes are deployed by GitHub Actions, see "Publishing → live site".
