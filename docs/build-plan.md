@@ -64,7 +64,8 @@ Detailed plan: `docs/phase-2-plan.md`.
 ## Phase 5: Go live
 
 - ~~Sanity webhook → site rebuild~~ and daily rebuild: **moved earlier** (set up after phase 2, see `CLAUDE.md` → Rebuild).
-- Domain `r0ttencore.com` on Cloudflare: add only the web records (apex + `www`, redirect `www` → apex or the reverse). **Do not touch MX / mail TXT records (Hostinger email).** Check that email still works after the change.
+- ~~Move the DNS zone to Cloudflare~~: **done 2026-10-04** (see `CLAUDE.md` → DNS). Email test pending (mailbox access).
+- At launch: Workers & Pages → r0ttencore → Domains & Routes → custom domains `r0ttencore.com` + `www` (replaces the Netlify A / CNAME records), Redirect Rule `www` → apex. **Do not touch MX / mail TXT records (Hostinger email).** Afterwards remove the domain from the old Netlify site.
 - Invite the co-founder to Sanity (editor role) and test an edit end-to-end.
 - One-page editor guide for the co-founder (how to add an event, photos, videos, announce the next one).
 - Final checks: 404, redirects, sitemap submitted to Google Search Console.
