@@ -28,6 +28,11 @@ const linkProps = href && external ? { target: '_blank', rel: 'noopener' } : {};
 </Tag>
 
 <style>
+  /* The pill already spaces its children (gap). */
+  .pill :global(.arrow--inline) {
+    margin-left: 0;
+  }
+
   .pill {
     display: inline-flex;
     align-items: center;

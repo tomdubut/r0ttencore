@@ -8,6 +8,7 @@ import Logo from './Logo.astro';
 import Pill from './Pill.astro';
 import { getSettings, getUpcomingEvent } from '../lib/content';
 import { instagramUrl } from '../lib/format';
+import Arrow from './icons/Arrow.astro';
 
 const settings = await getSettings();
 const next = await getUpcomingEvent();
@@ -36,7 +37,7 @@ const year = new Date().getFullYear();
         {
           next && (
             <Pill href={paths.event(next.slug)} class="footer-next" size="m">
-              NEXT: {next.city.toUpperCase()} ↗
+              NEXT: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
             </Pill>
           )
         }

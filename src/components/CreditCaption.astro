@@ -5,6 +5,7 @@
  */
 import { instagramUrl } from '../lib/format';
 import type { Credit } from '../lib/types';
+import Arrow from './icons/Arrow.astro';
 
 interface Props {
   credit?: Credit;
@@ -24,7 +25,7 @@ const label = kind === 'photo' ? 'PHOTO' : 'VIDEO';
       <span class="label">{label} — </span>
       {credit.instagram ? (
         <a href={instagramUrl(credit.instagram)} target="_blank" rel="noopener">
-          {credit.name} ↗<span class="sr-only"> on Instagram (opens in a new tab)</span>
+          {credit.name}<Arrow inline direction="up-right" /><span class="sr-only"> on Instagram (opens in a new tab)</span>
         </a>
       ) : (
         <span>{credit.name}</span>

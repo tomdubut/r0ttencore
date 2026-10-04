@@ -8,6 +8,7 @@ import EventRow from '../../components/EventRow.astro';
 import { getPastEvents, getSettings, getUpcomingEvent } from '../../lib/content';
 import { alternate, formatDate, instagramUrl, pad2 } from '../../lib/format';
 import { CITIES } from '../../lib/types';
+import Arrow from '../../components/icons/Arrow.astro';
 
 const next = await getUpcomingEvent();
 const past = await getPastEvents();
@@ -65,7 +66,7 @@ const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
           </div>
           {next.ticketUrl ? (
             <Pill href={next.ticketUrl} variant="filled" size="l" external class="upcoming-cta">
-              TICKETS ↗
+              TICKETS<Arrow inline direction="up-right" />
             </Pill>
           ) : (
             <Pill variant="filled" size="l" class="upcoming-cta">
@@ -96,7 +97,7 @@ const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
     <div class="wrap cta-inner">
       <p class="display cta-title">{settings.texts.followCta}</p>
       <Pill href={instagramUrl(settings.instagram)} variant="filled" size="l" external>
-        FOLLOW @{settings.instagram} ↗
+        FOLLOW @{settings.instagram}<Arrow inline direction="up-right" />
       </Pill>
     </div>
   </section>

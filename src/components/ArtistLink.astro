@@ -8,6 +8,7 @@
 import type { Artist } from '../lib/types';
 import { instagramUrl } from '../lib/format';
 import { paths } from '../lib/paths';
+import Arrow from './icons/Arrow.astro';
 
 interface Props {
   artist: Artist;
@@ -17,10 +18,10 @@ const { artist } = Astro.props;
 
 {
   artist.showPage ? (
-    <a href={paths.artist(artist.slug)}>{artist.name} ↘</a>
+    <a href={paths.artist(artist.slug)}>{artist.name}<Arrow inline /></a>
   ) : artist.instagram ? (
     <a href={instagramUrl(artist.instagram)} target="_blank" rel="noopener">
-      {artist.name} ↗<span class="sr-only"> on Instagram (opens in a new tab)</span>
+      {artist.name}<Arrow inline direction="up-right" /><span class="sr-only"> on Instagram (opens in a new tab)</span>
     </a>
   ) : (
     <span>{artist.name}</span>

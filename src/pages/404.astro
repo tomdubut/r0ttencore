@@ -5,6 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Pill from '../components/Pill.astro';
 import { getSettings } from '../lib/content';
+import Arrow from '../components/icons/Arrow.astro';
 
 const { texts } = await getSettings();
 ---
@@ -15,7 +16,7 @@ const { texts } = await getSettings();
     <div class="wrap nf-inner">
       <h1 id="nf-title" class="display nf-title">404</h1>
       <p class="lead">{texts.notFoundText}</p>
-      <Pill href={paths.events} size="l">EVENTS ↘</Pill>
+      <Pill href={paths.events} size="l">EVENTS<Arrow inline /></Pill>
     </div>
   </section>
 </BaseLayout>

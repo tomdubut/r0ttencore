@@ -7,6 +7,7 @@
  */
 import { paths } from '../lib/paths';
 import Arrow from './icons/Arrow.astro';
+import Play from './icons/Play.astro';
 import Media from './Media.astro';
 import type { EventDoc } from '../lib/types';
 import { formatDate } from '../lib/format';
@@ -19,9 +20,8 @@ interface Props {
 const { event, variant = 'archive' } = Astro.props;
 const seed = Number(event.number) || 0;
 const thumbs = event.gallery.slice(0, 3);
-const mediaInfo = [event.videos.length > 0 && '▶ AFTERMOVIE', event.gallery.length > 0 && 'PHOTOS']
-  .filter(Boolean)
-  .join(' · ');
+const hasVideo = event.videos.length > 0;
+const hasPhotos = event.gallery.length > 0;
 ---
 
 <a
@@ -48,7 +48,16 @@ const mediaInfo = [event.videos.length > 0 && '▶ AFTERMOVIE', event.gallery.le
         ))}
       </span>
     ) : (
-      <span class="mono row-media muted">{mediaInfo}</span>
+      <span class="mono row-media muted">
+        {hasVideo && (
+          <>
+            <Play />
+            AFTERMOVIE
+          </>
+        )}
+        {hasVideo && hasPhotos && ' · '}
+        {hasPhotos && 'PHOTOS'}
+      </span>
     )
   }
   <Arrow class="row-arrow" />
