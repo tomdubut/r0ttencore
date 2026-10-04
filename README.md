@@ -34,7 +34,7 @@ npm run typegen   # after changing a schema or a query in src/lib/queries.ts
 
 - Schemas: `studio/schemaTypes/` (documents: event, artist, homePage, aboutPage, siteSettings; objects: media, video, credit, seo).
 - Sidebar: `studio/structure.ts`. Settings, Homepage and About are single pages (fixed IDs, can't be deleted or duplicated).
-- Deploy: automatic via GitHub Actions (`.github/workflows/deploy-studio.yml`) when `studio/` changes, using the repo secret `SANITY_AUTH_TOKEN` (Sanity project token with the *Deploy Studio* permission only).
+- Deploy: automatic via GitHub Actions (`.github/workflows/deploy-studio.yml`) when `studio/` changes on `main` (after merge; never from working branches), using the repo secret `SANITY_AUTH_TOKEN` (Sanity project token with the *Deploy Studio* permission only).
 - The website only reads **published** content.
 
 ## Publishing → live site

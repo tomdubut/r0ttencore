@@ -1,11 +1,12 @@
 # Deploys the Sanity Studio (studio/) to https://r0ttencore.sanity.studio
-# Runs when studio/ changes on main or on a claude/* working branch, or by hand (Actions → Deploy Studio → Run workflow).
+# Runs when studio/ changes on main (i.e. after a pull request is merged), or by hand (Actions → Deploy Studio → Run workflow).
+# Not on working branches: Studio changes must not reach the editors before Tom approves the merge.
 # Needs the repository secret SANITY_AUTH_TOKEN (Sanity project token with the "Deploy Studio" permission only).
 name: Deploy Studio
 
 on:
   push:
-    branches: [main, 'claude/**']
+    branches: [main]
     paths: ['studio/**', '.github/workflows/deploy-studio.yml']
   workflow_dispatch:
 
