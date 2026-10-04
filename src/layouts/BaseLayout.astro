@@ -2,7 +2,9 @@
 /*
  * Page shell: <head>, self-hosted fonts, shared SVG grain filter, skip link, footer.
  * Each page renders its own <Header> inside the first section (so it can sit over a hero).
- * Full SEO tags (Open Graph, JSON-LD, canonical…) arrive in phase 4.
+ * <head> also carries the canonical URL (always r0ttencore.com, also when served from *.workers.dev)
+ * and the share card (Open Graph / Twitter): title, description, 1200×630 image.
+ * Image fallback: the page's own image → Settings → "Default share image" → none.
  */
 import '@fontsource/anton/400.css';
 import '@fontsource/archivo-black/400.css';
@@ -20,14 +22,21 @@ import antonUrl from '@fontsource/anton/files/anton-latin-400-normal.woff2?url';
 import archivoBlackUrl from '@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff2?url';
 
 import Footer from '../components/Footer.astro';
+import { getSettings } from '../lib/content';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Share-card image URL (1200×630), e.g. shareImageOf(event.cover). */
+  image?: string;
+  /** Keep the page out of Google (404). */
+  noindex?: boolean;
 }
 
-const { title, description = '[PLACEHOLDER — page description]' } = Astro.props;
+const { title, description = '[PLACEHOLDER — page description]', image, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} — r0t` : 'r0t — presented by r0ttencore';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const shareImage = image ?? (await getSettings()).shareImage;
 ---
 
 <!doctype html>
@@ -37,8 +46,21 @@ const fullTitle = title ? `${title} — r0t` : 'r0t — presented by r0ttencore'
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta property="og:site_name" content="r0t" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {shareImage && <meta property="og:image" content={shareImage} />}
+    {shareImage && <meta property="og:image:width" content="1200" />}
+    {shareImage && <meta property="og:image:height" content="630" />}
+    <meta name="twitter:card" content={shareImage ? 'summary_large_image' : 'summary'} />
     <meta name="theme-color" content="#101010" />
-    <link rel="icon" href="/brand/logo-cup.png" type="image/png" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href={antonUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={archivoBlackUrl} as="font" type="font/woff2" crossorigin />
     <script is:inline>

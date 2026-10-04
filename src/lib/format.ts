@@ -35,3 +35,13 @@ export function alternate(first: 'dark' | 'light', count: number): ('dark' | 'li
 export function creditsFor(event: EventDoc, role: CreditRole): Credit[] {
   return event.credits.filter((c) => c.role === role);
 }
+
+/** Share-card image URL of a media slot: the photo, or a video's cover image / YouTube thumbnail. */
+export function shareImageOf(media: Media): string | undefined {
+  if (media?.kind === 'image') return media.image.share;
+  if (media?.kind === 'youtube') {
+    const id = youtubeId(media.url);
+    return media.poster?.share ?? (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : undefined);
+  }
+  return undefined;
+}

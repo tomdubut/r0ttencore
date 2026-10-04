@@ -56,7 +56,7 @@ Detailed plan: `docs/phase-2-plan.md`.
 
 - Mobile polish on real devices (iOS Safari, Android Chrome); fix layout edge cases with real text lengths.
 - Lighthouse mobile ≥ 90 on all 4 templates; image sizes, font loading, CLS, JS weight.
-- SEO: titles/descriptions, canonical, Open Graph/Twitter cards, schema.org `Event` JSON-LD, `sitemap.xml`, `robots.txt`, favicon set, web manifest.
+- SEO: ~~titles/descriptions, canonical, Open Graph/Twitter cards, `sitemap.xml`, `robots.txt`, favicon set~~ **moved earlier (done 2026-10-04, once the domain was live)**. Left: schema.org `Event` JSON-LD (needs real dates/venues), web manifest.
 - Accessibility audit: keyboard paths (menu, slideshow, filters, video facades), focus styles, contrast, screen-reader labels, reduced motion.
 
 **Done when**: audits pass and Tom has reviewed on his phone.

@@ -23,7 +23,8 @@ export const EVENTS_QUERY = defineQuery(`
     gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },
     videos[]{ _key, title, url, by },
     "lineup": lineup[]-> ${ARTIST_SUMMARY},
-    ${CREDITS}
+    ${CREDITS},
+    seo { title, description, image ${IMAGE} }
   }
 `);
 
@@ -38,7 +39,7 @@ export const ARTISTS_QUERY = defineQuery(`
 `);
 
 export const SETTINGS_QUERY = defineQuery(`
-  *[_type == "siteSettings" && _id == "siteSettings"][0]{ email, instagram, genres, texts }
+  *[_type == "siteSettings" && _id == "siteSettings"][0]{ email, instagram, genres, texts, defaultShareImage ${IMAGE} }
 `);
 
 export const HOME_QUERY = defineQuery(`

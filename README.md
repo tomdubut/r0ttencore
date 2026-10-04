@@ -66,6 +66,13 @@ public/
   textures/                  grain textures from the deck
 ```
 
+## Search engines and share cards
+
+- Every page has a canonical URL on `https://r0ttencore.com` (also when opened on `*.workers.dev`) and an Open Graph / Twitter card (`layouts/BaseLayout.astro`).
+- Share image: the page's own image (event: "Google & sharing" image → cover → hero; artist: main photo; homepage: hero) → **Settings → Default share image** → none. Cropped to 1200×630 by `lib/image.ts`.
+- `/sitemap.xml` and `/robots.txt` are generated at build (`src/pages/`). The 404 page is `noindex`.
+- Favicons (`public/favicon.ico`, `icon.png`, `apple-touch-icon.png`) are generated from the logo: `node scripts/make-icons.mjs [logo.png]` after a logo change.
+
 ## Content rules
 
 Text in `[BRACKETS]` is a placeholder. Never replace it with invented content: real text comes from the brand deck or from Sanity.

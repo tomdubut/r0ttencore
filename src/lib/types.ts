@@ -15,6 +15,7 @@ export interface ImageAsset {
   height: number;
   srcset?: string;
   position?: string; // CSS object-position from the editor's hotspot
+  share?: string; // 1200×630 JPEG URL for share cards (Open Graph)
 }
 
 /**
@@ -83,6 +84,7 @@ export interface EventDoc {
   lineup: Artist[];
   text: string;
   credits: Credit[];
+  seo: { title?: string; description?: string; image?: string }; // "Google & sharing" overrides
 }
 
 /** Short sentences that are not in the deck: editable in Sanity (Settings → Short texts). */
@@ -98,6 +100,7 @@ export interface SiteTexts {
 }
 
 export interface SiteSettings {
+  shareImage?: string; // default share-card image URL (Settings → default share image)
   email: string;
   instagram: string; // handle without "@"
   genres: string[];
