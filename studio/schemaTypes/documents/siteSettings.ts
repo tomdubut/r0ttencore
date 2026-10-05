@@ -57,7 +57,7 @@ export const siteSettings = defineType({
         defineField({name: 'ticketsSoon', title: 'Button when there is no ticket link yet', type: 'string'}),
         defineField({name: 'followCta', title: 'Events page: call to follow on Instagram', type: 'string'}),
         defineField({name: 'emptyTitle', title: 'Events page: title when a city has no events', type: 'string'}),
-        defineField({name: 'emptyText', title: 'Events page: text when a city has no events', type: 'string'}),
+        defineField({name: 'emptyText', title: 'Events page: text when a city has no events (optional)', type: 'string', description: 'Shown under the title. Leave empty to show only the title.'}),
         defineField({name: 'nightLabel', title: 'Event page: label above the text about the night', type: 'string'}),
         defineField({name: 'notFoundText', title: '"Page not found" text', type: 'string'}),
         defineField({name: 'eventsDescription', title: 'Events page: description for Google & share cards', type: 'text', rows: 2}),
