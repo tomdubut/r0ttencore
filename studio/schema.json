@@ -509,6 +509,13 @@
               },
               "optional": true
             },
+            "artistsTitle": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "string"
+              },
+              "optional": true
+            },
             "artistsDescription": {
               "type": "objectAttribute",
               "value": {

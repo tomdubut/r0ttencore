@@ -105,6 +105,11 @@ const loadEvents = once(async (): Promise<EventDoc[]> => {
       lineup: (e.lineup ?? []).filter(Boolean).map(toArtist),
       text: e.text ?? '',
       credits: toCredits(e.credits),
+      seo: {
+        title: e.seo?.title ?? undefined,
+        description: e.seo?.description ?? undefined,
+        image: toImageAsset(e.seo?.image)?.share,
+      },
     };
   });
 });
@@ -167,6 +172,7 @@ export const getSettings = once(async (): Promise<SiteSettings> => {
   const s = await sanityClient.fetch(SETTINGS_QUERY);
   const t = s?.texts ?? {};
   return {
+    shareImage: toImageAsset(s?.defaultShareImage)?.share,
     email: s?.email ?? 'contact@r0ttencore.com',
     instagram: s?.instagram ?? 'r0tten.corp',
     genres: s?.genres ?? [],
@@ -179,6 +185,7 @@ export const getSettings = once(async (): Promise<SiteSettings> => {
       notFoundText: t.notFoundText || '[PLACEHOLDER — page not found text]',
       eventsDescription: t.eventsDescription || '[PLACEHOLDER — events page description]',
       artistsDescription: t.artistsDescription || '[PLACEHOLDER — artists page description]',
+      artistsTitle: t.artistsTitle || 'They r0tted with us', // wording approved by Tom
     },
   };
 });

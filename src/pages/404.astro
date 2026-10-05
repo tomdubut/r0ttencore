@@ -10,7 +10,7 @@ import Arrow from '../components/icons/Arrow.astro';
 const { texts } = await getSettings();
 ---
 
-<BaseLayout title="Page not found" description={texts.notFoundText}>
+<BaseLayout title="Page not found" description={texts.notFoundText} noindex>
   <Header slot="header" />
   <section class="section nf theme-dark" aria-labelledby="nf-title">
     <div class="wrap nf-inner">

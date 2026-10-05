@@ -1,8 +1,8 @@
 ---
 /*
  * Site header.
- * Desktop: logo (cup + r0t) + EVENTS / ABOUT / CONTACT on the left, NEXT pill on the right.
- * Mobile (<768px): two rows, no JS — row 1 = logo + NEXT pill, row 2 = the 3 nav links.
+ * Desktop: logo (cup + r0t) + EVENTS / ARTISTS / ABOUT / CONTACT on the left, NEXT pill on the right.
+ * Mobile (<768px): two rows, no JS — row 1 = logo + NEXT pill, row 2 = the 4 nav links.
  * `overlay` = transparent, positioned over a dark hero (homepage).
  * `split`   = event page (E2): light left half / black right half on desktop.
  */
@@ -13,7 +13,7 @@ import { getUpcomingEvent } from '../lib/content';
 import Arrow from './icons/Arrow.astro';
 
 interface Props {
-  active?: 'events' | 'about';
+  active?: 'events' | 'artists' | 'about';
   theme?: 'dark' | 'light';
   overlay?: boolean;
   split?: boolean;
@@ -24,6 +24,7 @@ const next = await getUpcomingEvent();
 
 const links = [
   { href: paths.events, label: 'EVENTS', key: 'events' },
+  { href: paths.artists, label: 'ARTISTS', key: 'artists' },
   { href: paths.about, label: 'ABOUT', key: 'about' },
   { href: '#contact', label: 'CONTACT', key: 'contact' },
 ];

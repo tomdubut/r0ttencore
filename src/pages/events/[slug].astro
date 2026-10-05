@@ -16,7 +16,7 @@ import Slideshow from '../../components/Slideshow.astro';
 import ArtistLink from '../../components/ArtistLink.astro';
 import CreditCaption from '../../components/CreditCaption.astro';
 import { getEvents, getSettings, isEventUpcoming } from '../../lib/content';
-import { alternate, creditsFor, formatDate, instagramUrl, videoMedia } from '../../lib/format';
+import { alternate, creditsFor, formatDate, instagramUrl, shareImageOf, videoMedia } from '../../lib/format';
 import { CREDIT_ROLES, type EventDoc } from '../../lib/types';
 import Arrow from '../../components/icons/Arrow.astro';
 import Play from '../../components/icons/Play.astro';
@@ -64,7 +64,11 @@ const themeOf = (key: string) => themes[present.indexOf(key)];
 const city = event.city.toUpperCase();
 ---
 
-<BaseLayout title={`${event.title} — ${event.city}`} description={event.text || texts.eventsDescription}>
+<BaseLayout
+  title={event.seo.title || `${event.title} — ${event.city}`}
+  description={event.seo.description || event.text || texts.eventsDescription}
+  image={event.seo.image ?? shareImageOf(event.cover) ?? shareImageOf(event.heroMedia)}
+>
   <Header slot="header" active="events" split />
 
   <!-- 1. Hero: info panel (light) + media panel (black) -->

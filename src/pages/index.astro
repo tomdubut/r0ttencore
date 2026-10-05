@@ -12,7 +12,7 @@ import SectionTitle from '../components/SectionTitle.astro';
 import EventRow from '../components/EventRow.astro';
 import Arrow from '../components/icons/Arrow.astro';
 import { getHomePage, getPastEvents, getSettings, getUpcomingEvent } from '../lib/content';
-import { alternate, formatDate, pad2, videoMedia } from '../lib/format';
+import { alternate, formatDate, pad2, shareImageOf, videoMedia } from '../lib/format';
 
 const home = await getHomePage();
 const settings = await getSettings();
@@ -28,7 +28,7 @@ const [nextTheme, archiveTheme, whatTheme] = [themeOf('next'), themeOf('archive'
 const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' · ');
 ---
 
-<BaseLayout description={home.description}>
+<BaseLayout description={home.description} image={shareImageOf(home.heroMedia)}>
   <Header slot="header" overlay />
 
   <!-- 1. Hero (dark): media slot + wordmark + deck tagline -->

@@ -34,7 +34,7 @@ npm run typegen   # after changing a schema or a query in src/lib/queries.ts
 
 - Schemas: `studio/schemaTypes/` (documents: event, artist, homePage, aboutPage, siteSettings; objects: media, video, credit, seo).
 - Sidebar: `studio/structure.ts`. Settings, Homepage and About are single pages (fixed IDs, can't be deleted or duplicated).
-- Deploy: automatic via GitHub Actions (`.github/workflows/deploy-studio.yml`) when `studio/` changes, using the repo secret `SANITY_AUTH_TOKEN` (Sanity project token with the *Deploy Studio* permission only).
+- Deploy: automatic via GitHub Actions (`.github/workflows/deploy-studio.yml`) when `studio/` changes on `main` (after merge; never from working branches), using the repo secret `SANITY_AUTH_TOKEN` (Sanity project token with the *Deploy Studio* permission only).
 - The website only reads **published** content.
 
 ## Publishing → live site
@@ -66,6 +66,13 @@ public/
   textures/                  grain textures from the deck
 ```
 
+## Search engines and share cards
+
+- Every page has a canonical URL on `https://r0ttencore.com` (also when opened on `*.workers.dev`) and an Open Graph / Twitter card (`layouts/BaseLayout.astro`).
+- Share image: the page's own image (event: "Google & sharing" image → cover → hero; artist: main photo; homepage: hero) → **Settings → Default share image** → none. Cropped to 1200×630 by `lib/image.ts`.
+- `/sitemap.xml` and `/robots.txt` are generated at build (`src/pages/`). The 404 page is `noindex`.
+- Favicons (`public/favicon.ico`, `icon.png`, `apple-touch-icon.png`) are generated from the logo: `node scripts/make-icons.mjs [logo.png]` after a logo change.
+
 ## Content rules
 
 Text in `[BRACKETS]` is a placeholder. Never replace it with invented content: real text comes from the brand deck or from Sanity.
@@ -74,8 +81,16 @@ Photo / video credits: add the people once in an event's (or artist's) **Credits
 
 ## Deploy
 
-Cloudflare builds the repo on every push (Workers Builds):
+Cloudflare builds the repo on every push (Workers Builds). Settings (Workers & Pages → r0ttencore → Settings → Builds), to re-enter if the repository is ever reconnected:
 
-- build command: `npm run build`
-- deploy command: `npx wrangler deploy`
-- `main` → production; other branches → preview URLs.
+| Setting | Value |
+|---|---|
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Non-production branch deploy command | `npx wrangler preview` (needs `"previews": {}` in `wrangler.jsonc`) |
+| Root directory | `/` |
+| Production branch | `main` |
+| Builds for non-production branches | on → preview URL per branch |
+| API token | "Create new token" (never delete the token selected here: builds fail with "Invalid access token") |
+
+Domains: `r0ttencore.com` + `www` are Workers custom domains (Settings → Domains & Routes); `www` redirects to the apex (zone Redirect Rule). Content publishes are deployed by GitHub Actions, see "Publishing → live site".

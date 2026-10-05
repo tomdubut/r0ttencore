@@ -43,6 +43,8 @@ export function toImageAsset(image: SanityImageInput | null | undefined): ImageA
 
   return {
     url: url(Math.min(1280, width)),
+    // 1200×630 JPEG, cropped around the hotspot: the size and format share cards (Open Graph) expect.
+    share: builder.image(source).width(1200).height(630).fit('crop').format('jpg').quality(80).url(),
     width,
     height,
     srcset: widths.map((w) => `${url(w)} ${w}w`).join(', '),

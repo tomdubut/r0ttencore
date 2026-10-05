@@ -13,7 +13,7 @@ import SectionTitle from '../../components/SectionTitle.astro';
 import EventRow from '../../components/EventRow.astro';
 import CreditCaption from '../../components/CreditCaption.astro';
 import { getArtistsWithPage, getEventsForArtist } from '../../lib/content';
-import { alternate, instagramUrl } from '../../lib/format';
+import { alternate, instagramUrl, shareImageOf } from '../../lib/format';
 import { paths } from '../../lib/paths';
 import type { ArtistDoc } from '../../lib/types';
 import Arrow from '../../components/icons/Arrow.astro';
@@ -37,8 +37,8 @@ const themeOf = (key: string) => themes[present.indexOf(key)];
 const meta = [artist.basedIn?.toUpperCase(), ...artist.genres.map((g) => g.toUpperCase())].filter(Boolean);
 ---
 
-<BaseLayout title={artist.name} description={artist.description || `${artist.name} — r0t`}>
-  <Header slot="header" split />
+<BaseLayout title={artist.name} description={artist.description || `${artist.name} — r0t`} image={shareImageOf(artist.portrait)}>
+  <Header slot="header" active="artists" split />
 
   <section class="hero" aria-labelledby="artist-name">
     <div class="hero-info theme-light">
