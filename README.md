@@ -32,8 +32,8 @@ npm run dev       # local Studio at http://localhost:3333 (log in with your Sani
 npm run typegen   # after changing a schema or a query in src/lib/queries.ts
 ```
 
-- Schemas: `studio/schemaTypes/` (documents: event, artist, homePage, aboutPage, artistsPage, siteSettings; objects: media, video, credit, seo).
-- Sidebar: `studio/structure.ts`. Settings, Homepage, About page and Artists page are single pages (fixed IDs, can't be deleted or duplicated).
+- Schemas: `studio/schemaTypes/` (documents: event, artist, homePage, aboutPage, artistsPage, headerFooter, siteSettings; objects: media, video, credit, seo).
+- Sidebar: `studio/structure.ts`. Settings, Header & footer, Homepage, About page and Artists page are single pages (fixed IDs, can't be deleted or duplicated).
 - Deploy: automatic via GitHub Actions (`.github/workflows/deploy-studio.yml`) when `studio/` changes on `main` (after merge; never from working branches), using the repo secret `SANITY_AUTH_TOKEN` (Sanity project token with the *Deploy Studio* permission only).
 - The website only reads **published** content.
 
@@ -41,7 +41,7 @@ npm run typegen   # after changing a schema or a query in src/lib/queries.ts
 
 The site is static: every **Publish** in the Studio triggers a rebuild, live about 2–3 minutes later.
 
-- Sanity webhook (sanity.io/manage → API → Webhooks): Create/Update/Delete, drafts **off**, filter `_type in ["event", "artist", "homePage", "aboutPage", "siteSettings"]`, POST to `https://api.github.com/repos/tomdubut/r0ttencore/dispatches`, projection `{"event_type": "sanity-publish"}`, headers `Accept: application/vnd.github+json` and `Authorization: Bearer <GitHub token>` (fine-grained token, this repo only, Contents read/write; renew before it expires). `main` is protected by a ruleset (pull request required), so this token cannot change the production code.
+- Sanity webhook (sanity.io/manage → API → Webhooks): Create/Update/Delete, drafts **off**, filter `_type in ["event", "artist", "homePage", "aboutPage", "artistsPage", "headerFooter", "siteSettings"]` (add any new document type here), POST to `https://api.github.com/repos/tomdubut/r0ttencore/dispatches`, projection `{"event_type": "sanity-publish"}`, headers `Accept: application/vnd.github+json` and `Authorization: Bearer <GitHub token>` (fine-grained token, this repo only, Contents read/write; renew before it expires). `main` is protected by a ruleset (pull request required), so this token cannot change the production code.
 - That starts `.github/workflows/deploy-content.yml` (Actions → Deploy content): `npm ci`, `npm run build`, `wrangler deploy` (repo secrets `CLOUDFLARE_API_TOKEN` = custom token with only Account → Workers Scripts → Edit, and `CLOUDFLARE_ACCOUNT_ID`). The build job has no secrets; only the upload step sees the Cloudflare token. The same workflow runs daily at 00:15 UTC; manual run: Actions → Deploy content → Run workflow.
 - Why not a Cloudflare deploy hook: Cloudflare's build service sometimes fails to start, and publishes were lost silently. Here each publish is a run with logs, and GitHub emails on failure.
 - A failed run keeps the previous version online.

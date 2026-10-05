@@ -107,6 +107,23 @@ export interface SiteSettings {
   texts: SiteTexts;
 }
 
+/** One menu link (Sanity → Header & footer). `page` is the site page it points to, if any. */
+export interface MenuLink {
+  label: string;
+  page?: 'home' | 'events' | 'artists' | 'about' | 'contact';
+  url?: string; // external web address (opens in a new tab)
+}
+
+/** Menu and texts of the header and footer (Sanity → Header & footer). */
+export interface HeaderFooter {
+  menu: MenuLink[];
+  nextLabel: string;
+  contactLabel: string;
+  citiesLine: string;
+  copyright: string;
+  presentedBy: string;
+}
+
 /** The /artists/ listing settings (Sanity → Artists page). */
 export interface ArtistsPage {
   title: string;

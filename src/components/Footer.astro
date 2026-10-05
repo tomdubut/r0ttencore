@@ -2,15 +2,17 @@
 /*
  * Footer on every page — from homepage-D-hybrid.html (desktop), stacked on mobile.
  * Holds the contact block (#contact), target of the CONTACT nav link.
+ * Menu and texts: Sanity → Header & footer; email and Instagram: Sanity → Settings.
  */
 import { paths } from '../lib/paths';
 import Logo from './Logo.astro';
 import Pill from './Pill.astro';
-import { getSettings, getUpcomingEvent } from '../lib/content';
+import { getHeaderFooter, getSettings, getUpcomingEvent } from '../lib/content';
 import { instagramUrl } from '../lib/format';
 import Arrow from './icons/Arrow.astro';
 
 const settings = await getSettings();
+const hf = await getHeaderFooter();
 const next = await getUpcomingEvent();
 const year = new Date().getFullYear();
 // If the address ever has to wrap, it breaks after the "@" (never in the middle of a word).
@@ -25,7 +27,7 @@ const [emailUser, emailDomain] = settings.email.split('@');
       </a>
 
       <div class="footer-contact">
-        <h2 class="mono muted">CONTACT / BOOKINGS</h2>
+        {hf.contactLabel && <h2 class="mono muted">{hf.contactLabel}</h2>}
         <a class="footer-email display" href={`mailto:${settings.email}`}>
           {emailUser}@<wbr />{emailDomain}
         </a>
@@ -35,14 +37,22 @@ const [emailUser, emailDomain] = settings.email.split('@');
       </div>
 
       <nav class="footer-nav" aria-label="Footer">
-        <a href={paths.events}>EVENTS</a>
-        <a href={paths.artists}>ARTISTS</a>
-        <a href={paths.about}>ABOUT</a>
-        <a href={`mailto:${settings.email}`}>CONTACT</a>
+        {
+          hf.menu.map((m) =>
+            m.page ? (
+              <a href={m.page === 'contact' ? `mailto:${settings.email}` : paths[m.page]}>{m.label}</a>
+            ) : (
+              <a href={m.url} target="_blank" rel="noopener">
+                {m.label}
+                <span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            ),
+          )
+        }
         {
           next && (
             <Pill href={paths.event(next.slug)} class="footer-next" size="m">
-              NEXT: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
+              {hf.nextLabel}: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
             </Pill>
           )
         }
@@ -50,9 +60,9 @@ const [emailUser, emailDomain] = settings.email.split('@');
     </div>
 
     <div class="footer-bottom">
-      <span>© {year} r0ttencore</span>
-      <span>PARIS — TOKYO — BEIJING</span>
-      <span class="presented">presented by r0ttencore</span>
+      <span>© {year} {hf.copyright}</span>
+      {hf.citiesLine && <span>{hf.citiesLine}</span>}
+      {hf.presentedBy && <span class="presented">{hf.presentedBy}</span>}
     </div>
   </div>
 </footer>

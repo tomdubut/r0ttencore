@@ -45,6 +45,12 @@ export const ARTISTS_PAGE_QUERY = defineQuery(`
   }
 `);
 
+export const HEADER_FOOTER_QUERY = defineQuery(`
+  *[_type == "headerFooter" && _id == "headerFooter"][0]{
+    menu[]{ label, page, url }, nextLabel, contactLabel, citiesLine, copyright, presentedBy
+  }
+`);
+
 export const SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings" && _id == "siteSettings"][0]{ email, instagram, genres, texts, defaultShareImage ${IMAGE} }
 `);

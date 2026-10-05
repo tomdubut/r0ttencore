@@ -6,10 +6,11 @@ import {CalendarIcon} from '@sanity/icons/Calendar'
 import {ClockIcon} from '@sanity/icons/Clock'
 import {CheckmarkCircleIcon} from '@sanity/icons/CheckmarkCircle'
 import {UsersIcon} from '@sanity/icons/Users'
+import {MenuIcon} from '@sanity/icons/Menu'
 
 /**
  * Studio sidebar:
- *   Settings · Homepage · About · Artists page   (single pages, opened directly)
+ *   Settings · Header & footer · Homepage · About · Artists page   (single pages, opened directly)
  *   Events → Upcoming / Past / All
  *   Artists
  */
@@ -21,6 +22,10 @@ export const structure: StructureResolver = (S) =>
         .title('Settings')
         .icon(CogIcon)
         .child(S.document().schemaType('siteSettings').documentId('siteSettings').title('Settings')),
+      S.listItem()
+        .title('Header & footer')
+        .icon(MenuIcon)
+        .child(S.document().schemaType('headerFooter').documentId('headerFooter').title('Header & footer')),
       S.listItem()
         .title('Homepage')
         .icon(HomeIcon)
