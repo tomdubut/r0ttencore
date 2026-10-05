@@ -16,6 +16,7 @@ interface Props {
 
 const { media, variant = 'inline', eager = false, sizes = '100vw', class: className } = Astro.props;
 const image = media?.kind === 'image' ? media.image : null;
+const alt = (media?.kind === 'image' && media.alt) || 'Event flyer';
 // Largest version in the srcset = what opens when the flyer is tapped.
 const full = image?.srcset?.split(', ').at(-1)?.split(' ')[0] ?? image?.url;
 ---
@@ -31,7 +32,7 @@ const full = image?.srcset?.split(', ').at(-1)?.split(' ')[0] ?? image?.url;
           sizes={sizes}
           width={image.width}
           height={image.height}
-          alt={media.alt}
+          alt={alt}
           loading={eager ? 'eager' : 'lazy'}
           fetchpriority={eager ? 'high' : undefined}
           decoding="async"

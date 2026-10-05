@@ -42,7 +42,7 @@ export const media = defineType({
           title: 'Description (alt text)',
           type: 'string',
           description: 'What the photo shows, for blind visitors and search engines. Example: "Crowd at r0t 02 in Paris".',
-          validation: (rule) => rule.required().error('Describe the photo in a few words.'),
+          validation: (rule) => rule.required().warning('Recommended (for blind visitors and Google), but you can publish without it.'),
         }),
       ],
       validation: (rule) =>
