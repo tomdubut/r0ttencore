@@ -122,7 +122,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 **aboutPage** (singleton, `_id: aboutPage`): intro paragraphs, cities, The Sounds text + genre cloud (name + size s/m/l/xl), Formats (label + lines + media, 4 expected), Network text + media, SEO description.
 
-**Studio rules**: clear labels, help text on every field, required fields validated, dropdowns for city/status, singletons cannot be duplicated/deleted, media library plugin (search, tags, see where an image is used). The editor must be simple for a non-technical person.
+**Studio rules**: clear labels, help text on every field, required fields validated (**alt texts are a warning, never a publish blocker**, Tom 2026-10-05; the site falls back to e.g. "<event>, photo 3" / "Event flyer"), dropdowns for city/status, singletons cannot be duplicated/deleted, media library plugin (search, tags, see where an image is used). The editor must be simple for a non-technical person.
 
 ## 6. Content rules
 

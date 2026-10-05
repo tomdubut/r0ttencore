@@ -156,7 +156,9 @@ const city = event.city.toUpperCase();
         id="photos"
         title="PHOTOS"
         theme={themeOf('photos')}
-        items={photos.map((p) => (p.image ? { kind: 'image', image: p.image, alt: p.alt, credit: p.credit } : null))}
+        items={photos.map((p, i) =>
+          p.image ? { kind: 'image', image: p.image, alt: p.alt || `${event.title}, photo ${i + 1}`, credit: p.credit } : null,
+        )}
       />
     )
   }

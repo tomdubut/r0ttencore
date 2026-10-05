@@ -88,9 +88,13 @@ const thumbOf = (m: MediaItem): MediaItem => {
     margin-top: 32px;
   }
 
+  /* Horizontal only: overflow-y hidden, so a vertical swipe or scroll over the photos
+     always scrolls the page (a few pixels of vertical overflow used to capture it). */
   .slides {
     display: flex;
     overflow-x: auto;
+    overflow-y: hidden;
+    touch-action: pan-x pan-y pinch-zoom;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     scrollbar-width: none;
@@ -171,6 +175,7 @@ const thumbOf = (m: MediaItem): MediaItem => {
     gap: 8px;
     margin-top: 12px;
     overflow-x: auto;
+    overflow-y: hidden; /* same as the photos: vertical scrolling goes to the page */
     padding: 4px 2px;
     scrollbar-width: none;
   }
