@@ -88,7 +88,7 @@ const filters = ['ALL', ...CITIES.map((c) => c.toUpperCase())];
       </div>
       <div class="empty" data-empty hidden={past.length > 0}>
         <p class="display empty-title">{settings.texts.emptyTitle}</p>
-        <p class="mono muted">{settings.texts.emptyText}</p>
+        {settings.texts.emptyText && <p class="mono muted">{settings.texts.emptyText}</p>}
       </div>
     </div>
   </section>

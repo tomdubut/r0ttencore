@@ -257,7 +257,7 @@ export const getSettings = once(async (): Promise<SiteSettings> => {
       ticketsSoon: t.ticketsSoon || '[TICKETS SOON]',
       followCta: t.followCta || '[NEVER MISS THE NEXT ONE.]',
       emptyTitle: t.emptyTitle || '[NOTHING HERE YET.]',
-      emptyText: t.emptyText || '[EMPTY-STATE TEXT]',
+      emptyText: t.emptyText ?? '', // optional line under the title: hidden when empty (Tom 2026-10-05)
       nightLabel: t.nightLabel || '[THE NIGHT]',
       notFoundText: t.notFoundText || '[PLACEHOLDER — page not found text]',
       eventsDescription: t.eventsDescription || '[PLACEHOLDER — events page description]',
