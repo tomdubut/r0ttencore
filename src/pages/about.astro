@@ -1,55 +1,84 @@
 ---
-/* About — mockup about-AB1.html, copy from the deck (deck wins over the mockup). */
+/*
+ * About — mockup about-AB1.html, copy from the deck (deck wins over the mockup).
+ * Each section (and each block inside it) only appears when it has content in Sanity;
+ * the sections that remain keep alternating dark / light.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Media from '../components/Media.astro';
 import Grain from '../components/Grain.astro';
 import Arrow from '../components/icons/Arrow.astro';
 import { getAboutPage } from '../lib/content';
+import { alternate } from '../lib/format';
 
 const about = await getAboutPage();
+
+const hasIntro = about.intro.length > 0 || Boolean(about.cities);
+const hasCloud = about.genreCloud.length > 0;
+const hasSounds = hasCloud || about.soundsText.length > 0;
+// A format card counts when it has a label, a line of text or a photo.
+const formats = about.formats.filter((f) => f.label || f.text.some(Boolean) || f.media);
+const hasNetwork = about.networkText.length > 0 || Boolean(about.networkMedia);
+
+// Sections after the intro (dark) alternate light / dark, whichever are present.
+const present = [hasSounds && 'sounds', formats.length > 0 && 'formats', hasNetwork && 'network'].filter(Boolean) as string[];
+const themes = alternate(hasIntro ? 'light' : 'dark', present.length);
+const themeOf = (key: string) => themes[present.indexOf(key)];
 ---
 
 <BaseLayout title="About" description={about.description}>
   <Header slot="header" active="about" />
 
   <!-- 1. What is r0t? (dark) -->
+  {!hasIntro && <h1 class="sr-only">About r0t</h1>}
+  {hasIntro && (
   <section class="intro theme-dark" aria-labelledby="about-title">
     <img class="intro-texture" src="/textures/texture-grain-swoosh.webp" alt="" decoding="async" />
     <div class="wrap intro-inner">
       <h1 id="about-title" class="display intro-title">WHAT IS<br />r0t?</h1>
-      <div class="intro-text">
-        <Arrow size={52} stroke={1.4} />
-        <div class="lead">
-          {about.intro.map((p) => <p>{p}</p>)}
+      {about.intro.length > 0 && (
+        <div class="intro-text">
+          <Arrow size={52} stroke={1.4} />
+          <div class="lead">
+            {about.intro.map((p) => <p>{p}</p>)}
+          </div>
         </div>
-      </div>
-      <p class="display intro-cities">{about.cities}</p>
+      )}
+      {about.cities && <p class="display intro-cities">{about.cities}</p>}
     </div>
   </section>
+  )}
 
-  <!-- 2. The sounds (light) -->
-  <section class="section sounds theme-light" aria-labelledby="sounds-title">
+  <!-- 2. The sounds -->
+  {hasSounds && (
+  <section class:list={['section', 'sounds', `theme-${themeOf('sounds')}`, !hasCloud && 'sounds--no-cloud']} aria-labelledby="sounds-title">
     <img class="sounds-texture" src="/textures/texture-grain-splash.webp" alt="" loading="lazy" decoding="async" />
     <div class="wrap sounds-inner">
       <h2 id="sounds-title" class="display sounds-title">THE SOUNDS</h2>
-      <ul class="cloud" aria-label="Genres" data-reveal>
-        {about.genreCloud.map((g) => <li class={`g-${g.size}`}>{g.name}</li>)}
-      </ul>
-      <div class="lead sounds-text" data-reveal>
-        {about.soundsText.map((p) => <p>{p}</p>)}
-      </div>
+      {hasCloud && (
+        <ul class="cloud" aria-label="Genres" data-reveal>
+          {about.genreCloud.map((g) => <li class={`g-${g.size}`}>{g.name}</li>)}
+        </ul>
+      )}
+      {about.soundsText.length > 0 && (
+        <div class="lead sounds-text" data-reveal>
+          {about.soundsText.map((p) => <p>{p}</p>)}
+        </div>
+      )}
     </div>
   </section>
+  )}
 
-  <!-- 3. Formats (dark) -->
-  <section class="section formats theme-dark" aria-labelledby="formats-title">
+  <!-- 3. Formats -->
+  {formats.length > 0 && (
+  <section class:list={['section', 'formats', `theme-${themeOf('formats')}`]} aria-labelledby="formats-title">
     <Grain opacity={0.25} />
     <div class="wrap formats-inner">
       <h2 id="formats-title" class="display formats-title">FORMATS</h2>
       <ul class="format-grid">
         {
-          about.formats.map((f, i) => (
+          formats.map((f, i) => (
             <li class="format" data-reveal>
               <Media
                 media={f.media}
@@ -59,7 +88,7 @@ const about = await getAboutPage();
                 class="format-media"
                 sizes="(min-width: 1100px) 25vw, (min-width: 600px) 50vw, 100vw"
               />
-              <h3 class="format-label">{f.label}</h3>
+              {f.label && <h3 class="format-label">{f.label}</h3>}
               {f.text.length > 1 ? (
                 <ul class="format-text format-list">
                   {f.text.map((t) => (
@@ -67,7 +96,7 @@ const about = await getAboutPage();
                   ))}
                 </ul>
               ) : (
-                <p class="format-text">{f.text[0]}</p>
+                f.text[0] && <p class="format-text">{f.text[0]}</p>
               )}
             </li>
           ))
@@ -75,17 +104,24 @@ const about = await getAboutPage();
       </ul>
     </div>
   </section>
+  )}
 
-  <!-- 4. Network (light) -->
-  <section class="section network theme-light" aria-labelledby="network-title">
+  <!-- 4. Network -->
+  {hasNetwork && (
+  <section class:list={['section', 'network', `theme-${themeOf('network')}`]} aria-labelledby="network-title">
     <div class="wrap network-inner">
       <h2 id="network-title" class="display network-title">NETWORK</h2>
-      <Media media={about.networkMedia} label="[NETWORK PHOTO]" class="network-media" sizes="(min-width: 900px) 40vw, 100vw" />
-      <div class="network-text" data-reveal>
-        {about.networkText.map((p) => <p>{p}</p>)}
-      </div>
+      {about.networkMedia && (
+        <Media media={about.networkMedia} class="network-media" sizes="(min-width: 900px) 40vw, 100vw" />
+      )}
+      {about.networkText.length > 0 && (
+        <div class="network-text" data-reveal>
+          {about.networkText.map((p) => <p>{p}</p>)}
+        </div>
+      )}
     </div>
   </section>
+  )}
 </BaseLayout>
 
 <style>
@@ -221,6 +257,11 @@ const about = await getAboutPage();
 
     .sounds-text {
       grid-column: 8 / span 5;
+    }
+
+    /* No genre bubbles: the text takes the left side instead of floating on the right. */
+    .sounds--no-cloud .sounds-text {
+      grid-column: 1 / span 8;
     }
   }
 

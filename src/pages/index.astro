@@ -2,6 +2,7 @@
 /*
  * Homepage — mockup homepage-A-archive.html, adapted (CLAUDE.md §3):
  * hero = media slot (image now, video later); sections alternate dark / light.
+ * Blocks and sections only appear when they have content in Sanity (same rule as About).
  */
 import { paths } from '../lib/paths';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -19,9 +20,11 @@ const settings = await getSettings();
 const next = await getUpcomingEvent();
 const past = await getPastEvents();
 const latest = past[0];
+const latestVideo = latest ? videoMedia(latest.videos[0]) : null;
+const hasWhat = home.whatIs.length > 0;
 
 // Hero is dark; the following sections alternate light / dark, whichever ones are present.
-const present = [next && 'next', latest && 'archive', 'what'].filter(Boolean) as string[];
+const present = [next && 'next', latest && 'archive', hasWhat && 'what'].filter(Boolean) as string[];
 const themes = alternate('light', present.length);
 const themeOf = (key: string) => themes[present.indexOf(key)];
 const [nextTheme, archiveTheme, whatTheme] = [themeOf('next'), themeOf('archive'), themeOf('what')];
@@ -33,15 +36,18 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
 
   <!-- 1. Hero (dark): media slot + wordmark + deck tagline -->
   <section class="hero theme-dark" aria-labelledby="hero-title">
-    <Media media={home.heroMedia} label="[HERO IMAGE / VIDEO]" class="hero-media" eager seed={1} />
+    <!-- Without a hero photo/video the dark grain background stays, without a placeholder label. -->
+    <Media media={home.heroMedia} class="hero-media" eager seed={1} />
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="wrap hero-inner">
-      <p class="display hero-tagline">
-        {home.tagline.map((line) => <span>{line}</span>)}
-      </p>
+      {home.tagline.length > 0 && (
+        <p class="display hero-tagline">
+          {home.tagline.map((line) => <span>{line}</span>)}
+        </p>
+      )}
       <div class="hero-bottom">
         <h1 id="hero-title" class="hero-word">r0t</h1>
-        <p class="display hero-cities">{home.cities}</p>
+        {home.cities && <p class="display hero-cities">{home.cities}</p>}
       </div>
     </div>
   </section>
@@ -83,15 +89,16 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
             meta={`(${pad2(past.length)}) EVENTS — ${pastCities}`}
           />
 
-          <div class="latest" data-reveal>
-            <Media
-              media={videoMedia(latest.videos[0])}
-              label={`[AFTERMOVIE — EVENT ${latest.number}]`}
-              play
-              seed={2}
-              class="latest-media"
-              sizes="(min-width: 900px) 66vw, 100vw"
-            />
+          <div class:list={['latest', !latestVideo && 'latest--no-media']} data-reveal>
+            {latestVideo && (
+              <Media
+                media={latestVideo}
+                play
+                seed={2}
+                class="latest-media"
+                sizes="(min-width: 900px) 66vw, 100vw"
+              />
+            )}
             <div class="latest-text">
               <div>
                 <p class="mono muted">LATEST — {latest.number}</p>
@@ -115,7 +122,8 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
     )
   }
 
-  <!-- 4. What is r0t? (light) — deck copy -->
+  <!-- 4. What is r0t? — deck copy -->
+  {hasWhat && (
   <section class:list={['section what', `theme-${whatTheme}`]} aria-labelledby="what-title">
     <img class="what-texture" src="/textures/texture-grain-swoosh.webp" alt="" loading="lazy" decoding="async" />
     <div class="wrap what-inner">
@@ -129,6 +137,7 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
       </div>
     </div>
   </section>
+  )}
 </BaseLayout>
 
 <style>
@@ -338,6 +347,11 @@ const pastCities = [...new Set(past.map((e) => e.city.toUpperCase()))].join(' ·
 
     .latest-text {
       grid-column: span 4;
+    }
+
+    /* No aftermovie yet: the text takes the space instead of an empty frame. */
+    .latest--no-media .latest-text {
+      grid-column: 1 / span 8;
     }
   }
 
