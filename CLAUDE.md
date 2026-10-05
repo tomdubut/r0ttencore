@@ -126,7 +126,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - Copy that appears in the mockups but not in the deck ("NEVER MISS THE NEXT ONE.", "THE NIGHT", "SCROLL — ARCHIVE", "PLAYING — REEL 2026", the empty-state lines…) is **sample text, not approved**: render it as `[PLACEHOLDER]` or make it an editable Sanity field.
 - Short functional UI labels from the mockups (EVENTS, LINE-UP, CREDITS, MORE EVENTS…) are kept; see `docs/phase-1-plan.md` → Build notes.
 - Photo/video sections show grain placeholders while empty; sections with no content at all (e.g. an event without photos) are hidden.
-- **About page** (Tom, 2026-10-05): every section and block appears only when it has content in Sanity (no genres → no bubble cloud; no Formats → no FORMATS section; Network without photo → no empty photo frame). Remaining sections keep alternating dark / light.
+- **About page and homepage** (Tom, 2026-10-05): every section and block appears only when it has content in Sanity (no genres → no bubble cloud; no Formats → no FORMATS section; Network without photo → no empty photo frame; homepage: no tagline/cities line when empty, no aftermovie frame without a video, no WHAT IS r0t? section without text, hero keeps its dark grain background without a label). Remaining sections keep alternating dark / light.
 - The site reads **published** content only. Seeded placeholder documents: events 01–03, artists [ARTIST 01–04] (page off), the three singletons.
 - Anything the team might want to change must be editable in Sanity without code.
 - Counts, "NEXT: <CITY>", years and "LATEST — 02" are computed from Sanity data, never hard-coded.
