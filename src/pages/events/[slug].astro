@@ -1,7 +1,8 @@
 ---
 /*
  * Event page — mockup event-page-E2.html.
- * Past event: hero (info + media) → photos → videos → the night + credits → more events.
+ * Past event: hero (info + media) → photos → videos → the night + flyer + credits → more events.
+ * Flyer: in the hero for an upcoming event without hero media, otherwise next to the night text.
  * Upcoming event: hero with TICKETS; photos / videos / credits are hidden.
  * Any section without content is hidden, on any event.
  */
@@ -14,6 +15,7 @@ import SectionTitle from '../../components/SectionTitle.astro';
 import EventCard from '../../components/EventCard.astro';
 import Slideshow from '../../components/Slideshow.astro';
 import ArtistLink from '../../components/ArtistLink.astro';
+import Flyer from '../../components/Flyer.astro';
 import CreditCaption from '../../components/CreditCaption.astro';
 import { getEvents, getSettings, isEventUpcoming } from '../../lib/content';
 import { alternate, creditsFor, formatDate, instagramUrl, shareImageOf, videoMedia } from '../../lib/format';
@@ -45,7 +47,10 @@ const creditRows = CREDIT_ROLES.map((role) => {
   return { role, people: people.length || role !== 'Location' ? people : [{ role, name: event.venue }] };
 }).filter((row) => row.people.length > 0);
 const showCredits = !upcoming && event.credits.length > 0;
-const showNight = Boolean(event.text) || showCredits;
+// The flyer fills the hero only before the event and when no hero image/video is set.
+const flyerInHero = upcoming && !event.heroMedia && Boolean(event.flyer);
+const flyerInNight = Boolean(event.flyer) && !flyerInHero;
+const showNight = Boolean(event.text) || showCredits || flyerInNight;
 
 // More events: the upcoming one first (if it isn't this one), then the most recent others. Max 2.
 const others = all.filter((e) => e.slug !== event.slug);
@@ -121,20 +126,26 @@ const city = event.city.toUpperCase();
     </div>
 
     <div class="hero-media theme-black">
-      <Media
-        media={event.heroMedia}
-        label="[HERO IMAGE / VIDEO]"
-        seed={Number(event.number)}
-        class="hero-media-slot"
-        eager
-        sizes="(min-width: 900px) 50vw, 100vw"
-      />
-      <CreditCaption
-        credit={event.heroMedia?.credit}
-        kind={event.heroMedia?.kind === 'youtube' ? 'video' : 'photo'}
-        variant="overlay"
-        class="hero-credit"
-      />
+      {flyerInHero ? (
+        <Flyer media={event.flyer} variant="hero" eager sizes="(min-width: 900px) 50vw, 100vw" />
+      ) : (
+        <>
+          <Media
+            media={event.heroMedia}
+            label="[HERO IMAGE / VIDEO]"
+            seed={Number(event.number)}
+            class="hero-media-slot"
+            eager
+            sizes="(min-width: 900px) 50vw, 100vw"
+          />
+          <CreditCaption
+            credit={event.heroMedia?.credit}
+            kind={event.heroMedia?.kind === 'youtube' ? 'video' : 'photo'}
+            variant="overlay"
+            class="hero-credit"
+          />
+        </>
+      )}
     </div>
   </section>
 
@@ -204,12 +215,15 @@ const city = event.city.toUpperCase();
   {
     showNight && (
       <section class:list={['section', `theme-${themeOf('night')}`]} aria-label="About the night">
-        <div class="wrap night">
+        <div class:list={['wrap', 'night', flyerInNight && 'night--flyer']}>
           {event.text && (
             <div class="night-text">
               <p class="mono muted">{texts.nightLabel}</p>
               <p class="night-body">{event.text}</p>
             </div>
+          )}
+          {flyerInNight && (
+            <Flyer media={event.flyer} class="night-flyer" sizes="(min-width: 900px) 33vw, 100vw" />
           )}
           {showCredits && (
             <div class="credits mono">
@@ -525,6 +539,30 @@ const city = event.city.toUpperCase();
 
     .credits {
       grid-column: 8 / span 5;
+    }
+
+    /* With a flyer: text and credits stacked on the left, the flyer on the right (a third of the width).
+       The last row takes the flyer's extra height, so the credits stay right under the text. */
+    .night--flyer {
+      grid-template-rows: auto auto 1fr;
+      align-items: start;
+    }
+
+    .night--flyer .night-text,
+    .night--flyer .credits {
+      grid-column: 1 / span 7;
+    }
+
+    .night--flyer :global(.night-flyer) {
+      grid-column: 9 / span 4;
+      grid-row: 1 / span 3;
+    }
+  }
+
+  /* Phone: the flyer is a bit narrower than the column, so it doesn't fill a whole screen. */
+  @media (max-width: 899px) {
+    .night :global(.night-flyer) {
+      max-width: 420px;
     }
   }
 

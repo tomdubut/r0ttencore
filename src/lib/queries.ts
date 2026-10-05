@@ -20,6 +20,7 @@ export const EVENTS_QUERY = defineQuery(`
     "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,
     cover ${IMAGE},
     heroMedia ${MEDIA},
+    flyer ${IMAGE},
     gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },
     videos[]{ _key, title, url, by },
     "lineup": lineup[]-> ${ARTIST_SUMMARY},

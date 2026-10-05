@@ -106,6 +106,7 @@ const loadEvents = once(async (): Promise<EventDoc[]> => {
       ticketUrl: e.ticketUrl ?? undefined,
       cover: imageMedia(e.cover),
       heroMedia: toMedia(e.heroMedia, creditOf),
+      flyer: imageMedia(e.flyer),
       gallery: (e.gallery ?? [])
         .map((g) => ({ image: toImageAsset(g), alt: g.alt ?? '', credit: creditOf(g.by, 'Photos') }))
         .filter((g) => g.image !== null),

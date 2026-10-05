@@ -79,6 +79,7 @@ export interface EventDoc {
   ticketUrl?: string;
   cover: Media; // image used in lists, cards and share cards
   heroMedia: Media; // right-hand panel of the event page
+  flyer: Media; // the poster, always shown whole (never cropped)
   gallery: GalleryImage[];
   videos: Video[]; // first one = main aftermovie
   lineup: Artist[];

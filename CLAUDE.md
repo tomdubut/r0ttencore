@@ -96,6 +96,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - title, slug (from title), number (string, e.g. `02`), city (dropdown: Paris / Tokyo / Beijing), date, venue, status (dropdown: upcoming / past), ticket link (URL)
 - coverImage (required image + alt: used for cards, lists and share cards)
 - heroMedia (media: fills the whole right half of the E2 hero on desktop, a full-width square on phones; cropped to fit → set the image hotspot; vertical videos get side bars)
+- **flyer** (image + alt, Tom 2026-10-05): always shown whole, never cropped, tap = full size. Upcoming event without heroMedia → fills the hero's black panel (object-fit contain); otherwise in "The night" section (text + credits left, flyer right on desktop, a third of the width; stacked on phones, max 420px) with a FLYER label. Empty → nothing shown.
 - gallery (array of images with alt, drag to reorder)
 - videos (array of media/YouTube: main aftermovie + clips, title each, reorderable)
 - line-up (array of **references to artist documents**, reorderable)

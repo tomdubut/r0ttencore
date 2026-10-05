@@ -256,6 +256,14 @@ export type Event = {
     _type: "image";
   };
   heroMedia?: Media;
+  flyer?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt: string;
+    _type: "image";
+  };
   gallery?: Array<{
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -438,7 +446,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../src/lib/queries.ts
 // Variable: EVENTS_QUERY
-// Query: *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },    videos[]{ _key, title, url, by },    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },    credits[]{ _key, role, name, instagram },    seo { title, description, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }  }
+// Query: *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },    flyer { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },    videos[]{ _key, title, url, by },    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },    credits[]{ _key, role, name, instagram },    seo { title, description, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }  }
 export type EVENTS_QUERY_RESULT = Array<{
   slug: string;
   number: string;
@@ -496,6 +504,20 @@ export type EVENTS_QUERY_RESULT = Array<{
       alt: null;
     } | null;
     by: string | null;
+  } | null;
+  flyer: {
+    asset: {
+      _id: string;
+      metadata: {
+        dimensions: {
+          width: number;
+          height: number;
+        } | null;
+      } | null;
+    } | null;
+    crop: SanityImageCrop | null;
+    hotspot: SanityImageHotspot | null;
+    alt: string;
   } | null;
   gallery: Array<{
     asset: {
@@ -831,7 +853,7 @@ export type ABOUT_QUERY_RESULT = {
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {\n    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,\n    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },\n    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },\n    videos[]{ _key, title, url, by },\n    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },\n    credits[]{ _key, role, name, instagram },\n    seo { title, description, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }\n  }\n': EVENTS_QUERY_RESULT;
+    '\n  *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {\n    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,\n    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },\n    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    flyer { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },\n    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },\n    videos[]{ _key, title, url, by },\n    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },\n    credits[]{ _key, role, name, instagram },\n    seo { title, description, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }\n  }\n': EVENTS_QUERY_RESULT;
     '\n  *[_type == "artist" && defined(slug.current)] | order(lower(name) asc) {\n    name, "slug": slug.current, instagram, "showPage": showPage == true,\n    basedIn, genres, description,\n    portrait { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    work[] { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    credits[]{ _key, role, name, instagram }\n  }\n': ARTISTS_QUERY_RESULT;
     '\n  *[_type == "artistsPage" && _id == "artistsPage"][0]{\n    title, intro, sortBy, filterBy,\n    "manualOrder": manualOrder[]->slug.current\n  }\n': ARTISTS_PAGE_QUERY_RESULT;
     '\n  *[_type == "headerFooter" && _id == "headerFooter"][0]{\n    menu[]{ label, page, url }, nextLabel, contactLabel, citiesLine, copyright, presentedBy\n  }\n': HEADER_FOOTER_QUERY_RESULT;
