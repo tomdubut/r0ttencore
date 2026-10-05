@@ -41,7 +41,7 @@ Phase plan: `docs/build-plan.md`. Design source: `design-reference/` (start with
 | About | `/about` | `about-AB1.html` |
 | Footer (all pages) | — | footer of `homepage-D-hybrid.html` **only** |
 | Mobile (all pages) | — | **No mobile mockup is used** (`homepage-D-mobile.html` is ignored). Mobile shows **the same content as desktop**, stacked in a single column, with the same dark/light sections. |
-| Artists listing | `/artists/` | **No mockup**: designed from existing pieces (approve via screenshots). City filter like `/events`. **Not linked in header or menu yet.** |
+| Artists listing | `/artists/` | **No mockup**: designed from existing pieces (approve via screenshots). City filter like `/events`. **ARTISTS in the header and footer nav** (after EVENTS). Big title "They r0tted with us" (Tom's wording; editable: Settings → Short texts → Artists page: big title). |
 | Artist page | `/artists/<slug>/` | **No mockup**: event-hero style (name + big media), work gallery (slideshow), videos, "events with r0t" (event rows), dark/light alternation. Reached via line-up links on event pages. |
 | Contact | — | No page: `CONTACT` nav item → footer contact block (`#contact`) / `mailto:`. (Contact form postponed: `docs/build-plan.md` H2.) |
 
@@ -83,8 +83,8 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 **Dark/light alternation (all pages, including the homepage)**: consecutive sections always alternate dark (`#101010`/`#141414`) and light (`#EFEFEB`). The footer is black (`#000`) with its top rule.
 
-**Header**: logo + EVENTS / ABOUT / CONTACT + `NEXT: <CITY> ↗` pill (**only when an upcoming event exists**). Transparent over dark heroes. Active nav item underlined. Header logo = ASCII cup + "r0t" wordmark side by side. The NEXT pill links to the **upcoming event page** (not the ticket link).
-**Mobile header** (two rows, no hamburger, no JS): row 1 = logo + NEXT pill; row 2 = EVENTS / ABOUT / CONTACT spread across the width, 44px tall. The header scrolls away with the page (not sticky).
+**Header**: logo + EVENTS / ARTISTS / ABOUT / CONTACT + `NEXT: <CITY> ↗` pill (**only when an upcoming event exists**). Transparent over dark heroes. Active nav item underlined. Header logo = ASCII cup + "r0t" wordmark side by side. The NEXT pill links to the **upcoming event page** (not the ticket link).
+**Mobile header** (two rows, no hamburger, no JS): row 1 = logo + NEXT pill; row 2 = EVENTS / ARTISTS / ABOUT / CONTACT spread across the width, 44px tall. The header scrolls away with the page (not sticky).
 
 **Motion**: subtle only (genre ticker scrolling, hover states, fade-ins). Everything respects `prefers-reduced-motion` (ticker static, no fades).
 

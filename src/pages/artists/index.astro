@@ -2,7 +2,7 @@
 /*
  * Artists listing. No mockup: built from the events listing (L1) pieces.
  * Only artists with "Show artist page" switched on in Sanity are listed.
- * Not linked in the header yet (decision in CLAUDE.md §3).
+ * Title: Settings → Short texts → "Artists page: title" (default "They r0tted with us").
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
@@ -21,13 +21,13 @@ const filters = ['ALL', ...cities];
 ---
 
 <BaseLayout title="Artists" description={texts.artistsDescription}>
-  <Header slot="header" />
+  <Header slot="header" active="artists" />
 
   <section class="hero theme-dark" aria-labelledby="artists-title">
     <img class="hero-texture" src="/textures/texture-grain-swoosh.webp" alt="" decoding="async" />
     <div class="wrap hero-inner">
       <div class="title-row">
-        <h1 id="artists-title" class="display title">ARTISTS</h1>
+        <h1 id="artists-title" class="display title">{texts.artistsTitle}</h1>
         <span class="mono count" aria-live="polite" data-count>({pad2(artists.length)})</span>
       </div>
       {
@@ -107,9 +107,10 @@ const filters = ['ALL', ...cities];
     margin-top: clamp(40px, 4.4vw, 64px);
   }
 
+  /* A sentence, not one word like EVENTS: title size instead of mega, so it stays on 2–3 lines. */
   .title {
-    font-size: var(--fs-mega);
-    line-height: 0.82;
+    font-size: var(--fs-title);
+    line-height: 0.95; /* room for the descender of "y" above the next line */
   }
 
   .count {

@@ -61,6 +61,7 @@ export const siteSettings = defineType({
         defineField({name: 'nightLabel', title: 'Event page: label above the text about the night', type: 'string'}),
         defineField({name: 'notFoundText', title: '"Page not found" text', type: 'string'}),
         defineField({name: 'eventsDescription', title: 'Events page: description for Google & share cards', type: 'text', rows: 2}),
+        defineField({name: 'artistsTitle', title: 'Artists page: big title', type: 'string', description: 'Default: "They r0tted with us".'}),
         defineField({name: 'artistsDescription', title: 'Artists page: description for Google & share cards', type: 'text', rows: 2}),
       ],
     }),

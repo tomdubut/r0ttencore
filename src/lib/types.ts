@@ -89,6 +89,7 @@ export interface EventDoc {
 
 /** Short sentences that are not in the deck: editable in Sanity (Settings → Short texts). */
 export interface SiteTexts {
+  artistsTitle: string;
   ticketsSoon: string;
   followCta: string;
   emptyTitle: string;

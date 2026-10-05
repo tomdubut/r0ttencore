@@ -96,6 +96,7 @@ export type SiteSettings = {
     nightLabel?: string;
     notFoundText?: string;
     eventsDescription?: string;
+    artistsTitle?: string;
     artistsDescription?: string;
   };
 };
@@ -613,6 +614,7 @@ export type SETTINGS_QUERY_RESULT = {
     nightLabel?: string;
     notFoundText?: string;
     eventsDescription?: string;
+    artistsTitle?: string;
     artistsDescription?: string;
   } | null;
   defaultShareImage: {

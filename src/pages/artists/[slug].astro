@@ -38,7 +38,7 @@ const meta = [artist.basedIn?.toUpperCase(), ...artist.genres.map((g) => g.toUpp
 ---
 
 <BaseLayout title={artist.name} description={artist.description || `${artist.name} — r0t`} image={shareImageOf(artist.portrait)}>
-  <Header slot="header" split />
+  <Header slot="header" active="artists" split />
 
   <section class="hero" aria-labelledby="artist-name">
     <div class="hero-info theme-light">

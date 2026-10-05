@@ -13,7 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
     paths.home,
     paths.events,
     paths.about,
-    // /artists/ is left out while it is not linked from the menu (CLAUDE.md §3).
+    paths.artists,
     ...events.map((e) => paths.event(e.slug)),
     ...artists.map((a) => paths.artist(a.slug)),
   ];

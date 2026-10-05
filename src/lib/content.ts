@@ -185,6 +185,7 @@ export const getSettings = once(async (): Promise<SiteSettings> => {
       notFoundText: t.notFoundText || '[PLACEHOLDER — page not found text]',
       eventsDescription: t.eventsDescription || '[PLACEHOLDER — events page description]',
       artistsDescription: t.artistsDescription || '[PLACEHOLDER — artists page description]',
+      artistsTitle: t.artistsTitle || 'They r0tted with us', // wording approved by Tom
     },
   };
 });
