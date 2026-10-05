@@ -9,7 +9,7 @@ import {UsersIcon} from '@sanity/icons/Users'
 
 /**
  * Studio sidebar:
- *   Settings · Homepage · About   (single pages, opened directly)
+ *   Settings · Homepage · About · Artists page   (single pages, opened directly)
  *   Events → Upcoming / Past / All
  *   Artists
  */
@@ -29,6 +29,10 @@ export const structure: StructureResolver = (S) =>
         .title('About page')
         .icon(InfoOutlineIcon)
         .child(S.document().schemaType('aboutPage').documentId('aboutPage').title('About page')),
+      S.listItem()
+        .title('Artists page')
+        .icon(UsersIcon)
+        .child(S.document().schemaType('artistsPage').documentId('artistsPage').title('Artists page')),
 
       S.divider(),
 

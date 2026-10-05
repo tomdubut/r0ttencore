@@ -96,7 +96,6 @@ export type SiteSettings = {
     nightLabel?: string;
     notFoundText?: string;
     eventsDescription?: string;
-    artistsTitle?: string;
     artistsDescription?: string;
   };
 };
@@ -115,6 +114,30 @@ export type SanityImageHotspot = {
   y: number;
   height: number;
   width: number;
+};
+
+export type ArtistReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "artist";
+};
+
+export type ArtistsPage = {
+  _id: string;
+  _type: "artistsPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  intro?: string;
+  sortBy?: "name" | "recent" | "manual";
+  manualOrder?: Array<
+    {
+      _key: string;
+    } & ArtistReference
+  >;
+  filterBy?: "city" | "genre" | "none";
 };
 
 export type AboutPage = {
@@ -187,13 +210,6 @@ export type Slug = {
   _type: "slug";
   current: string;
   source?: string;
-};
-
-export type ArtistReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "artist";
 };
 
 export type Event = {
@@ -380,11 +396,12 @@ export type AllSanitySchemaTypes =
   | SiteSettings
   | SanityImageCrop
   | SanityImageHotspot
+  | ArtistReference
+  | ArtistsPage
   | AboutPage
   | HomePage
   | Artist
   | Slug
-  | ArtistReference
   | Event
   | MediaFolderReference
   | MediaFolder
@@ -600,6 +617,17 @@ export type ARTISTS_QUERY_RESULT = Array<{
 }>;
 
 // Source: ../src/lib/queries.ts
+// Variable: ARTISTS_PAGE_QUERY
+// Query: *[_type == "artistsPage" && _id == "artistsPage"][0]{    title, intro, sortBy, filterBy,    "manualOrder": manualOrder[]->slug.current  }
+export type ARTISTS_PAGE_QUERY_RESULT = {
+  title: string | null;
+  intro: string | null;
+  sortBy: "manual" | "name" | "recent" | null;
+  filterBy: "city" | "genre" | "none" | null;
+  manualOrder: Array<string> | null;
+} | null;
+
+// Source: ../src/lib/queries.ts
 // Variable: SETTINGS_QUERY
 // Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{ email, instagram, genres, texts, defaultShareImage { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }
 export type SETTINGS_QUERY_RESULT = {
@@ -614,7 +642,6 @@ export type SETTINGS_QUERY_RESULT = {
     nightLabel?: string;
     notFoundText?: string;
     eventsDescription?: string;
-    artistsTitle?: string;
     artistsDescription?: string;
   } | null;
   defaultShareImage: {
@@ -769,6 +796,7 @@ declare global {
   interface SanityQueries {
     '\n  *[_type == "event" && defined(slug.current)] | order(date desc, number desc) {\n    "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,\n    cover { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt },\n    heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },\n    videos[]{ _key, title, url, by },\n    "lineup": lineup[]-> { name, "slug": slug.current, instagram, "showPage": showPage == true },\n    credits[]{ _key, role, name, instagram },\n    seo { title, description, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }\n  }\n': EVENTS_QUERY_RESULT;
     '\n  *[_type == "artist" && defined(slug.current)] | order(lower(name) asc) {\n    name, "slug": slug.current, instagram, "showPage": showPage == true,\n    basedIn, genres, description,\n    portrait { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    work[] { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    credits[]{ _key, role, name, instagram }\n  }\n': ARTISTS_QUERY_RESULT;
+    '\n  *[_type == "artistsPage" && _id == "artistsPage"][0]{\n    title, intro, sortBy, filterBy,\n    "manualOrder": manualOrder[]->slug.current\n  }\n': ARTISTS_PAGE_QUERY_RESULT;
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{ email, instagram, genres, texts, defaultShareImage { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt } }\n': SETTINGS_QUERY_RESULT;
     '\n  *[_type == "homePage" && _id == "homePage"][0]{ heroMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by }, tagline, cities, whatIs, seoDescription }\n': HOME_QUERY_RESULT;
     '\n  *[_type == "aboutPage" && _id == "aboutPage"][0]{\n    intro, cities, soundsText,\n    genreCloud[]{ name, size },\n    formats[]{ label, text, media { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by } },\n    networkText,\n    networkMedia { kind, image { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, youtubeUrl, title, poster { asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt }, by },\n    seoDescription\n  }\n': ABOUT_QUERY_RESULT;

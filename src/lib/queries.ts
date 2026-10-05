@@ -38,6 +38,13 @@ export const ARTISTS_QUERY = defineQuery(`
   }
 `);
 
+export const ARTISTS_PAGE_QUERY = defineQuery(`
+  *[_type == "artistsPage" && _id == "artistsPage"][0]{
+    title, intro, sortBy, filterBy,
+    "manualOrder": manualOrder[]->slug.current
+  }
+`);
+
 export const SETTINGS_QUERY = defineQuery(`
   *[_type == "siteSettings" && _id == "siteSettings"][0]{ email, instagram, genres, texts, defaultShareImage ${IMAGE} }
 `);

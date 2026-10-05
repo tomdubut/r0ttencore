@@ -2,22 +2,35 @@
 /*
  * Artists listing. No mockup: built from the events listing (L1) pieces.
  * Only artists with "Show artist page" switched on in Sanity are listed.
- * Title: Settings → Short texts → "Artists page: title" (default "They r0tted with us").
+ * Title, intro, order and filter buttons: Sanity → Artists page (lib/content.ts → getArtistsPage).
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Media from '../../components/Media.astro';
 import Arrow from '../../components/icons/Arrow.astro';
-import { getArtistsWithPage, getSettings } from '../../lib/content';
+import { getArtistsForListing, getArtistsPage, getSettings } from '../../lib/content';
 import { pad2 } from '../../lib/format';
 import { paths } from '../../lib/paths';
 
-const artists = await getArtistsWithPage();
-const { texts } = await getSettings();
+const artists = await getArtistsForListing();
+const page = await getArtistsPage();
+const { texts, genres: settingsGenres } = await getSettings();
 
-// Filter by the cities artists are based in (only cities that actually appear).
-const cities = [...new Set(artists.map((a) => a.basedIn?.trim().toUpperCase()).filter(Boolean))] as string[];
-const filters = ['ALL', ...cities];
+// Filter values of each artist: their city, or their genres, depending on the Sanity setting.
+const valuesOf = (a: (typeof artists)[number]): string[] =>
+  page.filterBy === 'genre'
+    ? a.genres.map((g) => g.trim().toUpperCase()).filter(Boolean)
+    : [a.basedIn?.trim().toUpperCase() ?? ''].filter(Boolean);
+
+// Buttons = values that at least one listed artist has.
+// Cities: A → Z. Genres: the curated list in Settings → Genres, in that order (artists' free tags
+// would give dozens of buttons); if that list is empty, every genre used, A → Z.
+const used = new Set(artists.flatMap(valuesOf));
+const curated = settingsGenres.map((g) => g.trim().toUpperCase()).filter((g) => used.has(g));
+const values =
+  page.filterBy === 'genre' && settingsGenres.length > 0 ? [...new Set(curated)] : [...used].sort((x, y) => x.localeCompare(y));
+const filters = ['ALL', ...values];
+const showFilters = page.filterBy !== 'none' && values.length > 1;
 ---
 
 <BaseLayout title="Artists" description={texts.artistsDescription}>
@@ -27,12 +40,13 @@ const filters = ['ALL', ...cities];
     <img class="hero-texture" src="/textures/texture-grain-swoosh.webp" alt="" decoding="async" />
     <div class="wrap hero-inner">
       <div class="title-row">
-        <h1 id="artists-title" class="display title">{texts.artistsTitle}</h1>
+        <h1 id="artists-title" class="display title">{page.title}</h1>
         <span class="mono count" aria-live="polite" data-count>({pad2(artists.length)})</span>
       </div>
+      {page.intro && <p class="lead intro">{page.intro}</p>}
       {
-        cities.length > 1 && (
-          <div class="filters" data-filters role="group" aria-label="Filter artists by city">
+        showFilters && (
+          <div class="filters" data-filters role="group" aria-label={`Filter artists by ${page.filterBy}`}>
             {filters.map((f, i) => (
               <button type="button" class="filter" data-filter={f} aria-pressed={i === 0 ? 'true' : 'false'}>
                 {f}
@@ -49,7 +63,7 @@ const filters = ['ALL', ...cities];
       <ul class="rows" data-rows>
         {
           artists.map((a, i) => (
-            <li data-city={a.basedIn?.trim().toUpperCase() ?? ''}>
+            <li data-city={valuesOf(a).join('|')}>
               <a class="row" href={paths.artist(a.slug)}>
                 <Media media={a.portrait?.kind === 'image' ? a.portrait : null} seed={i} class="row-thumb" sizes="120px" />
                 <span class="row-text">
@@ -117,6 +131,12 @@ const filters = ['ALL', ...cities];
     padding-bottom: 0.8em;
     font-size: clamp(12px, calc(12px + 6 * (100vw - 390px) / 1050), 18px);
     letter-spacing: 0;
+  }
+
+  .intro {
+    max-width: 44ch;
+    margin-top: clamp(20px, 2vw, 28px);
+    white-space: pre-line;
   }
 
   .filters {
