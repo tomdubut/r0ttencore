@@ -1,15 +1,16 @@
 ---
 /*
  * Site header.
- * Desktop: logo (cup + r0t) + EVENTS / ARTISTS / ABOUT / CONTACT on the left, NEXT pill on the right.
- * Mobile (<768px): two rows, no JS — row 1 = logo + NEXT pill, row 2 = the 4 nav links.
+ * Desktop: logo (cup + r0t) + menu links on the left, NEXT pill on the right.
+ * Mobile (<768px): two rows, no JS — row 1 = logo + NEXT pill, row 2 = the menu links.
+ * Menu and NEXT label: Sanity → Header & footer (lib/content.ts → getHeaderFooter).
  * `overlay` = transparent, positioned over a dark hero (homepage).
  * `split`   = event page (E2): light left half / black right half on desktop.
  */
 import { paths } from '../lib/paths';
 import Logo from './Logo.astro';
 import Pill from './Pill.astro';
-import { getUpcomingEvent } from '../lib/content';
+import { getHeaderFooter, getUpcomingEvent } from '../lib/content';
 import Arrow from './icons/Arrow.astro';
 
 interface Props {
@@ -21,13 +22,15 @@ interface Props {
 
 const { active, theme = 'dark', overlay = false, split = false } = Astro.props;
 const next = await getUpcomingEvent();
+const { menu, nextLabel } = await getHeaderFooter();
 
-const links = [
-  { href: paths.events, label: 'EVENTS', key: 'events' },
-  { href: paths.artists, label: 'ARTISTS', key: 'artists' },
-  { href: paths.about, label: 'ABOUT', key: 'about' },
-  { href: '#contact', label: 'CONTACT', key: 'contact' },
-];
+// "Contact" scrolls to the contact block in the footer; other links go to a page or a web address.
+const links = menu.map((m) => ({
+  label: m.label,
+  key: m.page,
+  href: m.page === 'contact' ? '#contact' : m.page ? paths[m.page] : m.url!,
+  external: !m.page,
+}));
 ---
 
 <header
@@ -48,7 +51,11 @@ const links = [
         {
           links.map((l) => (
             <li>
-              <a href={l.href} aria-current={active === l.key ? 'page' : undefined}>
+              <a
+                href={l.href}
+                aria-current={active && active === l.key ? 'page' : undefined}
+                {...(l.external ? { target: '_blank', rel: 'noopener' } : {})}
+              >
                 {l.label}
               </a>
             </li>
@@ -60,7 +67,7 @@ const links = [
     {
       next && (
         <Pill href={paths.event(next.slug)} class="next-pill" size="m">
-          NEXT: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
+          {nextLabel}: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
         </Pill>
       )
     }

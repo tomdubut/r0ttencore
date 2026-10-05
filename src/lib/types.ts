@@ -79,6 +79,7 @@ export interface EventDoc {
   ticketUrl?: string;
   cover: Media; // image used in lists, cards and share cards
   heroMedia: Media; // right-hand panel of the event page
+  flyer: Media; // the poster, always shown whole (never cropped)
   gallery: GalleryImage[];
   videos: Video[]; // first one = main aftermovie
   lineup: Artist[];
@@ -105,6 +106,23 @@ export interface SiteSettings {
   instagram: string; // handle without "@"
   genres: string[];
   texts: SiteTexts;
+}
+
+/** One menu link (Sanity → Header & footer). `page` is the site page it points to, if any. */
+export interface MenuLink {
+  label: string;
+  page?: 'home' | 'events' | 'artists' | 'about' | 'contact';
+  url?: string; // external web address (opens in a new tab)
+}
+
+/** Menu and texts of the header and footer (Sanity → Header & footer). */
+export interface HeaderFooter {
+  menu: MenuLink[];
+  nextLabel: string;
+  contactLabel: string;
+  citiesLine: string;
+  copyright: string;
+  presentedBy: string;
 }
 
 /** The /artists/ listing settings (Sanity → Artists page). */

@@ -136,6 +136,23 @@ export const event = defineType({
         'Fills the right half of the page on computers, a square on phones (cropped to fit). Before the event: the flyer or a teaser. After: a photo or the aftermovie. Avoid vertical videos here (they get black bars).',
     }),
     defineField({
+      name: 'flyer',
+      title: 'Flyer',
+      type: 'image',
+      group: 'media',
+      description:
+        'The event poster, shown whole (never cropped). Before the event: next to the title if no big image/video is set above. After the event: next to “About the night”. Visitors can tap it to see it full size.',
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Description (alt text)',
+          type: 'string',
+          description: 'e.g. "Flyer of r0t.2: line-up and date".',
+          validation: (rule) => rule.required().error('Describe the flyer in a few words.'),
+        }),
+      ],
+    }),
+    defineField({
       name: 'gallery',
       title: 'Photos',
       type: 'array',

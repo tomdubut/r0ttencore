@@ -6,8 +6,16 @@
  */
 import { sanityClient } from './sanity';
 import { toImageAsset, type SanityImageInput } from './image';
-import { ABOUT_QUERY, ARTISTS_PAGE_QUERY, ARTISTS_QUERY, EVENTS_QUERY, HOME_QUERY, SETTINGS_QUERY } from './queries';
-import type { AboutPage, Artist, ArtistDoc, ArtistsPage, Credit, EventDoc, HomePage, Media, SiteSettings } from './types';
+import {
+  ABOUT_QUERY,
+  ARTISTS_PAGE_QUERY,
+  ARTISTS_QUERY,
+  EVENTS_QUERY,
+  HEADER_FOOTER_QUERY,
+  HOME_QUERY,
+  SETTINGS_QUERY,
+} from './queries';
+import type { AboutPage, Artist, ArtistDoc, ArtistsPage, HeaderFooter, MenuLink, Credit, EventDoc, HomePage, Media, SiteSettings } from './types';
 
 // ---------- Mapping helpers ----------
 
@@ -98,6 +106,7 @@ const loadEvents = once(async (): Promise<EventDoc[]> => {
       ticketUrl: e.ticketUrl ?? undefined,
       cover: imageMedia(e.cover),
       heroMedia: toMedia(e.heroMedia, creditOf),
+      flyer: imageMedia(e.flyer),
       gallery: (e.gallery ?? [])
         .map((g) => ({ image: toImageAsset(g), alt: g.alt ?? '', credit: creditOf(g.by, 'Photos') }))
         .filter((g) => g.image !== null),
@@ -206,6 +215,35 @@ export async function getEventsForArtist(slug: string): Promise<EventDoc[]> {
 }
 
 // ---------- Single pages ----------
+
+// ---------- Header & footer ----------
+
+/** Today's menu: used until "Header & footer" is published in Sanity (and if its menu is emptied). */
+const DEFAULT_MENU: MenuLink[] = [
+  { label: 'EVENTS', page: 'events' },
+  { label: 'ARTISTS', page: 'artists' },
+  { label: 'ABOUT', page: 'about' },
+  { label: 'CONTACT', page: 'contact' },
+];
+const MENU_PAGES = ['home', 'events', 'artists', 'about', 'contact'] as const;
+
+export const getHeaderFooter = once(async (): Promise<HeaderFooter> => {
+  const h = await sanityClient.fetch(HEADER_FOOTER_QUERY);
+  const menu: MenuLink[] = (h?.menu ?? []).flatMap((m): MenuLink[] => {
+    if (!m.label) return [];
+    if (m.page === 'url') return m.url ? [{ label: m.label, url: m.url }] : [];
+    const page = MENU_PAGES.find((p) => p === m.page);
+    return page ? [{ label: m.label, page }] : [];
+  });
+  return {
+    menu: menu.length > 0 ? menu : DEFAULT_MENU,
+    nextLabel: h?.nextLabel || 'NEXT',
+    contactLabel: h?.contactLabel || 'CONTACT / BOOKINGS',
+    citiesLine: h?.citiesLine ?? 'PARIS — TOKYO — BEIJING',
+    copyright: h?.copyright || 'r0ttencore',
+    presentedBy: h?.presentedBy ?? 'presented by r0ttencore',
+  };
+});
 
 export const getSettings = once(async (): Promise<SiteSettings> => {
   const s = await sanityClient.fetch(SETTINGS_QUERY);

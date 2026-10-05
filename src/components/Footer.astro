@@ -2,17 +2,21 @@
 /*
  * Footer on every page — from homepage-D-hybrid.html (desktop), stacked on mobile.
  * Holds the contact block (#contact), target of the CONTACT nav link.
+ * Menu and texts: Sanity → Header & footer; email and Instagram: Sanity → Settings.
  */
 import { paths } from '../lib/paths';
 import Logo from './Logo.astro';
 import Pill from './Pill.astro';
-import { getSettings, getUpcomingEvent } from '../lib/content';
+import { getHeaderFooter, getSettings, getUpcomingEvent } from '../lib/content';
 import { instagramUrl } from '../lib/format';
 import Arrow from './icons/Arrow.astro';
 
 const settings = await getSettings();
+const hf = await getHeaderFooter();
 const next = await getUpcomingEvent();
 const year = new Date().getFullYear();
+// If the address ever has to wrap, it breaks after the "@" (never in the middle of a word).
+const [emailUser, emailDomain] = settings.email.split('@');
 ---
 
 <footer class="site-footer theme-black" id="contact">
@@ -23,22 +27,32 @@ const year = new Date().getFullYear();
       </a>
 
       <div class="footer-contact">
-        <h2 class="mono muted">CONTACT / BOOKINGS</h2>
-        <a class="footer-email display" href={`mailto:${settings.email}`}>{settings.email}</a>
+        {hf.contactLabel && <h2 class="mono muted">{hf.contactLabel}</h2>}
+        <a class="footer-email display" href={`mailto:${settings.email}`}>
+          {emailUser}@<wbr />{emailDomain}
+        </a>
         <a class="footer-insta display" href={instagramUrl(settings.instagram)} target="_blank" rel="noopener">
           @{settings.instagram}<span class="sr-only"> on Instagram (opens in a new tab)</span>
         </a>
       </div>
 
       <nav class="footer-nav" aria-label="Footer">
-        <a href={paths.events}>EVENTS</a>
-        <a href={paths.artists}>ARTISTS</a>
-        <a href={paths.about}>ABOUT</a>
-        <a href={`mailto:${settings.email}`}>CONTACT</a>
+        {
+          hf.menu.map((m) =>
+            m.page ? (
+              <a href={m.page === 'contact' ? `mailto:${settings.email}` : paths[m.page]}>{m.label}</a>
+            ) : (
+              <a href={m.url} target="_blank" rel="noopener">
+                {m.label}
+                <span class="sr-only"> (opens in a new tab)</span>
+              </a>
+            ),
+          )
+        }
         {
           next && (
             <Pill href={paths.event(next.slug)} class="footer-next" size="m">
-              NEXT: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
+              {hf.nextLabel}: {next.city.toUpperCase()}<Arrow inline direction="up-right" />
             </Pill>
           )
         }
@@ -46,9 +60,9 @@ const year = new Date().getFullYear();
     </div>
 
     <div class="footer-bottom">
-      <span>© {year} r0ttencore</span>
-      <span>PARIS — TOKYO — BEIJING</span>
-      <span class="presented">presented by r0ttencore</span>
+      <span>© {year} {hf.copyright}</span>
+      {hf.citiesLine && <span>{hf.citiesLine}</span>}
+      {hf.presentedBy && <span class="presented">{hf.presentedBy}</span>}
     </div>
   </div>
 </footer>
@@ -69,6 +83,8 @@ const year = new Date().getFullYear();
   }
 
   .footer-contact {
+    container-type: inline-size; /* the email is sized to this column (cqi units below) */
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -79,10 +95,12 @@ const year = new Date().getFullYear();
     font-weight: 400;
   }
 
+  /* Fits the address on one line in its column (it is ~10.5em wide in Anton),
+     between 22px and the mockup's 64px. */
   .footer-email {
-    font-size: clamp(30px, calc(30px + 34 * (100vw - 390px) / 1050), 64px);
+    font-size: clamp(22px, 9.2cqi, 64px);
     line-height: 1;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .footer-insta {

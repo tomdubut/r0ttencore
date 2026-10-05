@@ -20,6 +20,7 @@ export const EVENTS_QUERY = defineQuery(`
     "slug": slug.current, number, title, city, date, venue, status, ticketUrl, text,
     cover ${IMAGE},
     heroMedia ${MEDIA},
+    flyer ${IMAGE},
     gallery[]{ asset->{ _id, metadata { dimensions { width, height } } }, crop, hotspot, alt, by },
     videos[]{ _key, title, url, by },
     "lineup": lineup[]-> ${ARTIST_SUMMARY},
@@ -42,6 +43,12 @@ export const ARTISTS_PAGE_QUERY = defineQuery(`
   *[_type == "artistsPage" && _id == "artistsPage"][0]{
     title, intro, sortBy, filterBy,
     "manualOrder": manualOrder[]->slug.current
+  }
+`);
+
+export const HEADER_FOOTER_QUERY = defineQuery(`
+  *[_type == "headerFooter" && _id == "headerFooter"][0]{
+    menu[]{ label, page, url }, nextLabel, contactLabel, citiesLine, copyright, presentedBy
   }
 `);
 

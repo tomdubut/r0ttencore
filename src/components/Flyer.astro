@@ -1,0 +1,82 @@
+---
+/*
+ * Event flyer: always shown whole (never cropped), linked to the full-size image.
+ * variant "hero"   → fills the event hero's media panel, centred on black (upcoming events).
+ * variant "inline" → natural proportions, with a FLYER label (next to "About the night").
+ */
+import type { Media } from '../lib/types';
+
+interface Props {
+  media: Media;
+  variant?: 'hero' | 'inline';
+  eager?: boolean;
+  sizes?: string;
+  class?: string;
+}
+
+const { media, variant = 'inline', eager = false, sizes = '100vw', class: className } = Astro.props;
+const image = media?.kind === 'image' ? media.image : null;
+// Largest version in the srcset = what opens when the flyer is tapped.
+const full = image?.srcset?.split(', ').at(-1)?.split(' ')[0] ?? image?.url;
+---
+
+{
+  image && media?.kind === 'image' && (
+    <figure class:list={['flyer', `flyer--${variant}`, className]}>
+      {variant === 'inline' && <figcaption class="mono muted flyer-label">FLYER</figcaption>}
+      <a href={full} target="_blank" rel="noopener" class="flyer-link">
+        <img
+          src={image.url}
+          srcset={image.srcset}
+          sizes={sizes}
+          width={image.width}
+          height={image.height}
+          alt={media.alt}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : undefined}
+          decoding="async"
+        />
+        <span class="sr-only"> (full size, opens in a new tab)</span>
+      </a>
+    </figure>
+  )
+}
+
+<style>
+  .flyer {
+    margin: 0;
+  }
+
+  .flyer-link {
+    display: block;
+  }
+
+  .flyer img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .flyer-label {
+    margin-bottom: 12px;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  /* Hero: the whole flyer inside the panel, with breathing room, on the panel's black background. */
+  .flyer--hero {
+    position: absolute;
+    inset: 0;
+    padding: clamp(16px, 3vw, 48px);
+  }
+
+  .flyer--hero .flyer-link {
+    width: 100%;
+    height: 100%;
+  }
+
+  .flyer--hero img {
+    height: 100%;
+    object-fit: contain;
+  }
+</style>

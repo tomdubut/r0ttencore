@@ -2,6 +2,7 @@ import {aboutPage} from './documents/aboutPage'
 import {artist} from './documents/artist'
 import {artistsPage} from './documents/artistsPage'
 import {event} from './documents/event'
+import {headerFooter} from './documents/headerFooter'
 import {homePage} from './documents/homePage'
 import {siteSettings} from './documents/siteSettings'
 import {credit} from './objects/credit'
@@ -17,6 +18,7 @@ export const schemaTypes = [
   aboutPage,
   artistsPage,
   siteSettings,
+  headerFooter,
   // objects
   media,
   video,
@@ -25,4 +27,4 @@ export const schemaTypes = [
 ]
 
 /** One-of-a-kind documents: opened directly from the sidebar, never created, duplicated or deleted. */
-export const SINGLETONS = ['siteSettings', 'homePage', 'aboutPage', 'artistsPage']
+export const SINGLETONS = ['siteSettings', 'homePage', 'aboutPage', 'artistsPage', 'headerFooter']
