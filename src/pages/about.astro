@@ -52,7 +52,7 @@ const themeOf = (key: string) => themes[present.indexOf(key)];
 
   <!-- 2. The sounds -->
   {hasSounds && (
-  <section class:list={['section', 'sounds', `theme-${themeOf('sounds')}`, !hasCloud && 'sounds--no-cloud']} aria-labelledby="sounds-title">
+  <section class:list={['section', 'sounds', `theme-${themeOf('sounds')}`]} aria-labelledby="sounds-title">
     <img class="sounds-texture" src="/textures/texture-grain-splash.webp" alt="" loading="lazy" decoding="async" />
     <div class="wrap sounds-inner">
       <h2 id="sounds-title" class="display sounds-title">THE SOUNDS</h2>
@@ -257,11 +257,6 @@ const themeOf = (key: string) => themes[present.indexOf(key)];
 
     .sounds-text {
       grid-column: 8 / span 5;
-    }
-
-    /* No genre bubbles: the text takes the left side instead of floating on the right. */
-    .sounds--no-cloud .sounds-text {
-      grid-column: 1 / span 8;
     }
   }
 

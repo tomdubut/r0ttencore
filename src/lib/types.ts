@@ -89,7 +89,6 @@ export interface EventDoc {
 
 /** Short sentences that are not in the deck: editable in Sanity (Settings → Short texts). */
 export interface SiteTexts {
-  artistsTitle: string;
   ticketsSoon: string;
   followCta: string;
   emptyTitle: string;
@@ -106,6 +105,15 @@ export interface SiteSettings {
   instagram: string; // handle without "@"
   genres: string[];
   texts: SiteTexts;
+}
+
+/** The /artists/ listing settings (Sanity → Artists page). */
+export interface ArtistsPage {
+  title: string;
+  intro: string;
+  sortBy: 'name' | 'recent' | 'manual';
+  manualOrder: string[]; // artist slugs, in the editor's order
+  filterBy: 'city' | 'genre' | 'none';
 }
 
 export interface HomePage {

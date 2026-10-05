@@ -1,5 +1,6 @@
 import {aboutPage} from './documents/aboutPage'
 import {artist} from './documents/artist'
+import {artistsPage} from './documents/artistsPage'
 import {event} from './documents/event'
 import {homePage} from './documents/homePage'
 import {siteSettings} from './documents/siteSettings'
@@ -14,6 +15,7 @@ export const schemaTypes = [
   artist,
   homePage,
   aboutPage,
+  artistsPage,
   siteSettings,
   // objects
   media,
@@ -23,4 +25,4 @@ export const schemaTypes = [
 ]
 
 /** One-of-a-kind documents: opened directly from the sidebar, never created, duplicated or deleted. */
-export const SINGLETONS = ['siteSettings', 'homePage', 'aboutPage']
+export const SINGLETONS = ['siteSettings', 'homePage', 'aboutPage', 'artistsPage']

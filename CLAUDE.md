@@ -41,7 +41,7 @@ Phase plan: `docs/build-plan.md`. Design source: `design-reference/` (start with
 | About | `/about` | `about-AB1.html` |
 | Footer (all pages) | — | footer of `homepage-D-hybrid.html` **only** |
 | Mobile (all pages) | — | **No mobile mockup is used** (`homepage-D-mobile.html` is ignored). Mobile shows **the same content as desktop**, stacked in a single column, with the same dark/light sections. |
-| Artists listing | `/artists/` | **No mockup**: designed from existing pieces (approve via screenshots). City filter like `/events`. **ARTISTS in the header and footer nav** (after EVENTS). Big title "They r0tted with us" (Tom's wording; editable: Settings → Short texts → Artists page: big title). |
+| Artists listing | `/artists/` | **No mockup**: designed from existing pieces (approve via screenshots). City filter like `/events`. **ARTISTS in the header and footer nav** (after EVENTS). Title, intro, order and filters editable in Sanity → **Artists page** (see §5). |
 | Artist page | `/artists/<slug>/` | **No mockup**: event-hero style (name + big media), work gallery (slideshow), videos, "events with r0t" (event rows), dark/light alternation. Reached via line-up links on event pages. |
 | Contact | — | No page: `CONTACT` nav item → footer contact block (`#contact`) / `mailto:`. (Contact form postponed: `docs/build-plan.md` H2.) |
 
@@ -113,6 +113,8 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 
 **homePage** (singleton, `_id: homePage`): heroMedia (media), tagline lines, cities line, "What is r0t?" paragraphs, SEO description.
 
+**artistsPage** (singleton, `_id: artistsPage`, Tom 2026-10-05): big title (default "They r0tted with us"), optional intro paragraph, order (Name A→Z / Most recent r0t event first / Manual drag & drop list, unlisted artists after it A→Z), filter buttons (by city "Based in" / by genre = Settings → Genres entries that at least one artist has, in that order / none). Missing document → those defaults.
+
 **siteSettings** (singleton, `_id: siteSettings`): contact email, Instagram handle, genre list, default share image, **Short texts** (not in the deck, start as `[PLACEHOLDER]`): tickets-soon button, follow CTA, empty-state title/text, night label, 404 text, events/artists page descriptions.
 
 **aboutPage** (singleton, `_id: aboutPage`): intro paragraphs, cities, The Sounds text + genre cloud (name + size s/m/l/xl), Formats (label + lines + media, 4 expected), Network text + media, SEO description.
@@ -126,7 +128,7 @@ Use fluid sizes (`clamp()`) between the mobile (390) and desktop (1440) mockup v
 - Copy that appears in the mockups but not in the deck ("NEVER MISS THE NEXT ONE.", "THE NIGHT", "SCROLL — ARCHIVE", "PLAYING — REEL 2026", the empty-state lines…) is **sample text, not approved**: render it as `[PLACEHOLDER]` or make it an editable Sanity field.
 - Short functional UI labels from the mockups (EVENTS, LINE-UP, CREDITS, MORE EVENTS…) are kept; see `docs/phase-1-plan.md` → Build notes.
 - Photo/video sections show grain placeholders while empty; sections with no content at all (e.g. an event without photos) are hidden.
-- **About page and homepage** (Tom, 2026-10-05): every section and block appears only when it has content in Sanity (no genres → no bubble cloud; no Formats → no FORMATS section; Network without photo → no empty photo frame; homepage: no tagline/cities line when empty, no aftermovie frame without a video, no WHAT IS r0t? section without text, hero keeps its dark grain background without a label). Remaining sections keep alternating dark / light.
+- **About page and homepage** (Tom, 2026-10-05): every section and block appears only when it has content in Sanity (no genres → no bubble cloud, the text stays on the right on desktop; no Formats → no FORMATS section; Network without photo → no empty photo frame; homepage: no tagline/cities line when empty, no aftermovie frame without a video, no WHAT IS r0t? section without text, hero keeps its dark grain background without a label). Remaining sections keep alternating dark / light.
 - The site reads **published** content only. Seeded placeholder documents: events 01–03, artists [ARTIST 01–04] (page off), the three singletons.
 - Anything the team might want to change must be editable in Sanity without code.
 - Counts, "NEXT: <CITY>", years and "LATEST — 02" are computed from Sanity data, never hard-coded.

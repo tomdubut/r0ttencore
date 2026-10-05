@@ -6,8 +6,8 @@
  */
 import { sanityClient } from './sanity';
 import { toImageAsset, type SanityImageInput } from './image';
-import { ABOUT_QUERY, ARTISTS_QUERY, EVENTS_QUERY, HOME_QUERY, SETTINGS_QUERY } from './queries';
-import type { AboutPage, Artist, ArtistDoc, Credit, EventDoc, HomePage, Media, SiteSettings } from './types';
+import { ABOUT_QUERY, ARTISTS_PAGE_QUERY, ARTISTS_QUERY, EVENTS_QUERY, HOME_QUERY, SETTINGS_QUERY } from './queries';
+import type { AboutPage, Artist, ArtistDoc, ArtistsPage, Credit, EventDoc, HomePage, Media, SiteSettings } from './types';
 
 // ---------- Mapping helpers ----------
 
@@ -161,6 +161,45 @@ export async function getArtistsWithPage(): Promise<ArtistDoc[]> {
   return (await loadArtists()).filter((a) => a.showPage);
 }
 
+/** Settings of the /artists/ listing (Sanity → Artists page), with defaults when not filled. */
+export const getArtistsPage = once(async (): Promise<ArtistsPage> => {
+  const p = await sanityClient.fetch(ARTISTS_PAGE_QUERY);
+  return {
+    title: p?.title || 'They r0tted with us', // wording approved by Tom
+    intro: p?.intro ?? '',
+    sortBy: p?.sortBy === 'recent' || p?.sortBy === 'manual' ? p.sortBy : 'name',
+    manualOrder: (p?.manualOrder ?? []).filter((s): s is string => Boolean(s)),
+    filterBy: p?.filterBy === 'genre' || p?.filterBy === 'none' ? p.filterBy : 'city',
+  };
+});
+
+/**
+ * Artists with a page, in the order chosen in Sanity → Artists page:
+ * - name: A → Z
+ * - recent: by their most recent r0t event (artists without an event last, A → Z)
+ * - manual: the editor's list first, then everyone else A → Z
+ */
+export async function getArtistsForListing(): Promise<ArtistDoc[]> {
+  const [artists, page, events] = await Promise.all([getArtistsWithPage(), getArtistsPage(), getEvents()]);
+  const byName = (a: ArtistDoc, b: ArtistDoc) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+
+  if (page.sortBy === 'recent') {
+    const lastDate = (a: ArtistDoc) =>
+      events
+        .filter((e) => e.lineup.some((l) => l.slug === a.slug))
+        .reduce((max, e) => (e.date && e.date > max ? e.date : max), '');
+    return [...artists].sort((a, b) => lastDate(b).localeCompare(lastDate(a)) || byName(a, b));
+  }
+  if (page.sortBy === 'manual') {
+    const rank = (a: ArtistDoc) => {
+      const i = page.manualOrder.indexOf(a.slug);
+      return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return [...artists].sort((a, b) => rank(a) - rank(b) || byName(a, b));
+  }
+  return [...artists].sort(byName);
+}
+
 /** Events (newest first) whose line-up includes this artist. */
 export async function getEventsForArtist(slug: string): Promise<EventDoc[]> {
   return (await getEvents()).filter((e) => e.lineup.some((a) => a.slug === slug));
@@ -185,7 +224,6 @@ export const getSettings = once(async (): Promise<SiteSettings> => {
       notFoundText: t.notFoundText || '[PLACEHOLDER — page not found text]',
       eventsDescription: t.eventsDescription || '[PLACEHOLDER — events page description]',
       artistsDescription: t.artistsDescription || '[PLACEHOLDER — artists page description]',
-      artistsTitle: t.artistsTitle || 'They r0tted with us', // wording approved by Tom
     },
   };
 });

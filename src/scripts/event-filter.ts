@@ -1,6 +1,8 @@
 /*
- * City filter on /events. Progressive enhancement: the filter row is only displayed
- * when html.js is set (see the page styles), so without JS all events are simply listed.
+ * Filter buttons on /events (by city) and /artists/ (by city or genre).
+ * Each row's data-city holds its value(s), several separated by "|" (e.g. an artist's genres).
+ * Progressive enhancement: the filter row is only displayed when html.js is set
+ * (see the page styles), so without JS everything is simply listed.
  */
 const bar = document.querySelector<HTMLElement>('[data-filters]');
 const rows = [...document.querySelectorAll<HTMLElement>('[data-rows] [data-city]')];
@@ -19,7 +21,8 @@ if (bar) {
 
     let visible = 0;
     for (const row of rows) {
-      const show = city === 'ALL' || row.dataset.city?.toUpperCase() === city;
+      const values = (row.dataset.city ?? '').toUpperCase().split('|');
+      const show = city === 'ALL' || (city !== undefined && values.includes(city));
       row.hidden = !show;
       if (show) visible++;
     }
